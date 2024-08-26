@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingStart="25dp"
+    android:paddingTop="25dp"
+    android:background="@color/bg"
+    android:orientation="vertical"
+    tools:context=".HomeFragment">
+
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:text="Hello, Ido"
+        android:theme="@style/tight"
+        android:fontFamily="@font/bold"
+        android:textColor="@color/white"
+        android:textSize="30sp"
+    />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Good evening"
+        android:theme="@style/tight"
+        android:fontFamily="@font/bold"
+        android:textColor="@color/hint"
+        android:textSize="20sp"/>
+
+    <include layout="@layout/fragment_recently_viewed"  />
+
+</LinearLayout>

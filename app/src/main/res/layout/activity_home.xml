@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:background="@color/bg"
+    android:id="@+id/main_layout"
+    android:layout_width="match_parent"
+    android:layout_gravity="bottom"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    tools:context=".HomeActivity">
+
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/fragment_container"
+        />
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout
+        android:background="@color/bg"
+        android:layout_width="match_parent"
+        android:layout_gravity="bottom"
+        android:layout_height="wrap_content"
+        >
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottomAppBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:fabAlignmentMode="center"
+        app:contentInsetEnd="0dp"
+
+        android:backgroundTint="@color/green"
+        app:contentInsetStart="0dp"
+        app:fabCradleRoundedCornerRadius="10dp"
+        >
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/navbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="20dp"
+            android:theme="@style/Widget.BottomNavigationView"
+            app:itemTextColor="@color/hint"
+            app:itemIconTint="@color/hint"
+            android:background="@color/bg"
+            app:menu="@menu/bottom_menu" />
+
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/scan_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="@color/green"
+        android:src="@drawable/globe"
+        app:layout_anchor="@id/bottomAppBar" />
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+</LinearLayout>
+

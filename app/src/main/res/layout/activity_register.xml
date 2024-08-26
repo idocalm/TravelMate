@@ -1,0 +1,249 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:background="@color/bg"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    tools:context=".RegisterActivity">
+
+    <LinearLayout
+        android:layout_marginTop="30dp"
+        android:layout_marginLeft="-20dp"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Paris"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="New York"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Barcelona"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Bali"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Barcelona"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginLeft="-28dp"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Bangkok"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Dubai"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="San Francisco"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Amsterdam"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+
+
+
+    </LinearLayout>
+    <LinearLayout
+        android:layout_marginLeft="-40dp"
+        android:layout_marginBottom="40dp"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Tokyo"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Maui"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="The Maldives"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Rome"
+            android:textColor="@color/hint"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="5dp"
+            android:fontFamily="@font/bold"
+            android:text="Vancouver"
+            android:textColor="@color/white"
+            android:textSize="18sp" />
+
+
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/outline_black"
+        android:text="FILL IN THE DETAILS"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="35sp" />
+
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bold"
+        android:text="What's your name?"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/button_shape"
+        android:fontFamily="@font/bold"
+        android:hint="Name"
+        android:textColorHint="@color/white"
+        android:padding="15dp"
+        android:textColor="@color/white"/>
+
+    <TextView
+        android:layout_marginTop="20dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/bold"
+        android:text="What's your favorite currency?"
+        android:textAlignment="center"
+        android:textColor="@color/white"
+        android:textSize="15sp" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:textColorHint="@color/white"
+        app:placeholderTextColor="@color/white"
+        android:theme="@style/font_bold"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        android:layout_marginTop="10dp"
+        android:hint="Select currency">
+
+        <AutoCompleteTextView
+            android:id="@+id/currency"
+            android:layout_width="match_parent"
+
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            app:boxStrokeColor="@color/white"
+            app:boxStrokeWidth="2dp"
+            android:inputType="none"
+            />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <Button
+        android:id="@+id/submit"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/button_clean"
+        android:layout_marginTop="80dp"
+        android:text="Submit"
+        android:textAllCaps="false"
+
+        android:fontFamily="@font/bold"
+        android:textSize="25sp"
+        android:textColor="@color/black" />
+
+
+
+
+</LinearLayout>

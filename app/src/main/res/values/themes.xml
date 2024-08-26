@@ -1,0 +1,20 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.TravelMate" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorOnSurface">#FFF</item>
+        <item name="colorPrimary">@color/white</item>
+    </style>
+
+    <style name="Widget.BottomNavigationView"
+        parent="Widget.Design.BottomNavigationView">
+        <item name="fontFamily">@font/bold</item>
+    </style>
+
+    <style name="font_bold">
+        <item name="fontFamily">@font/bold</item>
+    </style>
+
+    <style name="Theme.TravelMate" parent="Base.Theme.TravelMate" />
+
+</resources>

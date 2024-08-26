@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "812862452575",
+    "project_id": "travel-mate-4cd5a",
+    "storage_bucket": "travel-mate-4cd5a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:812862452575:android:d05cc3421599c526fd3cea",
+        "android_client_info": {
+          "package_name": "com.idocalm.travelmate"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "812862452575-7kvgme9ctv45ve07eg1h744k2l1rs5pa.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.idocalm.travelmate",
+            "certificate_hash": "5dbc7aa28342b722ad56b0c81e8c05c7709a4a47"
+          }
+        },
+        {
+          "client_id": "812862452575-2tsq7br8blrsr9tbqhicqaav9sfj5l5i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCRMAmzZ37Zm7TrJbLhwd0U6fnor0IZicU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "812862452575-2tsq7br8blrsr9tbqhicqaav9sfj5l5i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
