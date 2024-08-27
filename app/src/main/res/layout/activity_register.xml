@@ -230,7 +230,7 @@
 
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <android.widget.Button
         android:id="@+id/submit"
         android:layout_width="300dp"
         android:layout_height="wrap_content"

@@ -185,7 +185,7 @@
         android:textColor="@color/white"
         android:textSize="30sp" />
 
-    <Button
+    <android.widget.Button
         android:id="@+id/google_sign_in"
         android:layout_marginTop="20dp"
         android:layout_width="300dp"
