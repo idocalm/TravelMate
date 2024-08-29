@@ -1,6 +1,6 @@
 package com.idocalm.travelmate.enums;
 
-public enum Currencies {
+public enum CurrencyType {
     NONE,
     USD,
     EUR,

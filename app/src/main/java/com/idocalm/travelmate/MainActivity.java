@@ -20,6 +20,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
+import com.idocalm.travelmate.enums.CurrencyType;
+import com.idocalm.travelmate.models.User;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
     EditText passwordEditText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        FirebaseApp.initializeApp(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         EdgeToEdge.enable(this);
-        FirebaseApp.initializeApp(this);
 
         loginButton = findViewById(R.id.login);
         googleButton = findViewById(R.id.google_sign_in);
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+
         if (Auth.isLoggedIn()) {
             DocumentReference ref = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
             ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -53,10 +56,23 @@ public class MainActivity extends AppCompatActivity {
                         DocumentSnapshot document = task.getResult();
                         if (document.exists()) {
                             Intent intent = new Intent(MainActivity.this, HomeActivity.class);
+                            CurrencyType currencyType = CurrencyType.NONE;
+                            if (document.getString("currency").equals("USD")) {
+                                currencyType = CurrencyType.USD;
+                            } else if (document.getString("currency").equals("EUR")) {
+                                currencyType = CurrencyType.EUR;
+                            } else if (document.getString("currency").equals("ILS")) {
+                                currencyType = CurrencyType.ILS;
+                            }
+
+                            Auth.instantiateUser(document.getString("name"), currencyType, FirebaseAuth.getInstance().getCurrentUser().getUid());
                             startActivity(intent);
+                            finish();
                         } else {
+                            Auth.instantiateUser(FirebaseAuth.getInstance().getCurrentUser().getUid());
                             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                             startActivity(intent);
+                            finish();
                         }
                     } else {
                         Log.d("MainActivity", "get failed with ", task.getException());
@@ -81,6 +97,7 @@ public class MainActivity extends AppCompatActivity {
             Auth.login(email, password, () -> {
                 Intent intent = new Intent(this, RegisterActivity.class);
                 startActivity(intent);
+                finish();
             }, () -> {
                 // Show error message
                 Toast.makeText(this, "Login failed - ", Toast.LENGTH_SHORT).show();

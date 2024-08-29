@@ -1,4 +1,4 @@
-package com.idocalm.travelmate;
+package com.idocalm.travelmate.fragments;
 
 import android.os.Bundle;
 
@@ -8,6 +8,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+
+import com.idocalm.travelmate.components.explore.AttractionsSearchFragment;
+import com.idocalm.travelmate.components.explore.FlightsSearchFragment;
+import com.idocalm.travelmate.components.explore.HotelsSearchFragment;
+import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.components.explore.RentalsSearchFragment;
+import com.idocalm.travelmate.components.explore.RestaurantsSearchFragment;
 
 public class ExploreFragment extends Fragment {
 
@@ -33,7 +40,14 @@ public class ExploreFragment extends Fragment {
 
         if (selectedButton == hotels) {
             getChildFragmentManager().beginTransaction().replace(R.id.explore_fragment_container, new HotelsSearchFragment()).commit();
-
+        } else if (selectedButton == flights) {
+            getChildFragmentManager().beginTransaction().replace(R.id.explore_fragment_container, new FlightsSearchFragment()).commit();
+        } else if (selectedButton == attractions) {
+            getChildFragmentManager().beginTransaction().replace(R.id.explore_fragment_container, new AttractionsSearchFragment()).commit();
+        } else if (selectedButton == restaurants) {
+            getChildFragmentManager().beginTransaction().replace(R.id.explore_fragment_container, new RestaurantsSearchFragment()).commit();
+        } else if (selectedButton == rentals) {
+            getChildFragmentManager().beginTransaction().replace(R.id.explore_fragment_container, new RentalsSearchFragment()).commit();
         }
     }
 

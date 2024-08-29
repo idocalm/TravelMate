@@ -1,6 +1,8 @@
 package com.idocalm.travelmate;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -11,11 +13,12 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import com.idocalm.travelmate.enums.Currencies;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.idocalm.travelmate.enums.CurrencyType;
+import com.idocalm.travelmate.auth.Auth;
+import com.idocalm.travelmate.models.User;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -23,7 +26,7 @@ public class RegisterActivity extends AppCompatActivity {
     AutoCompleteTextView currencyCompleteTextView;
     ArrayAdapter<String> currencyAdapter;
 
-    Currencies currency = Currencies.NONE;
+    CurrencyType currency = CurrencyType.NONE;
     EditText nameEditText;
     Button submitButton;
 
@@ -44,13 +47,13 @@ public class RegisterActivity extends AppCompatActivity {
         currencyCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String currency = currencyAdapter.getItem(position);
-                if (currency.equals("USD")) {
-                    RegisterActivity.this.currency = Currencies.USD;
-                } else if (currency.equals("EUR")) {
-                    RegisterActivity.this.currency = Currencies.EUR;
-                } else if (currency.equals("ILS")) {
-                    RegisterActivity.this.currency = Currencies.ILS;
+                String item = currencyAdapter.getItem(position);
+                if (item.equals("USD")) {
+                    currency = CurrencyType.USD;
+                } else if (item.equals("EUR")) {
+                    currency = CurrencyType.EUR;
+                } else if (item.equals("ILS")) {
+                    currency = CurrencyType.ILS;
                 }
             }
         });
@@ -62,12 +65,29 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            if (currency == Currencies.NONE) {
+            if (currency == CurrencyType.NONE) {
                 Toast.makeText(this, "Currency is required", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            Toast.makeText(this, "Currency selected: " + currency, Toast.LENGTH_SHORT).show();
+            Log.d("Reg", Auth.getUser().getId());
+
+            Auth.getUser().setName(name);
+            Auth.getUser().setCurrencyType(currency);
+
+            FirebaseFirestore.getInstance().collection("users").document(Auth.getUser().getId()).set(Auth.getUser()).addOnCompleteListener(task -> {
+                if (!task.isSuccessful()) {
+                    Toast.makeText(this, "Failed to register user", Toast.LENGTH_SHORT).show();
+                } else {
+                    Auth.getUser().setName(name);
+                    Auth.getUser().setCurrencyType(currency);
+                    Intent intent = new Intent(this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
+            });
+
+
         });
 
     }

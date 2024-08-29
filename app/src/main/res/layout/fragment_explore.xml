@@ -8,7 +8,7 @@
     android:paddingTop="25dp"
     android:background="@color/bg"
     android:orientation="vertical"
-    tools:context=".ExploreFragment">
+    tools:context=".fragments.ExploreFragment">
 
     <TextView
         android:layout_width="wrap_content"
@@ -24,7 +24,7 @@
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="I need help finding a ..."
+        android:text="I need help finding"
         android:theme="@style/tight"
         android:fontFamily="@font/bold"
         android:textColor="@color/hint"

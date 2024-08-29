@@ -16,12 +16,42 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.HomeActivity;
 import com.idocalm.travelmate.MainActivity;
 import com.idocalm.travelmate.RegisterActivity;
+import com.idocalm.travelmate.enums.CurrencyType;
+import com.idocalm.travelmate.models.User;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Auth {
 
+    private static volatile User instance = null;
+
+    public static User instantiateUser(String name, CurrencyType currencyType, String id) {
+        if (instance == null) {
+            synchronized (User.class) {
+                if (instance == null) {
+                    instance = new User(name, currencyType, id);
+                }
+            }
+        }
+        return instance;
+    }
+
+
+    public static User instantiateUser(String id) {
+        if (instance == null) {
+            synchronized (User.class) {
+                if (instance == null) {
+                    instance = new User("", CurrencyType.NONE, id);
+                }
+            }
+        }
+        return instance;
+    }
+
+    public static User getUser() {
+        return instance;
+    }
 
     public static void login(String email, String password, Runnable onSuccess, Runnable onFailure) {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)

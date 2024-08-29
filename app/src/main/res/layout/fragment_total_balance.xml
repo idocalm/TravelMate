@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/bg"
+    android:orientation="vertical"
+    android:layout_marginTop="30dp"
+    tools:context=".components.home.TotalBalanceFragment">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Total Balance"
+        android:textSize="18sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/bold"
+        android:theme="@style/tight"
+        />
+
+
+
+
+</LinearLayout>

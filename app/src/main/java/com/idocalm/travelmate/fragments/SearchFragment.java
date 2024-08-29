@@ -1,4 +1,4 @@
-package com.idocalm.travelmate;
+package com.idocalm.travelmate.fragments;
 
 import android.os.Bundle;
 
@@ -8,11 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class RecentlyViewed extends Fragment {
+import com.idocalm.travelmate.R;
 
-    public RecentlyViewed() {
+public class SearchFragment extends Fragment {
+
+
+    public SearchFragment() {
         // Required empty public constructor
     }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,7 +25,6 @@ public class RecentlyViewed extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_recently_viewed, container, false);
+        return inflater.inflate(R.layout.fragment_search, container, false);
     }
 }

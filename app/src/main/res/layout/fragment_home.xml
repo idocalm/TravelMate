@@ -7,9 +7,10 @@
     android:paddingTop="25dp"
     android:background="@color/bg"
     android:orientation="vertical"
-    tools:context=".HomeFragment">
+    tools:context=".fragments.HomeFragment">
 
     <TextView
+        android:id="@+id/welcome_name"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:text="Hello, Ido"
@@ -20,6 +21,7 @@
     />
 
     <TextView
+        android:id="@+id/greeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Good evening"
@@ -29,5 +31,7 @@
         android:textSize="20sp"/>
 
     <include layout="@layout/fragment_recently_viewed"  />
+
+    <include layout="@layout/fragment_total_balance"  />
 
 </LinearLayout>
