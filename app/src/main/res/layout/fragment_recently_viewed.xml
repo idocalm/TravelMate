@@ -27,123 +27,10 @@
         android:fillViewport="true">
 
         <LinearLayout
+            android:id="@+id/recently_viewed_trips"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal">
-
-            <LinearLayout
-                android:padding="10dp"
-                android:layout_width="270dp"
-                android:layout_height="210dp"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/placeholder"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="United Kingdom"
-                    android:textSize="15sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/bold"
-                    android:theme="@style/tight"
-                    />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Apr 9-17"
-                        android:textSize="10sp"
-                        android:textColor="@color/hint"
-                        android:fontFamily="@font/bold"
-                        android:theme="@style/tight"
-                        />
-
-                    <TextView
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="5 Locations"
-                        android:textSize="10sp"
-                        android:textColor="@color/hint"
-                        android:fontFamily="@font/bold"
-                        android:theme="@style/tight"
-                        />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:padding="10dp"
-                android:layout_width="270dp"
-                android:layout_height="210dp"
-                android:orientation="vertical">
-
-                <ImageView
-                    android:layout_width="250dp"
-                    android:layout_height="wrap_content"
-                    android:adjustViewBounds="true"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/placeholder"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="United Kingdom"
-                    android:textSize="15sp"
-                    android:textColor="@color/white"
-                    android:fontFamily="@font/bold"
-                    android:theme="@style/tight"
-                    />
-
-                <androidx.constraintlayout.widget.ConstraintLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintLeft_toLeftOf="parent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Apr 9-17"
-                        android:textSize="10sp"
-                        android:textColor="@color/hint"
-                        android:fontFamily="@font/bold"
-                        android:theme="@style/tight"
-                        />
-
-                    <TextView
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintRight_toRightOf="parent"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="5 Locations"
-                        android:textSize="10sp"
-                        android:textColor="@color/hint"
-                        android:fontFamily="@font/bold"
-                        android:theme="@style/tight"
-                        />
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-            </LinearLayout>
 
 
 
@@ -152,7 +39,7 @@
 
 
     </HorizontalScrollView>
-        
+
 
 
 </LinearLayout>

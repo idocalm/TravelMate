@@ -1,14 +1,18 @@
 package com.idocalm.travelmate;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.fragments.ExploreFragment;
 import com.idocalm.travelmate.fragments.HomeFragment;
 import com.idocalm.travelmate.fragments.ProfileFragment;
 import com.idocalm.travelmate.fragments.SearchFragment;
+import com.idocalm.travelmate.tutorials.TripTutorial;
 
 public class HomeActivity extends AppCompatActivity {
 
@@ -36,6 +40,14 @@ public class HomeActivity extends AppCompatActivity {
                 getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new SearchFragment()).commit();
             }
             return true;
+        });
+
+        FloatingActionButton fab = findViewById(R.id.trip_button);
+        fab.setOnClickListener(view -> {
+            if (!Auth.getUser().getTripIds().isEmpty()) {
+                Intent intent = new Intent(HomeActivity.this, TripTutorial.class);
+                startActivity(intent);
+            }
         });
 
     }

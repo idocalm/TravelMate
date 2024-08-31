@@ -9,9 +9,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.database.FirebaseDatabase;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
+import com.idocalm.travelmate.components.home.RecentlyViewed;
+import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 
 public class HomeFragment extends Fragment {
@@ -21,9 +27,12 @@ public class HomeFragment extends Fragment {
         // Required empty public constructor
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //fetchRecentTrips();
     }
 
     @Override
@@ -31,6 +40,8 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+
+        getChildFragmentManager().beginTransaction().replace(R.id.recently_viewed_container, new RecentlyViewed()).commit();
 
         String name = Auth.getUser().getName();
 

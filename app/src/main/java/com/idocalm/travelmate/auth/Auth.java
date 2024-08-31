@@ -19,6 +19,7 @@ import com.idocalm.travelmate.RegisterActivity;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.User;
 
+import java.util.ArrayList;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -26,11 +27,11 @@ public class Auth {
 
     private static volatile User instance = null;
 
-    public static User instantiateUser(String name, CurrencyType currencyType, String id) {
+    public static User instantiateUser(String name, CurrencyType currencyType, String id, ArrayList<String> trips) {
         if (instance == null) {
             synchronized (User.class) {
                 if (instance == null) {
-                    instance = new User(name, currencyType, id);
+                    instance = new User(name, currencyType, id, trips);
                 }
             }
         }
@@ -42,7 +43,7 @@ public class Auth {
         if (instance == null) {
             synchronized (User.class) {
                 if (instance == null) {
-                    instance = new User("", CurrencyType.NONE, id);
+                    instance = new User("", CurrencyType.NONE, id, new ArrayList<>());
                 }
             }
         }

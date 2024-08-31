@@ -23,6 +23,8 @@ import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.User;
 
+import java.util.ArrayList;
+
 public class MainActivity extends AppCompatActivity {
 
     Button loginButton;
@@ -65,10 +67,21 @@ public class MainActivity extends AppCompatActivity {
                                 currencyType = CurrencyType.ILS;
                             }
 
-                            Auth.instantiateUser(document.getString("name"), currencyType, FirebaseAuth.getInstance().getCurrentUser().getUid());
+                            ArrayList<String> trips = (ArrayList<String>) document.get("trips");
+
+                            for (String trip : trips) {
+                                Log.d("MainActivity", "Trip: " + trip);
+                            }
+
+
+
+                            Auth.instantiateUser(document.getString("name"), currencyType, FirebaseAuth.getInstance().getCurrentUser().getUid(), trips);
                             startActivity(intent);
                             finish();
                         } else {
+
+
+
                             Auth.instantiateUser(FirebaseAuth.getInstance().getCurrentUser().getUid());
                             Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
                             startActivity(intent);

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:paddingVertical="10dp"
+    android:layout_width="280dp"
+    android:layout_height="220dp"
+    android:background="@color/bg"
+    android:orientation="vertical"
+    android:paddingEnd="10dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/trip_image"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+
+        android:adjustViewBounds="true"
+        android:scaleType="centerCrop"
+        android:src="@drawable/placeholder"/>
+
+    <TextView
+        android:id="@+id/trip_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="United Kingdom"
+        android:textSize="15sp"
+        android:textColor="@color/white"
+        android:fontFamily="@font/bold"
+        android:theme="@style/tight"
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/trip_date"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Apr 9-17"
+            android:textSize="10sp"
+            android:textColor="@color/hint"
+            android:fontFamily="@font/bold"
+            android:theme="@style/tight"
+            />
+
+        <TextView
+            android:id="@+id/trip_locations_amount"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5 Locations"
+            android:textSize="10sp"
+            android:textColor="@color/hint"
+            android:fontFamily="@font/bold"
+            android:theme="@style/tight"
+            />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>
+

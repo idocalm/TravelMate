@@ -30,7 +30,12 @@
         android:textColor="@color/hint"
         android:textSize="20sp"/>
 
-    <include layout="@layout/fragment_recently_viewed"  />
+    <FrameLayout
+        android:id="@+id/recently_viewed_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
 
     <include layout="@layout/fragment_total_balance"  />
 
