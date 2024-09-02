@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingBottom="15dp"
-    android:background="@drawable/radius_xl"
+    android:background="@drawable/radius"
     android:backgroundTint="@color/bg"
     android:layout_margin="10dp"
     tools:context=".cards.HotelCardFragment">
@@ -26,18 +26,6 @@
             android:text="Hotel Name"
             android:textColor="@color/white"
             android:textSize="20sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="$400 Per stay"
-            android:textColor="@color/hint"
-            android:translationZ="2dp"
-            android:textSize="13sp"
-            android:fontFamily="@font/bold"
-            android:layout_marginTop="5dp"
-            android:id="@+id/hotel_price"
-            />
 
 
     </LinearLayout>

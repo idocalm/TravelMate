@@ -14,11 +14,9 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.auth.Auth;
-import com.idocalm.travelmate.models.User;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -29,6 +27,7 @@ public class RegisterActivity extends AppCompatActivity {
     CurrencyType currency = CurrencyType.NONE;
     EditText nameEditText;
     Button submitButton;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +42,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         currencyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, currencies);
         currencyCompleteTextView.setAdapter(currencyAdapter);
+
+
 
         currencyCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

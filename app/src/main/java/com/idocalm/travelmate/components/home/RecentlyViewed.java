@@ -2,6 +2,7 @@ package com.idocalm.travelmate.components.home;
 
 import android.os.Bundle;
 
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -15,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.cards.TripCard;
+import com.idocalm.travelmate.enums.TripVisibility;
 import com.idocalm.travelmate.models.Trip;
 
 import java.util.ArrayList;
@@ -45,24 +47,35 @@ public class RecentlyViewed extends Fragment {
         Log.d("RecentlyViewed", "User: " + Auth.getUser().getName());
         View view = inflater.inflate(R.layout.fragment_recently_viewed, container, false);
 
-        Log.d("RecentlyViewed", "User: " + Auth.getUser().getName());
+
 
         ArrayList<String> arr = Auth.getUser().getTripIds();
 
         LinearLayout tripsContainer = view.findViewById(R.id.recently_viewed_trips);
+        LinearLayout parent = view.findViewById(R.id.recently_viewed_main);
+        if (arr.isEmpty()) {
+
+            parent.setVisibility(View.GONE);
+        } else {
+            parent.setVisibility(View.VISIBLE);
+        }
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         for (String tripId : arr) {
+            Log.d("RecentlyViewed", "Trip ID: " + tripId);
             // get the trip from the database
             db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
+                    int visibility = Integer.parseInt(task.getResult().get("visibility").toString());
                     Trip trip = new Trip(
                             task.getResult().getString("name"),
-                            task.getResult().getString("location"),
+                            task.getResult().getString("destination"),
                             task.getResult().getString("owner"),
                             task.getResult().getString("description"),
                             task.getResult().getString("image"),
+                            visibility,
+                            visibility == TripVisibility.PUBLIC.ordinal() ? new ArrayList<>() : (ArrayList<String>) task.getResult().get("members"),
                             task.getResult().getTimestamp("start_date"),
                             task.getResult().getTimestamp("end_date"),
                             task.getResult().getTimestamp("created_at"),

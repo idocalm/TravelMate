@@ -15,6 +15,12 @@
         android:theme="@style/Theme.TravelMate"
         tools:targetApi="31">
         <activity
+            android:name=".CreateTripActivity"
+            android:exported="false" />
+        <activity
+            android:name=".tutorials.CreateTutorialActivity"
+            android:exported="false" />
+        <activity
             android:name=".tutorials.TripTutorial"
             android:exported="false" />
         <!--

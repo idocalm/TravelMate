@@ -67,13 +67,7 @@ public class MainActivity extends AppCompatActivity {
                                 currencyType = CurrencyType.ILS;
                             }
 
-                            ArrayList<String> trips = (ArrayList<String>) document.get("trips");
-
-                            for (String trip : trips) {
-                                Log.d("MainActivity", "Trip: " + trip);
-                            }
-
-
+                            ArrayList<String> trips = (ArrayList<String>) document.get("tripIds");
 
                             Auth.instantiateUser(document.getString("name"), currencyType, FirebaseAuth.getInstance().getCurrentUser().getUid(), trips);
                             startActivity(intent);

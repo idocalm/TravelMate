@@ -38,7 +38,7 @@
         <FrameLayout
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/radius_xl"
+            android:background="@drawable/radius"
             android:layout_gravity="center"
             android:backgroundTint="@color/green">
 
@@ -60,7 +60,7 @@
             android:layout_marginLeft="20dp"
             android:layout_width="150dp"
             android:layout_height="150dp"
-            android:background="@drawable/radius_xl"
+            android:background="@drawable/radius"
             android:layout_gravity="center"
             android:backgroundTint="@color/green">
 

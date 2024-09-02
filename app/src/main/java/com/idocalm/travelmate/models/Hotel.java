@@ -16,14 +16,25 @@ public class Hotel {
     private double latitude;
     private double longitude;
     private double price;
+    private String checkOutDate;
+    private String checkInDate;
 
-    public Hotel(int id, String name, String mainPhoto, double latitude, double longitude, long price) {
+    /* TODO: Implement price */
+
+    public Hotel(int id, String name, String mainPhoto, double latitude, double longitude, long price, String checkInDate, String checkOutDate) {
         this.id = id;
         this.name = name;
         this.mainPhoto = mainPhoto;
         this.latitude = latitude;
         this.longitude = longitude;
         this.price = price;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+
+    }
+
+    public int getId() {
+        return id;
     }
 
     public String getMainPhoto() {
@@ -44,6 +55,14 @@ public class Hotel {
 
     public double getLongitude() {
         return longitude;
+    }
+
+    public String getCheckInDate() {
+        return checkInDate;
+    }
+
+    public String getCheckOutDate() {
+        return checkOutDate;
     }
 
 

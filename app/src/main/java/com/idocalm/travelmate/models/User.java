@@ -1,5 +1,6 @@
 package com.idocalm.travelmate.models;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 
 import java.util.ArrayList;
@@ -42,9 +43,28 @@ public class User {
         this.name = name;
     }
 
+    public String getCurrencyString() {
+        if (currency == CurrencyType.NONE) {
+            return "None";
+        } else if (currency == CurrencyType.USD) {
+            return "USD";
+        } else if (currency == CurrencyType.EUR) {
+            return "EUR";
+        } else {
+            return "ILS";
+        }
+    }
+
     public void setCurrencyType(CurrencyType currencyType) {
         this.currency = currencyType;
     }
 
+    public void addTripId(String tripId) {
+        tripIds.add(tripId);
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(id).update("tripIds", tripIds);
+
+    }
 
 }

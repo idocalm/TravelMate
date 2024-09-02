@@ -15,10 +15,16 @@ public class TripTutorialAdapter extends PagerAdapter {
 
     String[] headings = {
             "Let's plan on your first trip!",
+            "Name, destination & dates",
+            "Add your travel buddies",
+            "That's it!",
     };
 
     String[] descriptions = {
+            "",
             "Start by choosing a destination for your trip, and enter your trip dates.",
+            "Add your travel buddies to your trip. You can add them by their username.",
+            "You're all set! You can now start planning your next trip!",
     };
 
     @Override

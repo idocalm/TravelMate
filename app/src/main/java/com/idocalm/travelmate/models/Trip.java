@@ -1,12 +1,14 @@
 package com.idocalm.travelmate.models;
 
 import com.google.firebase.Timestamp;
+import com.idocalm.travelmate.enums.TripVisibility;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 public class Trip {
     private String name;
-    private String location;
+    private String destination;
     private String owner;
     private String description;
     private Timestamp start_date;
@@ -15,13 +17,17 @@ public class Trip {
     private Timestamp last_edited;
     private Timestamp last_opened;
     private String image;
+    private int visibility;
+    private ArrayList<String> members;
 
-    public Trip(String name, String location, String owner, String description, String image, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened) {
+    public Trip(String name, String destination, String owner, String description, String image, int visibility, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened) {
         this.name = name;
-        this.location = location;
+        this.destination = destination;
         this.owner = owner;
         this.description = description;
         this.image = image;
+        this.visibility = visibility;
+        this.members = members;
         this.start_date = start_date;
         this.end_date = end_date;
         this.created_at = created_at;
@@ -33,8 +39,8 @@ public class Trip {
         return name;
     }
 
-    public String getLocation() {
-        return location;
+    public String getDestination() {
+        return destination;
     }
 
     public String getOwner() {
@@ -72,8 +78,8 @@ public class Trip {
         this.name = name;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setDestination(String dest) {
+        this.destination = dest;
     }
 
     public void setOwner(String owner) {

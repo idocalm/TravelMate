@@ -44,6 +44,7 @@ public class TripCard extends Fragment {
                 ImageView imageView = getView().findViewById(R.id.trip_image);
                 Log.d("TripCard", "Setting image");
                 imageView.setImageBitmap(image);
+
             }
         });
     }

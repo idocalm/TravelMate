@@ -61,7 +61,7 @@ public class HomeFragment extends Fragment {
         greetingTextView.setText(greeting);
 
         TextView nameTextView = view.findViewById(R.id.welcome_name);
-        nameTextView.setText(name);
+        nameTextView.setText("Hello, " + name);
 
 
 

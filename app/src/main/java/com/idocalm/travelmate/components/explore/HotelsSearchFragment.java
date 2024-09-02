@@ -36,7 +36,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
 
     static Button peopleAmount;
 
-    int amount = 1;
+    static int amount = 1;
     Date checkIn, checkOut;
 
     Button checkInDate, checkOutDate, search;
@@ -50,7 +50,8 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
         // Required empty public constructor
     }
 
-    public static void setPeopleAmount(int amount) {
+    public static void setPeopleAmount(int update) {
+        amount =  update;
         if (amount == 1) {
             peopleAmount.setText("1 Person");
         } else {
@@ -154,7 +155,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
             @Override
             public void run() {
                 try {
-                    Hotel[] hotels = Hotels.fetchHotels(location.getText().toString());
+                    Hotel[] hotels = Hotels.fetchHotels(location.getText().toString(), amount, checkIn, checkOut);
                     ArrayList<Hotel> list = new ArrayList<>();
                     Collections.addAll(list, hotels);
 

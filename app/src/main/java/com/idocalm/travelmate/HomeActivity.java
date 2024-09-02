@@ -44,8 +44,12 @@ public class HomeActivity extends AppCompatActivity {
 
         FloatingActionButton fab = findViewById(R.id.trip_button);
         fab.setOnClickListener(view -> {
-            if (!Auth.getUser().getTripIds().isEmpty()) {
+            if (Auth.getUser().getTripIds().isEmpty()) {
                 Intent intent = new Intent(HomeActivity.this, TripTutorial.class);
+                startActivity(intent);
+            } else {
+                Intent intent = new Intent(HomeActivity.this, CreateTripActivity.class);
+                intent.putExtra("tripAmount", Auth.getUser().getTripIds().size());
                 startActivity(intent);
             }
         });

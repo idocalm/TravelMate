@@ -33,10 +33,10 @@ public class ExploreFragment extends Fragment {
 
     void setButton(Button button) {
         if (selectedButton != null) {
-            selectedButton.setBackground(getResources().getDrawable(R.drawable.radius_xl));
+            selectedButton.setBackground(getResources().getDrawable(R.drawable.radius));
         }
         selectedButton = button;
-        selectedButton.setBackground(getResources().getDrawable(R.drawable.radius_xl_selected));
+        selectedButton.setBackground(getResources().getDrawable(R.drawable.radius_selected));
 
         if (selectedButton == hotels) {
             getChildFragmentManager().beginTransaction().replace(R.id.explore_fragment_container, new HotelsSearchFragment()).commit();
