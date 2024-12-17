@@ -233,7 +233,7 @@
         android:padding="15dp"
         android:textColor="@color/white"/>
 
-    <Button
+    <android.widget.Button
         android:id="@+id/login"
         android:layout_width="300dp"
         android:layout_height="wrap_content"

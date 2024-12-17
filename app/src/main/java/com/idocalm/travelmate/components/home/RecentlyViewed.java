@@ -47,14 +47,11 @@ public class RecentlyViewed extends Fragment {
         Log.d("RecentlyViewed", "User: " + Auth.getUser().getName());
         View view = inflater.inflate(R.layout.fragment_recently_viewed, container, false);
 
-
-
         ArrayList<String> arr = Auth.getUser().getTripIds();
 
         LinearLayout tripsContainer = view.findViewById(R.id.recently_viewed_trips);
         LinearLayout parent = view.findViewById(R.id.recently_viewed_main);
         if (arr.isEmpty()) {
-
             parent.setVisibility(View.GONE);
         } else {
             parent.setVisibility(View.VISIBLE);
@@ -69,30 +66,35 @@ public class RecentlyViewed extends Fragment {
                 if (task.isSuccessful()) {
                     int visibility = Integer.parseInt(task.getResult().get("visibility").toString());
                     Trip trip = new Trip(
+                            tripId,
                             task.getResult().getString("name"),
                             task.getResult().getString("destination"),
                             task.getResult().getString("owner"),
                             task.getResult().getString("description"),
                             task.getResult().getString("image"),
-                            visibility,
-                            visibility == TripVisibility.PUBLIC.ordinal() ? new ArrayList<>() : (ArrayList<String>) task.getResult().get("members"),
+                            (ArrayList<String>) task.getResult().get("members"),
                             task.getResult().getTimestamp("start_date"),
                             task.getResult().getTimestamp("end_date"),
                             task.getResult().getTimestamp("created_at"),
                             task.getResult().getTimestamp("last_edited"),
-                            task.getResult().getTimestamp("last_opened"));
-                    Log.d("RecentlyViewed", "Trip: " + trip.getName());
-                    // create a new trip card
+                            task.getResult().getTimestamp("last_opened")
+                    );
+
                     TripCard tripCard = new TripCard(trip);
-
                     FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                    transaction.add(tripsContainer.getId(), tripCard, "card_id" + tripId);
-
+                    transaction.add(tripCard, "trip_card");
                     transaction.commit();
-                    // add the trip card to the container
+                    transaction.runOnCommit(() -> {
+                        tripsContainer.addView(tripCard.getView());
+                    });
+                    // add the trip card to the view
 
+
+                } else {
+                    Log.e("Trip", "Error getting document", task.getException());
                 }
             });
+
         }
 
         return view;

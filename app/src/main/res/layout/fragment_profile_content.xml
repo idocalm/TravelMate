@@ -3,11 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingStart="25dp"
-    android:paddingTop="25dp"
     android:background="@color/bg"
     android:orientation="vertical"
-    tools:context=".fragments.ProfileFragment">
+    tools:context=".fragments.ProfileContentFragment">
+
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,6 +35,7 @@
         android:orientation="horizontal">
 
         <FrameLayout
+            android:id="@+id/profile_account_button"
             android:layout_width="150dp"
             android:layout_height="150dp"
             android:background="@drawable/radius"
@@ -57,6 +57,7 @@
         </FrameLayout>
 
         <FrameLayout
+            android:id="@+id/profile_settings_button"
             android:layout_marginLeft="20dp"
             android:layout_width="150dp"
             android:layout_height="150dp"

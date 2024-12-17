@@ -1,6 +1,7 @@
 package com.idocalm.travelmate.cards;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -14,12 +15,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.idocalm.travelmate.ManageTripActivity;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.auth.Auth;
+import com.idocalm.travelmate.dialogs.TripSearchDialog;
 import com.idocalm.travelmate.models.Trip;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -85,8 +91,32 @@ public class TripCard extends Fragment {
             }
         });
 
-
         thread.start();
+
+        if (trip.getOwner().equals(Auth.getUser().getId())) {
+            view.setOnClickListener(v -> {
+                // pass to manage trip activity, with the trip id as an extra
+                Intent intent = new Intent(getActivity(), ManageTripActivity.class);
+                intent.putExtra("trip_id", trip.getId());
+                startActivity(intent);
+
+            });
+        } else {
+            view.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Long press to view more.", Toast.LENGTH_SHORT).show();
+            });
+
+            view.setOnLongClickListener(v -> {
+                TripSearchDialog dialog = new TripSearchDialog((Activity) getContext());
+                dialog.show();
+                return true;
+            });
+        }
+
+        Log.d("TripCard", "Owner: " + trip.getOwner());
+        Log.d("TripCard", "Auth: " + Auth.getUser().getId());
+
+
 
         return view;
     }

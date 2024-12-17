@@ -18,6 +18,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.auth.Auth;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RegisterActivity extends AppCompatActivity {
 
     String[] currencies = new String[] {"USD", "EUR", "ILS"};
@@ -76,7 +79,13 @@ public class RegisterActivity extends AppCompatActivity {
             Auth.getUser().setName(name);
             Auth.getUser().setCurrencyType(currency);
 
-            FirebaseFirestore.getInstance().collection("users").document(Auth.getUser().getId()).set(Auth.getUser()).addOnCompleteListener(task -> {
+            Map<String, Object> user = new HashMap<>();
+            user.put("name", name);
+            user.put("currency", currency.toString());
+            user.put("tripIds", Auth.getUser().getTripIds());
+            user.put("id", Auth.getUser().getId());
+
+            FirebaseFirestore.getInstance().collection("users").document(Auth.getUser().getId()).set(user).addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
                     Toast.makeText(this, "Failed to register user", Toast.LENGTH_SHORT).show();
                 } else {

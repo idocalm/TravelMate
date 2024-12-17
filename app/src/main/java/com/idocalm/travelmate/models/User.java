@@ -1,5 +1,7 @@
 package com.idocalm.travelmate.models;
 
+import android.widget.Toast;
+
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 
@@ -40,7 +42,11 @@ public class User {
     }
 
     public void setName(String name) {
+
         this.name = name;
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(id).update("name", name);
+
     }
 
     public String getCurrencyString() {

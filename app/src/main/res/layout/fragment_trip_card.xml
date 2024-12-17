@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout android:paddingVertical="10dp"
     android:layout_width="280dp"
+    android:minWidth="280dp"
     android:layout_height="220dp"
     android:background="@color/bg"
     android:orientation="vertical"

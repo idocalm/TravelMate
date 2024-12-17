@@ -82,8 +82,8 @@ public class Hotels {
         JSONObject hotels = new JSONObject(response.body().string());
         JSONArray hotelsArray = hotels.getJSONArray("results");
 
-        Hotel[] hotelList = new Hotel[5];
-        for (int i = 0; i < 5; i++) {
+        Hotel[] hotelList = new Hotel[hotelsArray.length()];
+        for (int i = 0; i < hotelsArray.length(); i++) {
             JSONObject hotel = hotelsArray.getJSONObject(i);
             hotelList[i] = new Hotel(
                     hotel.getInt("id"),
@@ -94,7 +94,6 @@ public class Hotels {
                     1000,
                     checkInDate,
                     checkOutDate
-
             );
         }
             // Parse the response

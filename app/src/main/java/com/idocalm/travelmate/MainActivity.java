@@ -100,7 +100,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Password is required", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+
             String password = passwordEditText.getText().toString();
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                Auth.instantiateUser(FirebaseAuth.getInstance().getCurrentUser().getUid());
+            }
             Auth.login(email, password, () -> {
                 Intent intent = new Intent(this, RegisterActivity.class);
                 startActivity(intent);

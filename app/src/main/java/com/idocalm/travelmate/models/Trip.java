@@ -1,12 +1,19 @@
 package com.idocalm.travelmate.models;
 
+import android.util.Log;
+
+import androidx.fragment.app.FragmentTransaction;
+
 import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.idocalm.travelmate.cards.TripCard;
 import com.idocalm.travelmate.enums.TripVisibility;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 
 public class Trip {
+    private String id;
     private String name;
     private String destination;
     private String owner;
@@ -17,22 +24,28 @@ public class Trip {
     private Timestamp last_edited;
     private Timestamp last_opened;
     private String image;
-    private int visibility;
     private ArrayList<String> members;
 
-    public Trip(String name, String destination, String owner, String description, String image, int visibility, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened) {
+
+    public Trip(String id, String name, String destination, String owner, String description, String image, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened) {
+        this.id = id;
         this.name = name;
         this.destination = destination;
         this.owner = owner;
         this.description = description;
         this.image = image;
-        this.visibility = visibility;
         this.members = members;
         this.start_date = start_date;
         this.end_date = end_date;
         this.created_at = created_at;
         this.last_edited = last_edited;
         this.last_opened = last_opened;
+    }
+
+
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {

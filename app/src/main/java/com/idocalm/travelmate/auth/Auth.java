@@ -58,6 +58,7 @@ public class Auth {
         FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
             .addOnSuccessListener(authResult -> {
                 onSuccess.run();
+
             })
             .addOnFailureListener(e -> {
                 register(email, password, onSuccess, onFailure);
@@ -67,6 +68,7 @@ public class Auth {
     public static void register(String email, String password, Runnable onSuccess, Runnable onFailure) {
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener(authResult -> {
+                instance = instantiateUser(authResult.getUser().getUid());
                 onSuccess.run();
             })
             .addOnFailureListener(e -> {
