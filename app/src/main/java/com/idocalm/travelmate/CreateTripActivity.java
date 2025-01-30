@@ -168,6 +168,10 @@ public class CreateTripActivity extends AppCompatActivity {
                 trip.put("created_at", new Timestamp(new Date()));
                 trip.put("last_edited", new Timestamp(new Date()));
                 trip.put("last_opened", new Timestamp(new Date()));
+                trip.put("itinerary", List.of());
+                trip.put("total_flights", 0.0);
+                trip.put("total_hotels", 0.0);
+                trip.put("total_other", 0.0);
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 db.collection("trips").add(trip).addOnCompleteListener(task -> {

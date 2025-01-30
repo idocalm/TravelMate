@@ -1,0 +1,435 @@
+@startuml
+class com.idocalm.travelmate.HomeActivity {
+~ BottomNavigationView navbar
+~ BreadcrumbFragment breadcrumbFragment
+~ Runnable dummy
+~ BreadcrumbEvent profile
+~ BreadcrumbFragment getEmptyBreadcrumb()
++ void onAccountClick()
++ void onSettingsClick()
+# void onCreate(Bundle)
+}
+
+
+class com.idocalm.travelmate.dialogs.HotelDialog {
+~ Button bookingButton
+~ JSONObject hotelData
+~ String name
+~ double latitude
+~ double longitude
+~ String mainPhoto
+# void onCreate(Bundle)
+}
+
+
+class com.idocalm.travelmate.components.home.RecentlyViewed {
+- Trip[] recentlyViewedTrips
++ void onCreate(Bundle)
++ void setRecentlyViewedTrips(Trip[])
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.components.explore.RentalsSearchFragment {
+- {static} String ARG_PARAM1
+- {static} String ARG_PARAM2
+- String mParam1
+- String mParam2
++ {static} RentalsSearchFragment newInstance(String,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.components.explore.HotelsSearchFragment {
+~ {static} Button peopleAmount
+~ {static} int amount
+~ Date checkIn
+~ Button checkInDate
+~ boolean checkInSelected
+~ boolean checkOutSelected
+~ AutoCompleteTextView location
+~ ListView hotelsList
+~ HotelsListAdapter adapter
++ {static} void setPeopleAmount(int)
++ void onDateSet(DatePicker,int,int,int)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+- void searchHotels()
++ void onCancel(DialogInterface)
+}
+
+
+class com.idocalm.travelmate.components.home.TotalBalanceFragment {
+- {static} String ARG_PARAM1
+- {static} String ARG_PARAM2
+- String mParam1
+- String mParam2
++ {static} TotalBalanceFragment newInstance(String,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.components.explore.FlightsSearchFragment {
+- {static} String ARG_PARAM1
+- {static} String ARG_PARAM2
+- String mParam1
+- String mParam2
++ {static} FlightsSearchFragment newInstance(String,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+enum com.idocalm.travelmate.enums.TripVisibility {
++  NONE
++  PUBLIC
++  PRIVATE
+}
+
+class com.idocalm.travelmate.models.Trip {
+- String id
+- String name
+- String destination
+- String owner
+- String description
+- Timestamp start_date
+- Timestamp end_date
+- Timestamp created_at
+- Timestamp last_edited
+- Timestamp last_opened
+- String image
+- ArrayList<String> members
++ String getId()
++ String getName()
++ String getDestination()
++ String getOwner()
++ String getDescription()
++ String getImage()
++ Timestamp getStartDate()
++ Timestamp getEndDate()
++ Timestamp getCreatedAt()
++ Timestamp getLastEdited()
++ Timestamp getLastOpened()
++ void setName(String)
++ void setDestination(String)
++ void setOwner(String)
++ void setDescription(String)
++ void setStartDate(Timestamp)
++ void setEndDate(Timestamp)
++ void setCreatedAt(Timestamp)
++ void setLastEdited(Timestamp)
++ void setLastOpened(Timestamp)
++ void save()
+}
+
+
+class com.idocalm.travelmate.auth.Auth {
+- {static} User instance
++ {static} User instantiateUser(String,CurrencyType,String,ArrayList<String>)
++ {static} User instantiateUser(String)
++ {static} User getUser()
++ {static} void login(String,String,Runnable,Runnable)
++ {static} void register(String,String,Runnable,Runnable)
++ {static} boolean isLoggedIn()
+}
+
+
+class com.idocalm.travelmate.components.explore.AttractionsSearchFragment {
+- {static} String ARG_PARAM1
+- {static} String ARG_PARAM2
+- String mParam1
+- String mParam2
++ {static} AttractionsSearchFragment newInstance(String,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.cards.HotelCardFragment {
+- String name
+- String mainPhoto
+- double latitude
+- double longitude
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.RegisterActivity {
+~ String[] currencies
+~ AutoCompleteTextView currencyCompleteTextView
+~ ArrayAdapter<String> currencyAdapter
+~ CurrencyType currency
+~ EditText nameEditText
+~ Button submitButton
+# void onCreate(Bundle)
+}
+
+
+class com.idocalm.travelmate.MainActivity {
+~ Button loginButton
+~ Button googleButton
+~ EditText emailEditText
+~ EditText passwordEditText
+# void onCreate(Bundle)
+# void onStart()
+}
+
+
+class com.idocalm.travelmate.api.Hotels {
++ {static} Hotel[] fetchHotels(String,int,Date,Date)
++ {static} JSONObject getHotelData(Hotel)
+}
+
+class com.idocalm.travelmate.CreateTripActivity {
+~ AutoCompleteTextView visibilityCompleteTextView
+~ ArrayAdapter<String> visibilityAdapter
+~ EditText destinationEditText
+~ TripVisibility visibility
+~ String[] visibilityOptions
+~ LinearLayout participantsLayout
+# void onCreate(Bundle)
+- boolean validateDate(String)
+- boolean isBefore(String,String)
+- boolean isPast(String)
+}
+
+
+class com.idocalm.travelmate.fragments.ProfileSettingsFragment {
+- {static} String ARG_PARAM1
+- {static} String ARG_PARAM2
+- String mParam1
+- String mParam2
++ {static} ProfileSettingsFragment newInstance(String,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.fragments.SearchFragment {
+~ SearchType searchType
+~ ImageButton publicButton
+~ EditText searchInput
+~ List<Trip> searchResult
+~ LinearLayout searchResults
+- void setSearchType(SearchType)
++ void onCreate(Bundle)
+- void updateSearchResults()
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.fragments.ProfileContentFragment {
+- ContentListener listener
++ void onAttach(Context)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+interface com.idocalm.travelmate.fragments.ProfileContentFragment$ContentListener {
+~ void onAccountClick()
+~ void onSettingsClick()
+}
+
+class com.idocalm.travelmate.components.explore.RestaurantsSearchFragment {
+- {static} String ARG_PARAM1
+- {static} String ARG_PARAM2
+- String mParam1
+- String mParam2
++ {static} RestaurantsSearchFragment newInstance(String,String)
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.dialogs.PersonsDialog {
++ Button plus
++ TextView amountText
++ int amount
+# void onCreate(Bundle)
++ void onClick(View)
+}
+
+
+class com.idocalm.travelmate.utils.GalleryManager {
+- Context context
+- File photoFile
+- {static} String AUTHORITY
++ void fromGallery(ActivityResultLauncher<Intent>,ActivityResultLauncher<Intent>)
++ void onRequestPermissionsResult(int,String[],int[])
++ void takePicture(ActivityResultLauncher<Intent>,ActivityResultLauncher<String>)
++ void launchCamera(ActivityResultLauncher<Intent>)
++ void openDialog(ActivityResultLauncher<Intent>,ActivityResultLauncher<Intent>,ActivityResultLauncher<String>)
++ Uri getCapturedImageUri()
++ Uri getImageUri(Intent)
+- File createImageFile()
+}
+
+
+class com.idocalm.travelmate.fragments.ProfileAccountFragment {
+~ ImageView profileImage
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.components.triptutorial.TripTutorialAdapter {
+~ String[] headings
+~ String[] descriptions
++ int getCount()
++ boolean isViewFromObject(View,Object)
++ Object instantiateItem(ViewGroup,int)
++ void destroyItem(ViewGroup,int,Object)
+}
+
+
+class com.idocalm.travelmate.ManageTripActivity {
++ void setImage(Bitmap)
+# void onCreate(Bundle)
+}
+
+class com.idocalm.travelmate.utils.ImageManager {
+}
+class com.idocalm.travelmate.components.explore.HotelsListAdapter {
++ View getView(int,View,ViewGroup)
+- void openDialog(Hotel,JSONObject)
+- void openHotelDialog(Hotel)
+}
+
+class com.idocalm.travelmate.fragments.BreadcrumbFragment {
+- ArrayList<BreadcrumbEvent> elements
+- Fragment fragment
++ Runnable onHomeClick
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.cards.TripCard {
+- Trip trip
++ void onCreate(Bundle)
++ void setImage(Bitmap)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.tutorials.TripTutorial {
+~ ViewPager viewPager
+~ Button back
+# void onCreate(Bundle)
+}
+
+
+class com.idocalm.travelmate.fragments.HomeFragment {
++ void onCreate(Bundle)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+enum com.idocalm.travelmate.enums.SearchType {
++  PUBLIC
++  PRIVATE
+}
+
+class com.idocalm.travelmate.models.Hotel {
+- int id
+- String name
+- String mainPhoto
+- double latitude
+- double longitude
+- double price
+- String checkOutDate
+- String checkInDate
++ int getId()
++ String getMainPhoto()
++ String getName()
++ int getPrice()
++ double getLatitude()
++ double getLongitude()
++ String getCheckInDate()
++ String getCheckOutDate()
+}
+
+
+class com.idocalm.travelmate.models.BreadcrumbEvent {
+- String title
+- Runnable onClick
++ String getTitle()
++ Runnable getOnClick()
+}
+
+
+class com.idocalm.travelmate.fragments.ExploreFragment {
+~ Button hotels
+~ Button selectedButton
+~ View.OnClickListener buttonListener
++ void onCreate(Bundle)
+~ void setButton(Button)
++ View onCreateView(LayoutInflater,ViewGroup,Bundle)
+}
+
+
+class com.idocalm.travelmate.dialogs.TripSearchDialog {
+# void onCreate(Bundle)
+}
+
+enum com.idocalm.travelmate.enums.CurrencyType {
++  NONE
++  USD
++  EUR
++  ILS
+}
+
+class com.idocalm.travelmate.models.User {
+- String name
+- CurrencyType currency
+- String id
+- ArrayList<String> tripIds
++ String getName()
++ CurrencyType getCurrencyType()
++ String getId()
++ ArrayList<String> getTripIds()
++ void setName(String)
++ String getCurrencyString()
++ void setCurrencyType(CurrencyType)
++ void addTripId(String)
+}
+
+
+
+
+com.idocalm.travelmate.ContentListener <|.. com.idocalm.travelmate.HomeActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.idocalm.travelmate.HomeActivity
+android.app.Dialog <|-- com.idocalm.travelmate.dialogs.HotelDialog
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.home.RecentlyViewed
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.explore.RentalsSearchFragment
+com.idocalm.travelmate.components.explore.OnDateSetListener <|.. com.idocalm.travelmate.components.explore.HotelsSearchFragment
+com.idocalm.travelmate.components.explore.OnCancelListener <|.. com.idocalm.travelmate.components.explore.HotelsSearchFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.explore.HotelsSearchFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.home.TotalBalanceFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.explore.FlightsSearchFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.explore.AttractionsSearchFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.cards.HotelCardFragment
+androidx.appcompat.app.AppCompatActivity <|-- com.idocalm.travelmate.RegisterActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.idocalm.travelmate.MainActivity
+androidx.appcompat.app.AppCompatActivity <|-- com.idocalm.travelmate.CreateTripActivity
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.ProfileSettingsFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.SearchFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.ProfileContentFragment
+com.idocalm.travelmate.fragments.ProfileContentFragment +.. com.idocalm.travelmate.fragments.ProfileContentFragment$ContentListener
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.components.explore.RestaurantsSearchFragment
+com.idocalm.travelmate.dialogs.OnClickListener <|.. com.idocalm.travelmate.dialogs.PersonsDialog
+android.app.Dialog <|-- com.idocalm.travelmate.dialogs.PersonsDialog
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.ProfileAccountFragment
+androidx.viewpager.widget.PagerAdapter <|-- com.idocalm.travelmate.components.triptutorial.TripTutorialAdapter
+androidx.appcompat.app.AppCompatActivity <|-- com.idocalm.travelmate.ManageTripActivity
+android.widget.ArrayAdapter <|-- com.idocalm.travelmate.components.explore.HotelsListAdapter
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.BreadcrumbFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.cards.TripCard
+androidx.appcompat.app.AppCompatActivity <|-- com.idocalm.travelmate.tutorials.TripTutorial
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.HomeFragment
+androidx.fragment.app.Fragment <|-- com.idocalm.travelmate.fragments.ExploreFragment
+android.app.Dialog <|-- com.idocalm.travelmate.dialogs.TripSearchDialog
+@enduml

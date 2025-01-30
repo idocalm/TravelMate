@@ -2,7 +2,7 @@
 <LinearLayout android:paddingVertical="10dp"
     android:layout_width="280dp"
     android:minWidth="280dp"
-    android:layout_height="220dp"
+    android:layout_height="225dp"
     android:background="@color/bg"
     android:orientation="vertical"
     android:paddingEnd="10dp"
@@ -15,10 +15,9 @@
         android:layout_height="160dp"
 
         android:adjustViewBounds="true"
-        android:scaleType="centerCrop"
-        android:src="@drawable/placeholder"/>
-
+        android:scaleType="centerCrop"/>
     <TextView
+        android:layout_marginTop="10dp"
         android:id="@+id/trip_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

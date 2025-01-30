@@ -100,21 +100,7 @@ public class SearchFragment extends Fragment {
                         Toast.makeText(getContext(), "found " + task.getResult().size() + " results", Toast.LENGTH_SHORT).show();
                         for (int i = 0; i < task.getResult().size(); i++) {
                             Log.d("SearchFragment", "Trip " + i + ": " + task.getResult().getDocuments().get(i).getString("name"));
-                            searchResult.add(new Trip(
-                                    task.getResult().getDocuments().get(i).getId(),
-                                    task.getResult().getDocuments().get(i).getString("name"),
-                                    task.getResult().getDocuments().get(i).getString("destination"),
-                                    task.getResult().getDocuments().get(i).getString("owner"),
-                                    task.getResult().getDocuments().get(i).getString("description"),
-                                    task.getResult().getDocuments().get(i).getString("image"),
-                                    (ArrayList<String>) task.getResult().getDocuments().get(i).get("members"),
-                                    task.getResult().getDocuments().get(i).getTimestamp("start_date"),
-                                    task.getResult().getDocuments().get(i).getTimestamp("end_date"),
-                                    task.getResult().getDocuments().get(i).getTimestamp("created_at"),
-                                    task.getResult().getDocuments().get(i).getTimestamp("last_edited"),
-                                    task.getResult().getDocuments().get(i).getTimestamp("last_opened")
-                            ));
-
+                            searchResult.add(Trip.fromDB(task.getResult().getDocuments().get(i)));
                         }
                         updateSearchResults();
 

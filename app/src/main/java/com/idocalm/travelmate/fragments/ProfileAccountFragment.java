@@ -49,7 +49,7 @@ public class ProfileAccountFragment extends Fragment {
                     if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
                         Uri imageUri = galleryManager.getImageUri(result.getData());
                         profileImage.setImageURI(imageUri);
-                        
+
                     }
                 });
 

@@ -13,6 +13,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.home.RecentlyViewed;
+import com.idocalm.travelmate.components.home.TotalBalanceFragment;
 import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
 
@@ -42,6 +43,7 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         getChildFragmentManager().beginTransaction().replace(R.id.recently_viewed_container, new RecentlyViewed()).commit();
+        getChildFragmentManager().beginTransaction().replace(R.id.total_balance_container, new TotalBalanceFragment()).commit();
 
         String name = Auth.getUser().getName();
 
