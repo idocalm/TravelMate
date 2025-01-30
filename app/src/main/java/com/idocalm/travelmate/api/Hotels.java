@@ -48,7 +48,8 @@ public class Hotels {
 
         for (int i = 0; i < locations.length(); i++) {
             JSONObject locationObject = locations.getJSONObject(i);
-            if (locationObject.getString("dest_type").equals("city")) {
+            Log.d("Hotels", "fetchHotels: " + locationObject.getString("dest_type"));
+            if (locationObject.getString("dest_type").equals("city") ) {
                 city = locationObject;
                 break;
             }
