@@ -81,5 +81,78 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:id="@+id/profile_friend_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:orientation="horizontal"
+        >
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/right_arrow"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Friend invitation link"
+            android:theme="@style/tight"
+            android:fontFamily="@font/bold"
+            android:textColor="@color/hint"
+            android:textSize="20sp"/>
+
+    </LinearLayout>
+
+    <TextView
+        android:paddingStart="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="25dp"
+        android:text="Add friends"
+        android:theme="@style/tight"
+        android:fontFamily="@font/bold"
+        android:textColor="@color/hint"
+        android:textSize="17sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/add_friend_input"
+            android:layout_weight="80"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:fontFamily="@font/bold"
+            android:hint="Enter an invite code"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:textSize="20sp"
+            android:theme="@style/tight"
+            android:paddingStart="10dp"
+        />
+
+        <android.widget.Button
+            android:layout_weight="20"
+            android:id="@+id/add_friend_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/button_clean"
+            android:fontFamily="@font/bold"
+            android:text="Add"
+            android:textAllCaps="false"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+
+    </LinearLayout>
+
 
 </LinearLayout>

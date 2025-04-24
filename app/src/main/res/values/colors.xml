@@ -4,5 +4,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="hint">#9C9C9C</color>
     <color name="bg">#121113</color>
+    <color name="bg_for_dialog">#2B2A2C</color>
     <color name="green">#D0FD3E</color>
+    <color name="red">#FF0000</color>
 </resources>

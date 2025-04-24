@@ -10,7 +10,6 @@ public class Hotel {
     private String checkOutDate;
     private String checkInDate;
 
-    /* TODO: Implement price */
 
     public Hotel(int id, String name, String mainPhoto, double latitude, double longitude, long price, String checkInDate, String checkOutDate) {
         this.id = id;

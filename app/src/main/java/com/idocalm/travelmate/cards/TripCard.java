@@ -44,7 +44,10 @@ public class TripCard extends Fragment {
     }
 
     public void setImage(Bitmap image) {
-        getActivity().runOnUiThread( new Runnable() {
+        if (getActivity() == null) return; // avoid crash if activity is not available
+
+
+         getActivity().runOnUiThread( new Runnable() {
             @Override
             public void run() {
                 ImageView imageView = getView().findViewById(R.id.trip_image);

@@ -14,10 +14,12 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.auth.Auth;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,9 +33,18 @@ public class RegisterActivity extends AppCompatActivity {
     EditText nameEditText;
     Button submitButton;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            Log.d("RegisterActivity", "User not logged in, redirecting to login screen.");
+            startActivity(new Intent(RegisterActivity.this, MainActivity.class));
+            finish();
+            return;
+        } else {
+            Log.d("RegisterActivity", "User logged in, proceeding with registration.");
+        }
+
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
@@ -42,11 +53,8 @@ public class RegisterActivity extends AppCompatActivity {
         currencyCompleteTextView = findViewById(R.id.currency);
         nameEditText = findViewById(R.id.name);
 
-
         currencyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, currencies);
         currencyCompleteTextView.setAdapter(currencyAdapter);
-
-
 
         currencyCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -74,26 +82,20 @@ public class RegisterActivity extends AppCompatActivity {
                 return;
             }
 
-            Log.d("Reg", Auth.getUser().getId());
-
-            Auth.getUser().setName(name);
-            Auth.getUser().setCurrencyType(currency);
-
             Map<String, Object> user = new HashMap<>();
             user.put("name", name);
+            user.put("profile", FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl() != null ? FirebaseAuth.getInstance().getCurrentUser().getPhotoUrl().toString() :
+                    "https://upload.wikimedia.org/wikipedia/commons/7/7c/Profile_avatar_placeholder_large.png?20150327203541");
             user.put("currency", currency.toString());
-            user.put("tripIds", Auth.getUser().getTripIds());
-            user.put("id", Auth.getUser().getId());
+            user.put("tripIds", new ArrayList<String>());
+            user.put("id", FirebaseAuth.getInstance().getCurrentUser().getUid());
+            user.put("friendsIds", new ArrayList<String>());
 
             FirebaseFirestore.getInstance().collection("users").document(Auth.getUser().getId()).set(user).addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
                     Toast.makeText(this, "Failed to register user", Toast.LENGTH_SHORT).show();
                 } else {
-                    Auth.getUser().setName(name);
-                    Auth.getUser().setCurrencyType(currency);
-                    Intent intent = new Intent(this, HomeActivity.class);
-                    startActivity(intent);
-                    finish();
+                    Auth.instantiateUser(this);
                 }
             });
 

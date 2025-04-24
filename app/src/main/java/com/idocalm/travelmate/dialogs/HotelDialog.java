@@ -9,8 +9,10 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.idocalm.travelmate.components.explore.HotelsSearchFragment;
 import com.idocalm.travelmate.R;
 
@@ -45,6 +47,11 @@ public class HotelDialog extends Dialog {
 
         bookingButton = findViewById(R.id.hotel_dialog_booking);
         doneButton = findViewById(R.id.hotel_dialog_done);
+        ImageView hotelImage = findViewById(R.id.dialog_hotel_image);
+
+        Glide.with(getContext())
+                .load(mainPhoto)
+                .into(hotelImage);
 
         bookingButton.setOnClickListener((v) -> {
             try {
@@ -65,13 +72,6 @@ public class HotelDialog extends Dialog {
         TextView name = findViewById(R.id.dialog_hotel_name);
         name.setText(this.name);
 
-        Geocoder geocoder = new Geocoder(getContext());
-        TextView location = findViewById(R.id.dialog_hotel_address);
-        try {
-            location.setText(geocoder.getFromLocation(latitude, longitude, 1).get(0).getAddressLine(0));
-        } catch (Exception e) {
-            location.setText("Not available");
-        }
 
 
 

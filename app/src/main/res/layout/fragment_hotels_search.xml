@@ -14,14 +14,14 @@
         android:layout_height="wrap_content">
 
         <AutoCompleteTextView
-            android:id="@+id/countries"
+            android:id="@+id/dest_country"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="35dp"
-            android:drawableStart="@drawable/hotel_icon"
+            android:drawableStart="@drawable/location"
             android:drawablePadding="10dp"
-            android:hint="Where are you going?"
+            android:hint="Destination country"
             android:textColorHint="@color/hint"
             android:theme="@style/tight"
             android:fontFamily="@font/bold"
@@ -30,6 +30,7 @@
             android:textColor="@color/white"
             android:textSize="15sp"
             />
+
 
         <android.widget.Button
             android:id="@+id/amount"
@@ -48,6 +49,25 @@
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <AutoCompleteTextView
+        android:id="@+id/dest_city"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        android:layout_width="match_parent"
+        android:layout_height="35dp"
+        android:drawableStart="@drawable/hotel_icon"
+        android:drawablePadding="10dp"
+        android:hint="Destination city"
+        android:textColorHint="@color/hint"
+        android:theme="@style/tight"
+        android:fontFamily="@font/bold"
+        android:background="@null"
+        android:completionThreshold="1"
+        android:textColor="@color/white"
+        android:textSize="15sp"
+        />
+
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_marginTop="10dp"

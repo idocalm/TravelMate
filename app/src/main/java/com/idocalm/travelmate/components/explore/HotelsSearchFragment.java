@@ -16,14 +16,21 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.models.Hotel;
 
 import com.idocalm.travelmate.api.Hotels;
 import com.idocalm.travelmate.dialogs.PersonsDialog;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -42,7 +49,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     Button checkInDate, checkOutDate, search;
     boolean checkInSelected = false;
     boolean checkOutSelected = false;
-    AutoCompleteTextView location;
+    AutoCompleteTextView countries, city;
     ListView hotelsList;
     HotelsListAdapter adapter;
 
@@ -88,9 +95,64 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_hotels_search, container, false);
 
-        location = view.findViewById(R.id.countries);
+        countries = view.findViewById(R.id.dest_country);
+        city = view.findViewById(R.id.dest_city);
+        city.setVisibility(View.GONE);
+        countries.setVisibility(View.VISIBLE);
+
         ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.countries));
-        location.setAdapter(locationAdapter);
+        countries.setAdapter(locationAdapter);
+
+
+        // in any country change, use external API to get cities, then set them to the city AutoCompleteTextView
+        countries.setOnItemClickListener((parent, view1, position, id) -> {
+            String selectedCountry = locationAdapter.getItem(position);
+            if (selectedCountry != null) {
+                city.setVisibility(View.VISIBLE);
+
+                RequestQueue queue = Volley.newRequestQueue(getContext());
+                String url = "https://countriesnow.space/api/v0.1/countries/cities";
+
+                JSONObject requestBody = new JSONObject();
+                try {
+                    requestBody.put("country", selectedCountry);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    return;
+                }
+
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+                        Request.Method.POST,
+                        url,
+                        requestBody,
+                        response -> {
+                            try {
+                                JSONArray citiesArray = response.getJSONArray("data");
+                                Log.d("Cities", citiesArray.toString());
+                                ArrayList<String> availableCities = new ArrayList<>();
+                                for (int i = 0; i < citiesArray.length(); i++) {
+                                    availableCities.add(citiesArray.getString(i));
+                                }
+
+                                ArrayAdapter<String> cityAdapter = new ArrayAdapter<>(
+                                        getContext(),
+                                        android.R.layout.simple_list_item_1,
+                                        availableCities
+                                );
+                                city.setAdapter(cityAdapter);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                                Toast.makeText(getContext(), "Error parsing city data", Toast.LENGTH_SHORT).show();
+                            }
+                        },
+                        error -> {
+                            Toast.makeText(getContext(), "Failed to load cities", Toast.LENGTH_SHORT).show();
+                        }
+                );
+
+                queue.add(jsonObjectRequest);
+            }
+        });
 
         search = view.findViewById(R.id.search);
         search.setOnClickListener(v -> {
@@ -155,7 +217,8 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
             @Override
             public void run() {
                 try {
-                    Hotel[] hotels = Hotels.fetchHotels(location.getText().toString(), amount, checkIn, checkOut);
+                    String query = city.getText().toString() + ", " + countries.getText().toString();
+                    Hotel[] hotels = Hotels.fetchHotels(query, amount, checkIn, checkOut);
                     ArrayList<Hotel> list = new ArrayList<>();
                     Collections.addAll(list, hotels);
 

@@ -1,5 +1,6 @@
 package com.idocalm.travelmate.fragments;
 
+import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
@@ -9,12 +10,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.idocalm.travelmate.MainActivity;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.BreadcrumbEvent;
 
 import java.util.ArrayList;
@@ -44,6 +49,12 @@ public class BreadcrumbFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_breadcrumb, container, false);
         Typeface bold = getResources().getFont(R.font.bold);
+
+        Button logoutButton = view.findViewById(R.id.logout_btn);
+        logoutButton.setOnClickListener(v -> {
+            Log.d("BreadcrumbFragment", "Logout button clicked");
+            Auth.logOut(getActivity());
+        });
 
         LinearLayout contentLayout = view.findViewById(R.id.breadcrumb_content);
         FrameLayout fragmentLayout = view.findViewById(R.id.breadcrumb_fragment);
@@ -109,6 +120,7 @@ public class BreadcrumbFragment extends Fragment {
         lastTextView.setTypeface(bold);
         lastTextView.setTextColor(getResources().getColor(R.color.white));
         contentLayout.addView(lastTextView);
+
 
 
         return view;

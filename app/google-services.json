@@ -1,8 +1,9 @@
 {
   "project_info": {
     "project_number": "812862452575",
+    "firebase_url": "https://travel-mate-4cd5a-default-rtdb.europe-west1.firebasedatabase.app",
     "project_id": "travel-mate-4cd5a",
-    "storage_bucket": "travel-mate-4cd5a.appspot.com"
+    "storage_bucket": "travel-mate-4cd5a.firebasestorage.app"
   },
   "client": [
     {

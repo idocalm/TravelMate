@@ -99,7 +99,6 @@ public class HotelsListAdapter extends ArrayAdapter<Hotel> {
             @Override
             public void run() {
                 try {
-
                     JSONObject hotelData = Hotels.getHotelData(hotel);
                     openDialog(hotel, hotelData);
                 } catch (IOException e) {

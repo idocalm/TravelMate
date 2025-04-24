@@ -9,10 +9,20 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.text.InputType;
+import android.util.Log;
+import android.widget.EditText;
+import android.widget.Toast;
+
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
+
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.idocalm.travelmate.auth.Auth;
 
 import java.io.File;
 import java.io.IOException;
@@ -86,21 +96,47 @@ public class GalleryManager {
     }
 
     public void openDialog(ActivityResultLauncher<Intent> galleryLauncher,
-                           ActivityResultLauncher<Intent> cameraLauncher, ActivityResultLauncher<String> permissionLauncher) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setTitle("Choose an option")
-                .setItems(new CharSequence[]{"Camera", "Gallery"}, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
-                        if (which == 0) {
-                            // Camera option selected
-                            takePicture(cameraLauncher, permissionLauncher);
-                        } else {
-                            // Gallery option selected
-                            fromGallery(galleryLauncher, cameraLauncher);
-                        }
-                    }
-                });
-        builder.create().show();
+                           ActivityResultLauncher<Intent> cameraLauncher,
+                           ActivityResultLauncher<String> permissionLauncher) {
+
+        // For now, disabled the camera option / gallery option
+        showUrlInputDialog();
+    }
+
+    private void showUrlInputDialog() {
+        AlertDialog.Builder urlDialogBuilder = new AlertDialog.Builder(context);
+        urlDialogBuilder.setTitle("Enter Image URL");
+
+        final EditText input = new EditText(context);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        urlDialogBuilder.setView(input);
+
+        urlDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String imageUrl = input.getText().toString().trim();
+                if (!imageUrl.isEmpty()) {
+                    Log.d("GalleryManager", "Image URL: " + imageUrl);
+                    handleImageUrl(imageUrl);
+                } else {
+                    Toast.makeText(context, "URL cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        urlDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        urlDialogBuilder.show();
+    }
+
+    private void handleImageUrl(String imageUrl) {
+        // store profile image URL in the database
+        Auth.getUser().setProfile(imageUrl);
     }
 
     public Uri getCapturedImageUri() {

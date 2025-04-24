@@ -2,35 +2,35 @@ package com.idocalm.travelmate;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
-import com.idocalm.travelmate.enums.CurrencyType;
-import com.idocalm.travelmate.models.User;
-
-import java.util.ArrayList;
+import java.util.function.Consumer;
 
 public class MainActivity extends AppCompatActivity {
 
+    public GoogleSignInClient mGoogleSignInClient;
     Button loginButton;
     Button googleButton;
     EditText emailEditText;
     EditText passwordEditText;
+    private Consumer<GoogleSignInAccount> successHandler;
+    private Runnable failureHandler;
+    public static final int RC_SIGN_IN = 1001;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         FirebaseApp.initializeApp(this);
@@ -44,53 +44,41 @@ public class MainActivity extends AppCompatActivity {
         passwordEditText = findViewById(R.id.password);
     }
 
+    public void setSignInResultHandler(Consumer<GoogleSignInAccount> successHandler, Runnable failureHandler) {
+        this.successHandler = successHandler;
+        this.failureHandler = failureHandler;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN) {
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                if (successHandler != null) successHandler.accept(account);
+            } catch (ApiException e) {
+                if (failureHandler != null) failureHandler.run();
+            }
+        }
+    }
+
     @Override
     protected void onStart() {
         super.onStart();
 
-
-        if (Auth.isLoggedIn()) {
-            DocumentReference ref = FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        DocumentSnapshot document = task.getResult();
-                        if (document.exists()) {
-                            Intent intent = new Intent(MainActivity.this, HomeActivity.class);
-                            CurrencyType currencyType = CurrencyType.NONE;
-                            if (document.getString("currency").equals("USD")) {
-                                currencyType = CurrencyType.USD;
-                            } else if (document.getString("currency").equals("EUR")) {
-                                currencyType = CurrencyType.EUR;
-                            } else if (document.getString("currency").equals("ILS")) {
-                                currencyType = CurrencyType.ILS;
-                            }
-
-                            ArrayList<String> trips = (ArrayList<String>) document.get("tripIds");
-
-                            Auth.instantiateUser(document.getString("name"), currencyType, FirebaseAuth.getInstance().getCurrentUser().getUid(), trips);
-                            startActivity(intent);
-                            finish();
-                        } else {
-
-
-
-                            Auth.instantiateUser(FirebaseAuth.getInstance().getCurrentUser().getUid());
-                            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    } else {
-                        Log.d("MainActivity", "get failed with ", task.getException());
-                    }
-                }
+        googleButton.setOnClickListener(v -> {
+            Auth.loginWithGoogle(this, () -> {
+                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+            }, () -> {
+                // Show error message
+                Toast.makeText(this, "Login failed - ", Toast.LENGTH_SHORT).show();
             });
-
-        }
+        });
 
         loginButton.setOnClickListener(v -> {
-            if ( emailEditText.getText().toString().isEmpty()) {
+            if (emailEditText.getText().toString().isEmpty()) {
                 Toast.makeText(this, "Email is required", Toast.LENGTH_SHORT).show();
                 return;
             }
@@ -101,15 +89,11 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-
             String password = passwordEditText.getText().toString();
-            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                Auth.instantiateUser(FirebaseAuth.getInstance().getCurrentUser().getUid());
-            }
-            Auth.login(email, password, () -> {
-                Intent intent = new Intent(this, RegisterActivity.class);
-                startActivity(intent);
-                finish();
+
+
+            Auth.login(this, email, password, () -> {
+                Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
             }, () -> {
                 // Show error message
                 Toast.makeText(this, "Login failed - ", Toast.LENGTH_SHORT).show();

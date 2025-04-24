@@ -10,17 +10,30 @@ import android.os.Bundle;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
+import com.idocalm.travelmate.components.friends.FriendsListAdapter;
+import com.idocalm.travelmate.models.User;
 import com.idocalm.travelmate.utils.GalleryManager;
+
+import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ProfileAccountFragment extends Fragment {
 
@@ -41,7 +54,63 @@ public class ProfileAccountFragment extends Fragment {
         // Inflate the layout for this fragment
 
         GalleryManager galleryManager = new GalleryManager(getContext());
+        View view = inflater.inflate(R.layout.fragment_profile_account, container, false);
+        profileImage = view.findViewById(R.id.profile_img);
 
+        ViewPager friendsList = view.findViewById(R.id.friends_list);
+        ArrayList<String> friends = Auth.getUser().getFriendsIds();
+        Log.d("ProfileAccountFragment", "Friends IDs: " + friends.toString());
+        ArrayList<User> friendsListData = new ArrayList<>();
+
+        int totalFriends = friends.size();
+        AtomicInteger completedCount = new AtomicInteger(0); // thread-safe counter
+
+        for (String id : friends) {
+            final String friendId = id;
+            Log.d("ProfileAccountFragment", "Fetching friend: " + friendId);
+
+            FirebaseFirestore.getInstance().collection("users").document(friendId).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            User friend = User.fromDocument(documentSnapshot);
+                            friendsListData.add(friend);
+                            Log.d("ProfileAccountFragment", "Friend added: " + friend.getName());
+                        } else {
+                            Log.d("ProfileAccountFragment", "Friend not found: " + friendId);
+                        }
+
+                        if (completedCount.incrementAndGet() == totalFriends) {
+                            // All fetches done!
+                            FriendsListAdapter adapter = new FriendsListAdapter(getContext(), friendsListData);
+                            friendsList.setAdapter(adapter);
+                            Log.d("ProfileAccountFragment", "All friends fetched, adapter set.");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.d("ProfileAccountFragment", "Failed to fetch friend: " + friendId + " - " + e.getMessage());
+
+                        if (completedCount.incrementAndGet() == totalFriends) {
+                            // All fetches done!
+                            FriendsListAdapter adapter = new FriendsListAdapter(getContext(), friendsListData);
+                            friendsList.setAdapter(adapter);
+
+                            // make it so when you click a friend, theres a dialog to remove them
+
+
+                        }
+                    });
+        }
+
+
+
+        // attempt to fetch profile image from the db and load it into the image view
+        if (Auth.getUser().getProfileImage() != null) {
+            Glide.with(getContext())
+                    .load(Auth.getUser().getProfileImage())
+                    .into(profileImage);
+        } else {
+            Log.d("ProfileAccountFragment", "No profile image found");
+        }
 
         ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
@@ -73,12 +142,11 @@ public class ProfileAccountFragment extends Fragment {
                 });
 
 
-        View view = inflater.inflate(R.layout.fragment_profile_account, container, false);
-
-        profileImage = view.findViewById(R.id.profile_img);
         profileImage.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Long click to change profile photo", Toast.LENGTH_SHORT).show();
         });
+
+
         TextView name = view.findViewById(R.id.profile_name);
         TextView currency = view.findViewById(R.id.profile_currency);
 
@@ -86,7 +154,7 @@ public class ProfileAccountFragment extends Fragment {
         ImageView editCurrency = view.findViewById(R.id.edit_currency);
 
         editName.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
             builder.setTitle("Edit Name");
             builder.setMessage("Enter your new name");
 
@@ -106,10 +174,8 @@ public class ProfileAccountFragment extends Fragment {
             builder.show();
         });
 
-
         name.setText(Auth.getUser().getName());
         currency.setText(Auth.getUser().getCurrencyString());
-
 
         profileImage.setOnLongClickListener(v -> {
             galleryManager.openDialog(galleryLauncher, cameraLauncher, permissionLauncher);

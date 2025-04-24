@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="300dp"
-    android:background="@color/white"
+    android:background="@color/bg_for_dialog"
     android:orientation="vertical" >
 
     <TextView
@@ -12,10 +12,10 @@
         android:layout_gravity="center"
         android:layout_margin="10dp"
         android:text="How many people will be staying?"
-        android:textColor="@color/black"
-        android:textSize="30sp"
+        android:textColor="@color/white"
+        android:textSize="25sp"
         android:textAlignment="center"
-        android:fontFamily="@font/outline_black"
+        android:fontFamily="@font/bold"
         android:textStyle="bold"/>
 
 
@@ -47,7 +47,7 @@
             android:layout_gravity="center"
             android:layout_marginHorizontal="20dp"
             android:text="1"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="30sp"
             android:textAlignment="center"
             android:fontFamily="@font/outline_black"
