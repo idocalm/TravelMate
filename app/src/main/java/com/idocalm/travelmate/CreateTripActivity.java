@@ -29,8 +29,11 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.enums.TripVisibility;
+import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -155,28 +158,21 @@ public class CreateTripActivity extends AppCompatActivity {
                 Timestamp start = new Timestamp(startDate.getTime());
                 Timestamp end = new Timestamp(endDate.getTime());
 
-                HashMap<String, Object> trip = new HashMap<>();
-                trip.put("name", name);
-                trip.put("destination", destination);
-                trip.put("owner", Auth.getUser().getId());
-                trip.put("description", description);
-                trip.put("image", image);
-                trip.put("visibility", visibility.ordinal());
-                trip.put("members", List.of(Auth.getUser().getId()));
-                trip.put("start_date", start);
-                trip.put("end_date", end);
-                trip.put("created_at", new Timestamp(new Date()));
-                trip.put("last_edited", new Timestamp(new Date()));
-                trip.put("last_opened", new Timestamp(new Date()));
-                trip.put("itinerary", List.of());
-                trip.put("total_flights", 0.0);
-                trip.put("total_hotels", 0.0);
-                trip.put("total_other", 0.0);
+                ArrayList<String> members = new ArrayList<>();
+                members.add(Auth.getUser().getId());
+
+                ArrayList<ItineraryActivity> activities = new ArrayList<>();
+
+                Trip trip = new Trip(null, name, destination, Auth.getUser().getId(), description, image, members, start, end, new Timestamp(new Date()), new Timestamp(new Date()), new Timestamp(new Date()), activities);
+
+                HashMap<String, Object> t = Trip.toHashMap(trip);
 
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("trips").add(trip).addOnCompleteListener(task -> {
+                db.collection("trips").add(t).addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        Auth.getUser().addTripId(task.getResult().getId());
+                        String id = task.getResult().getId();
+                        db.collection("trips").document(id).update("id", task.getResult().getId());
+                        Auth.getUser().addTripId(id);
                         Toast.makeText(this, "Trip created successfully", Toast.LENGTH_SHORT).show();
                         finish();
 

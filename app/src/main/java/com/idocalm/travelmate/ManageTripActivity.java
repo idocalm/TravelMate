@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.models.ItineraryActivity;
@@ -88,32 +89,15 @@ public class ManageTripActivity extends AppCompatActivity {
             builder.setView(input);
 
             builder.setPositiveButton("Change", (dialogInterface, i) -> {
-                // get the URL from the input
                 String url = input.getText().toString();
-                // set the image to the new URL
-                Thread thread = new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            URL imageUrl = new URL(url);
-                            HttpURLConnection connection = (HttpURLConnection) imageUrl.openConnection();
-                            connection.setDoInput(true);
-                            connection.connect();
-                            InputStream input = connection.getInputStream();
-                            Bitmap bitmap = BitmapFactory.decodeStream(input);
-                            setImage(bitmap);
+                Glide.with(this)
+                        .load(url)
+                        .placeholder(R.drawable.trip_placeholder)
+                        .error(R.drawable.trip_placeholder)
+                        .into((ImageView) findViewById(R.id.trip_image));
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("trips").document(getIntent().getStringExtra("trip_id")).update("image", url);
 
-                            // save the new image URL to the database
-                            FirebaseFirestore db = FirebaseFirestore.getInstance();
-                            db.collection("trips").document(getIntent().getStringExtra("trip_id")).update("image", url);
-
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });
-                thread.start();
             });
 
             builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
@@ -246,25 +230,11 @@ public class ManageTripActivity extends AppCompatActivity {
                             noActivities.setVisibility(LinearLayout.GONE);
                         }
 
-                        Thread thread = new Thread(new Runnable() {
-                            @Override
-                            public void run() {
-                                try {
-                                    URL url = new URL(trip.getImage());
-                                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                                    connection.setDoInput(true);
-                                    connection.connect();
-                                    InputStream input = connection.getInputStream();
-                                    Bitmap bitmap = BitmapFactory.decodeStream(input);
-                                    setImage(bitmap);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                }
-
-                            }
-                        });
-
-                        thread.start();
+                        Glide.with(this)
+                                .load(trip.getImage())
+                                .placeholder(R.drawable.trip_placeholder)
+                                .error(R.drawable.trip_placeholder)
+                                .into((ImageView) findViewById(R.id.trip_image));
 
                     }
                 });

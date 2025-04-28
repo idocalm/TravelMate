@@ -56,7 +56,7 @@ public class Hotels {
         }
 
         if (city == null) {
-            throw new IOException("City not found");
+            return null;
         }
 
         String cityId = city.getString("dest_id");

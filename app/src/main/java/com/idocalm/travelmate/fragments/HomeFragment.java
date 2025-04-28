@@ -2,14 +2,21 @@ package com.idocalm.travelmate.fragments;
 
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.google.firebase.Timestamp;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.home.RecentlyViewed;
@@ -18,7 +25,10 @@ import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
 
 import java.lang.reflect.Array;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class HomeFragment extends Fragment {
@@ -36,6 +46,26 @@ public class HomeFragment extends Fragment {
         //fetchRecentTrips();
     }
 
+    public static String getTimeRemainingString(Timestamp now, Timestamp tripTime) {
+        long diffMillis = (tripTime.getSeconds() - now.getSeconds()) * 1000;
+
+        if (diffMillis <= 0) {
+            return "Your trip has already started!";
+        }
+
+        long diffDays = diffMillis / (1000 * 60 * 60 * 24);
+        if (diffDays >= 1) {
+            return "Only " + diffDays + (diffDays == 1 ? " day" : " days") + " left to your next trip";
+        }
+
+        long diffHours = diffMillis / (1000 * 60 * 60);
+        if (diffHours >= 1) {
+            return "Only " + diffHours + (diffHours == 1 ? " hour" : " hours") + " left to your next trip";
+        }
+
+        return "Less than 1 hour left to your next trip";
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -50,7 +80,7 @@ public class HomeFragment extends Fragment {
 
         /* check if the current time is between 7:00 and 12:00 */
         String greeting = "";
-        int hour = java.time.LocalTime.now().getHour();
+        int hour = LocalTime.now().getHour();
         if (hour >= 7 && hour < 12) {
             greeting = "Good morning";
         } else if (hour >= 12 && hour < 18) {
@@ -65,8 +95,58 @@ public class HomeFragment extends Fragment {
         TextView nameTextView = view.findViewById(R.id.welcome_name);
         nameTextView.setText("Hello, " + name);
 
+        TextView leftToTrip = view.findViewById(R.id.left_to_trip);
 
+        if (Auth.getUser().getTripIds() == null || Auth.getUser().getTripIds().isEmpty()) {
+            leftToTrip.setVisibility(View.GONE);
+            return view;
+        }
 
+        // fetch all ids from "trips", then get the one with the most recent start date
+        ArrayList<String> tripIds = Auth.getUser().getTripIds();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        ArrayList<Trip> loadedTrips = new ArrayList<>();
+
+        for (String tripId : tripIds) {
+            db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Trip trip = Trip.fromDB(task.getResult());
+                    loadedTrips.add(trip);
+
+                    // After all trips are loaded, find the closest one
+                    if (loadedTrips.size() == tripIds.size()) {
+                        Trip closestTrip = null;
+                        for (Trip t : loadedTrips) {
+                            if (closestTrip == null || (t.getStartDate().compareTo(closestTrip.getStartDate()) < 0 && t.getStartDate().compareTo(Timestamp.now()) > 0)) {
+                                closestTrip = t;
+                            }
+                        }
+
+                        if (closestTrip != null) {
+                            String time = getTimeRemainingString(Timestamp.now(), closestTrip.getStartDate());
+                            SpannableString spannable = new SpannableString(time);
+
+                            Pattern pattern = Pattern.compile("\\d+\\s+(days|day|hours|hour)");
+                            Matcher matcher = pattern.matcher(time);
+
+                            if (matcher.find()) {
+                                int start = matcher.start();
+                                int end = matcher.end();
+                                spannable.setSpan(
+                                        new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.green)), // Replace R.color.green with your green
+                                        start,
+                                        end,
+                                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                                );
+                            }
+
+                            leftToTrip.setText(spannable);
+                            leftToTrip.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }
+            });
+        }
 
         return view;
     }

@@ -16,6 +16,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -52,6 +53,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     AutoCompleteTextView countries, city;
     ListView hotelsList;
     HotelsListAdapter adapter;
+    ProgressBar loading;
 
     public HotelsSearchFragment() {
         // Required empty public constructor
@@ -95,6 +97,8 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_hotels_search, container, false);
 
+        loading = view.findViewById(R.id.loading_spinner);
+        loading.setVisibility(View.GONE);
         countries = view.findViewById(R.id.dest_country);
         city = view.findViewById(R.id.dest_city);
         city.setVisibility(View.GONE);
@@ -103,11 +107,11 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
         ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.countries));
         countries.setAdapter(locationAdapter);
 
-
         // in any country change, use external API to get cities, then set them to the city AutoCompleteTextView
         countries.setOnItemClickListener((parent, view1, position, id) -> {
             String selectedCountry = locationAdapter.getItem(position);
             if (selectedCountry != null) {
+                Log.d("Selected Country", selectedCountry);
                 city.setVisibility(View.VISIBLE);
 
                 RequestQueue queue = Volley.newRequestQueue(getContext());
@@ -117,9 +121,9 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
                 try {
                     requestBody.put("country", selectedCountry);
                 } catch (JSONException e) {
-                    e.printStackTrace();
-                    return;
+                    throw new RuntimeException(e);
                 }
+                Log.d("Request Body", requestBody.toString());
 
                 JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
                         Request.Method.POST,
@@ -157,6 +161,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
         search = view.findViewById(R.id.search);
         search.setOnClickListener(v -> {
             try {
+
                 searchHotels();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -213,12 +218,18 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     }
 
     private void searchHotels() throws IOException {
+        loading.setVisibility(View.VISIBLE);
+        hotelsList.setVisibility(View.GONE);
         new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     String query = city.getText().toString() + ", " + countries.getText().toString();
                     Hotel[] hotels = Hotels.fetchHotels(query, amount, checkIn, checkOut);
+
+                    if (hotels == null)
+                        hotels = new Hotel[0];
+
                     ArrayList<Hotel> list = new ArrayList<>();
                     Collections.addAll(list, hotels);
 
@@ -236,6 +247,20 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
             }
         }).start();
 
+        // listen to adapter changes
+        adapter.registerDataSetObserver(new android.database.DataSetObserver() {
+            @Override
+            public void onChanged() {
+                super.onChanged();
+                if (adapter.getCount() == 0) {
+                    loading.setVisibility(View.GONE);
+                    hotelsList.setVisibility(View.GONE);
+                } else {
+                    loading.setVisibility(View.GONE);
+                    hotelsList.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
     }
 

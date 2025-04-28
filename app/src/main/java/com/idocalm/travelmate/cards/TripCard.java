@@ -17,6 +17,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.idocalm.travelmate.ManageTripActivity;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
@@ -74,29 +75,10 @@ public class TripCard extends Fragment {
         String tripDate = formatter.format(trip.getStartDate().toDate()) + " - " + formatter.format(trip.getEndDate().toDate());
         date.setText(tripDate);
 
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Log.d("TripCard", "URL: " + trip.getImage());
-                    URL url = new URL(trip.getImage());
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setDoInput(true);
-                    connection.connect();
-                    InputStream input = connection.getInputStream();
-                    if (input == null) {
-                        Log.d("TripCard", "input is null");
-                    }
-                    Bitmap bitmap = BitmapFactory.decodeStream(input);
-                    setImage(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-
-        thread.start();
+        Glide.with(getContext())
+                .load(trip.getImage())
+                .placeholder(R.drawable.trip_placeholder)
+                .into((ImageView) view.findViewById(R.id.trip_image));
 
         if (trip.getOwner().equals(Auth.getUser().getId())) {
             view.setOnClickListener(v -> {

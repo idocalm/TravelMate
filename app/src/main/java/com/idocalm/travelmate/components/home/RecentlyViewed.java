@@ -64,9 +64,7 @@ public class RecentlyViewed extends Fragment {
             // get the trip from the database
             db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    int visibility = Integer.parseInt(task.getResult().get("visibility").toString());
                     Trip trip = Trip.fromDB(task.getResult());
-
 
                     TripCard tripCard = new TripCard(trip);
                     FragmentTransaction transaction = getChildFragmentManager().beginTransaction();

@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.cards.TripCard;
 import com.idocalm.travelmate.enums.TripVisibility;
 
@@ -16,6 +17,8 @@ import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class Trip {
@@ -33,6 +36,27 @@ public class Trip {
     private ArrayList<String> members;
     private ArrayList<ItineraryActivity> activities;
 
+    public static HashMap<String, Object> toHashMap(Trip t) {
+        HashMap<String, Object> trip = new HashMap<>();
+        trip.put("name", t.getName());
+        trip.put("destination", t.getDestination());
+        trip.put("owner", Auth.getUser().getId());
+        trip.put("description", t.getDescription());
+        trip.put("image", t.getImage());
+        trip.put("visibility", TripVisibility.PUBLIC.toString()); // TODO: make this dynamic
+        trip.put("members", t.getMembers());
+        trip.put("start_date", t.getStartDate());
+        trip.put("end_date", t.getEndDate());
+        trip.put("created_at", t.getCreatedAt());
+        trip.put("last_edited", t.getLastEdited());
+        trip.put("last_opened", t.getLastOpened());
+        trip.put("itinerary", t.getActivities());
+        trip.put("total_flights", 0.0);
+        trip.put("total_hotels", 0.0);
+        trip.put("total_other", 0.0);
+
+        return trip;
+    }
 
 
     public Trip(String id, String name, String destination, String owner, String description, String image, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened, ArrayList<ItineraryActivity> activities) {
@@ -49,6 +73,22 @@ public class Trip {
         this.last_edited = last_edited;
         this.last_opened = last_opened;
         this.activities = activities;
+    }
+
+    public Trip(Trip trip) {
+        this.id = trip.id;
+        this.name = trip.name;
+        this.destination = trip.destination;
+        this.owner = trip.owner;
+        this.description = trip.description;
+        this.image = trip.image;
+        this.members = trip.members;
+        this.start_date = trip.start_date;
+        this.end_date = trip.end_date;
+        this.created_at = trip.created_at;
+        this.last_edited = trip.last_edited;
+        this.last_opened = trip.last_opened;
+        this.activities = trip.activities;
     }
 
     // write a static function to create a new trip from the db response, without passing each field
@@ -73,20 +113,38 @@ public class Trip {
 
     }
 
+
+    public ArrayList<String> getMembers() {
+        return members;
+    }
+
     public static ArrayList<ItineraryActivity> getActivitiesFromDB(DocumentSnapshot snapshot) {
         ArrayList<ItineraryActivity> activities = new ArrayList<>();
-        // go over "itinerary" array of maps and create an ItineraryActivity object for each map
-        ArrayList<Map<String, Object>> activitiesMap = (ArrayList<Map<String, Object>>) snapshot.get("itinerary");
-        for (Map<String, Object> activityMap : activitiesMap) {
-            activities.add(new ItineraryActivity(
-                    (String) activityMap.get("name"),
-                    (String) activityMap.get("location"),
-                    (Timestamp) activityMap.get("start_date"),
-                    (Long) activityMap.get("duration"),
-                    (String) activityMap.get("note"),
-                    (String) activityMap.get("cost")
-            ));
+
+        Object rawActivities = snapshot.get("itinerary");
+
+        if (rawActivities instanceof List<?>) {
+            List<?> list = (List<?>) rawActivities;
+            for (Object item : list) {
+                if (item instanceof Map<?, ?>) {
+                    Map<String, Object> activityMap = (Map<String, Object>) item;
+                    activities.add(new ItineraryActivity(
+                            (String) activityMap.get("name"),
+                            (String) activityMap.get("location"),
+                            (Timestamp) activityMap.get("start_date"),
+                            (Long) activityMap.get("duration"),
+                            (String) activityMap.get("note"),
+                            (String) activityMap.get("cost")
+                    ));
+                } else {
+                    // (Optional) Log if there's a weird item
+                    Log.w("Trip", "Skipping non-map item in itinerary: " + item);
+                }
+            }
+        } else {
+            Log.w("Trip", "Itinerary field is missing or not a list");
         }
+
         return activities;
     }
 
@@ -101,6 +159,10 @@ public class Trip {
 
     public String getId() {
         return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -133,6 +195,7 @@ public class Trip {
     public Timestamp getCreatedAt() {
         return created_at;
     }
+
 
     public Timestamp getLastEdited() {
         return last_edited;

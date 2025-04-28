@@ -19,6 +19,7 @@ import android.widget.Toast;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.cards.SearchTripCard;
 import com.idocalm.travelmate.cards.TripCard;
 import com.idocalm.travelmate.enums.SearchType;
 import com.idocalm.travelmate.models.Trip;
@@ -27,7 +28,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SearchFragment extends Fragment {
-
 
     SearchType searchType;
     ImageButton publicButton, privateButton;
@@ -63,7 +63,7 @@ public class SearchFragment extends Fragment {
 
         for (Trip trip : searchResult) {
             FragmentTransaction ft = getChildFragmentManager().beginTransaction();
-            ft.add(R.id.search_results, new TripCard(trip));
+            ft.add(R.id.search_results, new SearchTripCard(trip));
             ft.commit();
         }
     }

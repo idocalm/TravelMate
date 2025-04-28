@@ -207,9 +207,6 @@
         <item>Svalbard and Jan Mayen</item>
         <item>Swaziland</item>
     </array>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="change_password_more"><![CDATA[Change password & more]]></string>
-    <string name="title_activity_maps">MapsActivity</string>
 
 </resources>
