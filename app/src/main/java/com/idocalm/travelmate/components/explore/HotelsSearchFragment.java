@@ -199,7 +199,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
         setPeopleAmount(amount);
 
         peopleAmount.setOnClickListener(v -> {
-            PersonsDialog dialog = new PersonsDialog(getActivity());
+            PersonsDialog dialog = new PersonsDialog(getActivity(), "hotels");
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
             dialog.show();
 

@@ -7,8 +7,7 @@
     android:paddingBottom="15dp"
     android:background="@drawable/radius"
     android:backgroundTint="@color/bg"
-    android:layout_margin="10dp"
-    tools:context=".cards.HotelCardFragment">
+    android:layout_margin="10dp">
 
     <LinearLayout
         android:layout_width="wrap_content"

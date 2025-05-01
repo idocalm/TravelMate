@@ -35,6 +35,8 @@ public class Trip {
     private String image;
     private ArrayList<String> members;
     private ArrayList<ItineraryActivity> activities;
+    private ArrayList<Hotel> hotels;
+    private ArrayList<Flight> flights;
 
     public static HashMap<String, Object> toHashMap(Trip t) {
         HashMap<String, Object> trip = new HashMap<>();

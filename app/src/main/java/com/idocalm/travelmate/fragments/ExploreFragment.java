@@ -9,12 +9,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.idocalm.travelmate.components.explore.AttractionsSearchFragment;
 import com.idocalm.travelmate.components.explore.FlightsSearchFragment;
 import com.idocalm.travelmate.components.explore.HotelsSearchFragment;
 import com.idocalm.travelmate.R;
-import com.idocalm.travelmate.components.explore.RentalsSearchFragment;
-import com.idocalm.travelmate.components.explore.RestaurantsSearchFragment;
 
 public class ExploreFragment extends Fragment {
 

@@ -1,66 +1,164 @@
 package com.idocalm.travelmate.components.explore;
 
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.ListView;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.api.FlightCallback;
+import com.idocalm.travelmate.api.Flights;
+import com.idocalm.travelmate.dialogs.PersonsDialog;
+import com.idocalm.travelmate.models.Flight;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link FlightsSearchFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
-public class FlightsSearchFragment extends Fragment {
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+public class FlightsSearchFragment extends Fragment implements DatePickerDialog.OnDateSetListener, DatePickerDialog.OnCancelListener {
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    static Button peopleAmount;
+    static int amount = 1;
+    Date flightDate;
+
+    Button date, search;
+    AutoCompleteTextView origin, destination;
+    FlightsListAdapter adapter;
+    ProgressBar loading;
 
     public FlightsSearchFragment() {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment FlightsSearchFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static FlightsSearchFragment newInstance(String param1, String param2) {
-        FlightsSearchFragment fragment = new FlightsSearchFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+        return new FlightsSearchFragment();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_flights_search, container, false);
+
+        View view = inflater.inflate(R.layout.fragment_flights_search, container, false);
+
+        peopleAmount = view.findViewById(R.id.people_amount);
+        loading = view.findViewById(R.id.loading_spinner);
+        loading.setVisibility(View.GONE);
+
+        origin = view.findViewById(R.id.org_country);
+        destination = view.findViewById(R.id.dest_country);
+
+        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.countries));
+        destination.setAdapter(locationAdapter);
+        origin.setAdapter(locationAdapter);
+
+        search = view.findViewById(R.id.search);
+        search.setOnClickListener(v -> searchFlights());
+
+        flightDate = Calendar.getInstance().getTime();
+        String dateStr = new SimpleDateFormat("dd/MM/yyyy").format(flightDate);
+
+        date = view.findViewById(R.id.flight_date);
+        date.setText(dateStr);
+
+        date.setOnClickListener(v -> {
+            DatePickerDialog dialog = new DatePickerDialog(getContext(), this,
+                    Calendar.getInstance().get(Calendar.YEAR),
+                    Calendar.getInstance().get(Calendar.MONTH),
+                    Calendar.getInstance().get(Calendar.DAY_OF_MONTH));
+            dialog.show();
+        });
+
+        setPeopleAmount(amount);
+
+        peopleAmount.setOnClickListener(v -> {
+            PersonsDialog dialog = new PersonsDialog(getActivity(), "flights");
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+            dialog.show();
+        });
+
+        return view;
+    }
+
+    private void searchFlights() {
+        loading.setVisibility(View.VISIBLE);
+
+        String from = origin.getText().toString();
+        String to = destination.getText().toString();
+
+        if (from.isEmpty() || to.isEmpty()) {
+            Toast.makeText(getContext(), "Please select a departure and destination", Toast.LENGTH_SHORT).show();
+            loading.setVisibility(View.GONE);
+            return;
+        }
+
+        Flights.fetchFlights(
+                getActivity(),
+                from,
+                to,
+                amount,
+                flightDate,
+                new FlightCallback() {
+                    @Override
+                    public void onFlightsFetched(ArrayList<Flight> flights) {
+                        loading.setVisibility(View.GONE);
+                        showResults(flights);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        loading.setVisibility(View.GONE);
+                        Toast.makeText(getContext(), "Error fetching flights: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
+        );
+    }
+
+    private void showResults(ArrayList<Flight> flights) {
+        ListView listView = getView().findViewById(R.id.flights_list);
+        adapter = new FlightsListAdapter(getContext(), flights);
+        listView.setAdapter(adapter);
+    }
+
+    public static void setPeopleAmount(int update) {
+        amount = update;
+        if (peopleAmount != null) {
+            if (amount == 1) {
+                peopleAmount.setText("1 Person");
+            } else {
+                peopleAmount.setText(amount + " People");
+            }
+        }
+    }
+
+    @Override
+    public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month);
+        calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+        flightDate = calendar.getTime();
+
+        String selectedDate = new SimpleDateFormat("dd/MM/yyyy").format(flightDate);
+        date.setText(selectedDate);
+    }
+
+    @Override
+    public void onCancel(DialogInterface dialog) {
+        // No-op
     }
 }

@@ -8,6 +8,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.idocalm.travelmate.components.explore.FlightsSearchFragment;
 import com.idocalm.travelmate.components.explore.HotelsSearchFragment;
 import com.idocalm.travelmate.R;
 
@@ -17,9 +18,11 @@ public class PersonsDialog extends Dialog implements
     public Button plus, minus, submit;
     public TextView amountText;
     public int amount = 1;
+    public String type;
 
-    public PersonsDialog(Activity a) {
+    public PersonsDialog(Activity a, String type) {
         super(a);
+        this.type = type;
     }
 
     @Override
@@ -53,7 +56,11 @@ public class PersonsDialog extends Dialog implements
                 amountText.setText(amountStr);
             }
         } else if (v.getId() == R.id.btn_done) {
-            HotelsSearchFragment.setPeopleAmount(amount);
+            if (type.equals("hotels")) {
+                HotelsSearchFragment.setPeopleAmount(amount);
+            } else if (type.equals("flights")) {
+                FlightsSearchFragment.setPeopleAmount(amount);
+            }
             dismiss();
         }
     }
