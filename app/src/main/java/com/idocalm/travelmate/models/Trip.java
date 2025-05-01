@@ -21,6 +21,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * The type Trip.
+ */
 public class Trip {
     private String id;
     private String name;
@@ -38,6 +41,12 @@ public class Trip {
     private ArrayList<Hotel> hotels;
     private ArrayList<Flight> flights;
 
+    /**
+     * To hash map hash map.
+     *
+     * @param t the t
+     * @return the hash map
+     */
     public static HashMap<String, Object> toHashMap(Trip t) {
         HashMap<String, Object> trip = new HashMap<>();
         trip.put("name", t.getName());
@@ -61,6 +70,23 @@ public class Trip {
     }
 
 
+    /**
+     * Instantiates a new Trip.
+     *
+     * @param id          the id
+     * @param name        the name
+     * @param destination the destination
+     * @param owner       the owner
+     * @param description the description
+     * @param image       the image
+     * @param members     the members
+     * @param start_date  the start date
+     * @param end_date    the end date
+     * @param created_at  the created at
+     * @param last_edited the last edited
+     * @param last_opened the last opened
+     * @param activities  the activities
+     */
     public Trip(String id, String name, String destination, String owner, String description, String image, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened, ArrayList<ItineraryActivity> activities) {
         this.id = id;
         this.name = name;
@@ -77,6 +103,11 @@ public class Trip {
         this.activities = activities;
     }
 
+    /**
+     * Instantiates a new Trip.
+     *
+     * @param trip the trip
+     */
     public Trip(Trip trip) {
         this.id = trip.id;
         this.name = trip.name;
@@ -93,7 +124,12 @@ public class Trip {
         this.activities = trip.activities;
     }
 
-    // write a static function to create a new trip from the db response, without passing each field
+    /**
+     * From db trip.
+     *
+     * @param snapshot the snapshot
+     * @return the trip
+     */
     public static Trip fromDB(DocumentSnapshot snapshot) {
         Trip trip = new Trip(
                 snapshot.getId(),
@@ -116,10 +152,21 @@ public class Trip {
     }
 
 
+    /**
+     * Gets members.
+     *
+     * @return the members
+     */
     public ArrayList<String> getMembers() {
         return members;
     }
 
+    /**
+     * Gets activities from db.
+     *
+     * @param snapshot the snapshot
+     * @return the activities from db
+     */
     public static ArrayList<ItineraryActivity> getActivitiesFromDB(DocumentSnapshot snapshot) {
         ArrayList<ItineraryActivity> activities = new ArrayList<>();
 
@@ -150,6 +197,11 @@ public class Trip {
         return activities;
     }
 
+    /**
+     * Gets activities.
+     *
+     * @return the activities
+     */
     public ArrayList<Map<String, Object>> getActivities() {
         ArrayList<Map<String, Object>> res = new ArrayList<>();
         for (ItineraryActivity activity : this.activities) {
@@ -159,99 +211,203 @@ public class Trip {
         return res;
     }
 
+    /**
+     * Gets id.
+     *
+     * @return the id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets id.
+     *
+     * @param id the id
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Gets name.
+     *
+     * @return the name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Gets destination.
+     *
+     * @return the destination
+     */
     public String getDestination() {
         return destination;
     }
 
+    /**
+     * Gets owner.
+     *
+     * @return the owner
+     */
     public String getOwner() {
         return owner;
     }
 
+    /**
+     * Gets description.
+     *
+     * @return the description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Gets image.
+     *
+     * @return the image
+     */
     public String getImage() {
         return image;
     }
+
+    /**
+     * Gets start date.
+     *
+     * @return the start date
+     */
     public Timestamp getStartDate() {
         return start_date;
     }
 
+    /**
+     * Gets end date.
+     *
+     * @return the end date
+     */
     public Timestamp getEndDate() {
         return end_date;
     }
 
+    /**
+     * Gets created at.
+     *
+     * @return the created at
+     */
     public Timestamp getCreatedAt() {
         return created_at;
     }
 
 
+    /**
+     * Gets last edited.
+     *
+     * @return the last edited
+     */
     public Timestamp getLastEdited() {
         return last_edited;
     }
 
+    /**
+     * Gets last opened.
+     *
+     * @return the last opened
+     */
     public Timestamp getLastOpened() {
         return last_opened;
     }
 
+    /**
+     * Sets name.
+     *
+     * @param name the name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Sets destination.
+     *
+     * @param dest the dest
+     */
     public void setDestination(String dest) {
         this.destination = dest;
     }
 
+    /**
+     * Sets owner.
+     *
+     * @param owner the owner
+     */
     public void setOwner(String owner) {
         this.owner = owner;
     }
 
+    /**
+     * Sets description.
+     *
+     * @param description the description
+     */
     public void setDescription(String description) {
         this.description = description;
     }
 
+    /**
+     * Sets start date.
+     *
+     * @param start_date the start date
+     */
     public void setStartDate(Timestamp start_date) {
         this.start_date = start_date;
     }
 
+    /**
+     * Sets end date.
+     *
+     * @param end_date the end date
+     */
     public void setEndDate(Timestamp end_date) {
         this.end_date = end_date;
     }
 
+    /**
+     * Sets created at.
+     *
+     * @param created_at the created at
+     */
     public void setCreatedAt(Timestamp created_at) {
         this.created_at = created_at;
     }
 
+    /**
+     * Sets last edited.
+     *
+     * @param last_edited the last edited
+     */
     public void setLastEdited(Timestamp last_edited) {
         this.last_edited = last_edited;
     }
 
+    /**
+     * Sets last opened.
+     *
+     * @param last_opened the last opened
+     */
     public void setLastOpened(Timestamp last_opened) {
         this.last_opened = last_opened;
     }
 
+    /**
+     * Add activity.
+     *
+     * @param activity the activity
+     */
     public void addActivity(ItineraryActivity activity) {
         this.activities.add(activity);
     }
-
-    public void save() {
-        // TODO: save the trip to the database
-    }
-
-
-
 
 }

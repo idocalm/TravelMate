@@ -6,8 +6,17 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
+/**
+ * The type Flight response.
+ */
 public class FlightResponse {
 
+    /**
+     * Parse flights array list.
+     *
+     * @param rawJson the raw json
+     * @return the array list
+     */
     public static ArrayList<Flight> parseFlights(String rawJson) {
         ArrayList<Flight> flightsList = new ArrayList<>();
 

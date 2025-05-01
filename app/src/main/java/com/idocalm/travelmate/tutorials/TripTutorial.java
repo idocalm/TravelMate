@@ -20,7 +20,8 @@ public class TripTutorial extends AppCompatActivity {
 
     ViewPager viewPager;
 
-    Button back, next, skip;
+    Button back,
+    next, skip;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

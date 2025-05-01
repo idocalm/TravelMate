@@ -7,6 +7,9 @@ import java.time.Duration;
 import java.util.Date;
 import java.util.Map;
 
+/**
+ * The type Itinerary activity.
+ */
 public class ItineraryActivity {
 
     private String name;
@@ -17,6 +20,16 @@ public class ItineraryActivity {
     private String note;
     private String cost;
 
+    /**
+     * Instantiates a new Itinerary activity.
+     *
+     * @param name       the name
+     * @param location   the location
+     * @param start_date the start date
+     * @param duration   the duration
+     * @param note       the note
+     * @param cost       the cost
+     */
     public ItineraryActivity(String name, String location, Timestamp start_date, Long duration, String note, String cost) {
         this.name = name;
         this.location = location;
@@ -26,6 +39,12 @@ public class ItineraryActivity {
         this.cost = cost;
     }
 
+    /**
+     * From db itinerary activity.
+     *
+     * @param snapshot the snapshot
+     * @return the itinerary activity
+     */
     public static ItineraryActivity fromDB(DocumentSnapshot snapshot) {
         return new ItineraryActivity(
                 snapshot.getString("name"),
@@ -36,6 +55,12 @@ public class ItineraryActivity {
                 snapshot.getString("cost")
         );
     }
+
+    /**
+     * To map map.
+     *
+     * @return the map
+     */
     public Map<String, Object> toMap() {
         return Map.of(
                 "name", name,

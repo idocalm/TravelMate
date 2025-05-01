@@ -2,32 +2,110 @@ package com.idocalm.travelmate.models;
 
 import java.util.ArrayList;
 
+/**
+ * The type Flight.
+ */
 public class Flight {
+    /**
+     * The Deal type.
+     */
     public String dealType;
+    /**
+     * The Price.
+     */
     public int price;
+    /**
+     * The Currency.
+     */
     public String currency;
+    /**
+     * The Total duration.
+     */
     public String totalDuration;
+    /**
+     * The Departure date.
+     */
     public String departureDate;
+    /**
+     * The Departure time.
+     */
     public String departureTime;
+    /**
+     * The Refundable.
+     */
     public boolean refundable;
+    /**
+     * The Is refundable.
+     */
     public String isRefundable;
+    /**
+     * The Airline name.
+     */
     public String airlineName;
+    /**
+     * The Image url.
+     */
     public String imageUrl;
+    /**
+     * The Segments.
+     */
     public ArrayList<Segment> segments;
 
+    /**
+     * The type Segment.
+     */
     public static class Segment {
+        /**
+         * The Airline.
+         */
         public String airline;
+        /**
+         * The Flight number.
+         */
         public String flightNumber;
+        /**
+         * The Origin.
+         */
         public String origin;
+        /**
+         * The Destination.
+         */
         public String destination;
+        /**
+         * The Departure date.
+         */
         public String departureDate;
+        /**
+         * The Departure time.
+         */
         public String departureTime;
+        /**
+         * The Arrival date.
+         */
         public String arrivalDate;
+        /**
+         * The Arrival time.
+         */
         public String arrivalTime;
+        /**
+         * The Duration.
+         */
         public String duration;
+        /**
+         * The Cabin.
+         */
         public String cabin;
+        /**
+         * The Aircraft.
+         */
         public String aircraft;
+        /**
+         * The Terminal from.
+         */
         public String terminalFrom;
+        /**
+         * The Terminal to.
+         */
         public String terminalTo;
 
 
