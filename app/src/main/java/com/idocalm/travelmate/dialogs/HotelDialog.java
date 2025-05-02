@@ -83,10 +83,11 @@ public class HotelDialog extends Dialog {
 
                             if (trips.size() == tripIds.size()) {
                                 Log.d("HotelDialog", "All trips fetched: " + trips.size());
-                                // All trips have been fetched
+
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
                                 builder.setTitle("Select a trip");
                                 String[] tripNames = new String[trips.size()];
+
                                 int i = 0;
                                 for (String id : trips.keySet()) {
                                     tripNames[i] = trips.get(id);
@@ -100,6 +101,7 @@ public class HotelDialog extends Dialog {
                                     db.collection("trips").document(selectedTripId).collection("hotels").add(hotelMap)
                                             .addOnSuccessListener(documentReference -> {
                                                 Toast.makeText(getContext(), "Hotel added to trip", Toast.LENGTH_SHORT).show();
+                                                dismiss();
                                             })
                                             .addOnFailureListener(e -> {
                                                 Toast.makeText(getContext(), "Error adding hotel to trip", Toast.LENGTH_SHORT).show();

@@ -72,5 +72,43 @@ public class ItineraryActivity {
         );
     }
 
+    public static ItineraryActivity fromMap(Map<String, Object> map) {
+        return new ItineraryActivity(
+                (String) map.get("name"),
+                (String) map.get("location"),
+                (Timestamp) map.get("start_date"),
+                (Long) map.get("duration"),
+                (String) map.get("note"),
+                (String) map.get("cost")
+        );
+    }
 
+
+    public Timestamp getDate() {
+        return start_date;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getLocation() {
+        return location;
+    }
+
+    public Duration getDuration() {
+        return Duration.ofMillis(duration);
+    }
+
+    public String getNote() {
+        return note;
+    }
+
+    public String getCost() {
+        return cost;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 }
