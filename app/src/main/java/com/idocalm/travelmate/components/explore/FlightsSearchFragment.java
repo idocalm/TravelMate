@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.DatePicker;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -38,7 +39,7 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
     Button date, search;
     AutoCompleteTextView origin, destination;
     FlightsListAdapter adapter;
-    ProgressBar loading;
+    LinearLayout loading;
 
     public FlightsSearchFragment() {
         // Required empty public constructor
@@ -132,6 +133,7 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
         ListView listView = getView().findViewById(R.id.flights_list);
         adapter = new FlightsListAdapter(getContext(), flights);
         listView.setAdapter(adapter);
+        listView.setVisibility(View.VISIBLE);
     }
 
     public static void setPeopleAmount(int update) {

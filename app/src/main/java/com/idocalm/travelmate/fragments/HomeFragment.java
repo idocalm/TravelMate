@@ -115,14 +115,18 @@ public class HomeFragment extends Fragment {
 
                     // After all trips are loaded, find the closest one
                     if (loadedTrips.size() == tripIds.size()) {
+                        Log.d("HomeFragment", "All trips loaded: " + loadedTrips.size());
                         Trip closestTrip = null;
                         for (Trip t : loadedTrips) {
-                            if (closestTrip == null || (t.getStartDate().compareTo(closestTrip.getStartDate()) < 0 && t.getStartDate().compareTo(Timestamp.now()) > 0)) {
+                            if ((closestTrip == null || t.getStartDate().compareTo(closestTrip.getStartDate()) < 0) && t.getStartDate().compareTo(Timestamp.now()) > 0) {
                                 closestTrip = t;
                             }
                         }
 
                         if (closestTrip != null) {
+                            Log.d("HomeFragment", "Closest trip: " + closestTrip.getId());
+                            Log.d("HomeFragment", "Closest trip start date: " + closestTrip.getStartDate());
+                            Log.d("HomeFragment", "Current time: " + Timestamp.now());
                             String time = getTimeRemainingString(Timestamp.now(), closestTrip.getStartDate());
                             SpannableString spannable = new SpannableString(time);
 

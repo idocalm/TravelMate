@@ -69,7 +69,6 @@
         />
 
 
-
         <android.widget.Button
             android:id="@+id/flight_date"
             android:layout_width="match_parent"
@@ -77,6 +76,7 @@
             android:layout_marginRight="15dp"
             android:drawablePadding="10dp"
             android:layout_height="35dp"
+            android:layout_marginTop="5dp"
             android:background="@drawable/radius_transparent"
             android:fontFamily="@font/bold"
             android:paddingHorizontal="20dp"
@@ -105,14 +105,33 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <ProgressBar
+    <LinearLayout
         android:id="@+id/loading_spinner"
-        android:layout_marginTop="50dp"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:layout_marginTop="10dp"
         android:visibility="gone"
-        style="?android:attr/progressBarStyleLarge" />
+        >
+
+        <ProgressBar
+            android:layout_marginTop="50dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            style="?android:attr/progressBarStyleLarge" />
+        <TextView
+            android:id="@+id/no_flights"
+            android:layout_width="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="This might take a while..."
+            android:textColor="@color/white"
+            android:textSize="15sp"
+            android:fontFamily="@font/bold" />
+
+    </LinearLayout>
     <ListView
         android:layout_marginEnd="15dp"
         android:layout_width="match_parent"

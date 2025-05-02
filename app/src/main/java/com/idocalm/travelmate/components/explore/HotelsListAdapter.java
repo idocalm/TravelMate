@@ -86,7 +86,7 @@ public class HotelsListAdapter extends ArrayAdapter<Hotel> {
 
         Activity activity = (Activity) getContext();
         activity.runOnUiThread(() -> {
-            HotelDialog dialog = new HotelDialog(activity, hotel.getName(), hotel.getLatitude(), hotel.getLongitude(), hotel.getMainPhoto(), hotelData);
+            HotelDialog dialog = new HotelDialog(activity, hotel, hotelData);
             dialog.show();
         });
     }

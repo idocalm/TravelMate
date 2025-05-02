@@ -86,8 +86,10 @@ public class Trip {
      * @param last_edited the last edited
      * @param last_opened the last opened
      * @param activities  the activities
+     * @param hotels      the hotels
+     * @param flights     the flights
      */
-    public Trip(String id, String name, String destination, String owner, String description, String image, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened, ArrayList<ItineraryActivity> activities) {
+    public Trip(String id, String name, String destination, String owner, String description, String image, ArrayList<String> members, Timestamp start_date, Timestamp end_date, Timestamp created_at, Timestamp last_edited, Timestamp last_opened, ArrayList<ItineraryActivity> activities, ArrayList<Hotel> hotels, ArrayList<Flight> flights) {
         this.id = id;
         this.name = name;
         this.destination = destination;
@@ -101,6 +103,8 @@ public class Trip {
         this.last_edited = last_edited;
         this.last_opened = last_opened;
         this.activities = activities;
+        this.hotels = hotels;
+        this.flights = flights;
     }
 
     /**
@@ -144,7 +148,9 @@ public class Trip {
                 snapshot.getTimestamp("created_at"),
                 snapshot.getTimestamp("last_edited"),
                 snapshot.getTimestamp("last_opened"),
-                getActivitiesFromDB(snapshot)
+                getActivitiesFromDB(snapshot),
+                getHotelsFromDB(snapshot),
+                getFlightsFromDB(snapshot)
         );
 
         return trip;
@@ -195,6 +201,84 @@ public class Trip {
         }
 
         return activities;
+    }
+
+    /**
+     * Gets hotels from db.
+     *
+     * @param snapshot the snapshot
+     * @return the hotels from db
+     */
+    public static ArrayList<Hotel> getHotelsFromDB(DocumentSnapshot snapshot) {
+        ArrayList<Hotel> hotels = new ArrayList<>();
+
+        Object rawHotels = snapshot.get("hotels");
+
+        if (rawHotels instanceof List<?>) {
+            List<?> list = (List<?>) rawHotels;
+            for (Object item : list) {
+                if (item instanceof Map<?, ?>) {
+                    Map<String, Object> hotelMap = (Map<String, Object>) item;
+                    hotels.add(new Hotel(
+                            (Integer) hotelMap.get("id"),
+                            (String) hotelMap.get("name"),
+                            (String) hotelMap.get("main_photo"),
+                            (Long) hotelMap.get("price"),
+                            (Date) hotelMap.get("check_in"),
+                            (Date) hotelMap.get("check_out")
+                    ));
+                } else {
+                    // (Optional) Log if there's a weird item
+                    Log.w("Trip", "Skipping non-map item in hotels: " + item);
+                }
+            }
+        } else {
+            Log.w("Trip", "Hotels field is missing or not a list");
+        }
+
+        return hotels;
+    }
+
+    /**
+     * Gets flights from db.
+     *
+     * @param snapshot the snapshot
+     * @return the flights from db
+     */
+    public static ArrayList<Flight> getFlightsFromDB(DocumentSnapshot snapshot) {
+        ArrayList<Flight> flights = new ArrayList<>();
+
+        Object rawFlights = snapshot.get("flights");
+
+        if (rawFlights instanceof List<?>) {
+            List<?> list = (List<?>) rawFlights;
+            for (Object item : list) {
+                if (item instanceof Map<?, ?>) {
+                    Map<String, Object> flightMap = (Map<String, Object>) item;
+                    flights.add(new Flight(
+                            (String) flightMap.get("deal_type"),
+                            (Integer) flightMap.get("price"),
+                            (String) flightMap.get("currency"),
+                            (String) flightMap.get("total_duration"),
+                            (String) flightMap.get("departure_date"),
+                            (String) flightMap.get("departure_time"),
+                            (Boolean) flightMap.get("refundable"),
+                            (String) flightMap.get("is_refundable"),
+                            (String) flightMap.get("airline_name"),
+                            (String) flightMap.get("image_url"),
+                            (ArrayList<Flight.Segment>) flightMap.get("segments")
+                    ));
+                } else {
+                    // (Optional) Log if there's a weird item
+                    Log.w("Trip", "Skipping non-map item in flights: " + item);
+                }
+            }
+        } else {
+            Log.w("Trip", "Flights field is missing or not a list");
+        }
+
+        return flights;
+
     }
 
     /**
@@ -409,5 +493,16 @@ public class Trip {
     public void addActivity(ItineraryActivity activity) {
         this.activities.add(activity);
     }
+
+    /**
+     * Add hotel, and save it to the database.
+     *
+     * @param hotel the hotel
+     */
+    public void addHotel(Hotel hotel) {
+        this.hotels.add(hotel);
+        FirebaseFirestore.getInstance().collection("trips").document(this.id).update("hotels", this.hotels);
+    }
+
 
 }

@@ -16,7 +16,6 @@ import com.idocalm.travelmate.fragments.ProfileContentFragment;
 import com.idocalm.travelmate.fragments.ProfileSettingsFragment;
 import com.idocalm.travelmate.fragments.SearchFragment;
 import com.idocalm.travelmate.models.BreadcrumbEvent;
-import com.idocalm.travelmate.tutorials.TripTutorial;
 
 import java.util.ArrayList;
 
@@ -93,14 +92,9 @@ public class HomeActivity extends AppCompatActivity implements ProfileContentFra
 
         FloatingActionButton fab = findViewById(R.id.trip_button);
         fab.setOnClickListener(view -> {
-            if (Auth.getUser().getTripIds().isEmpty()) {
-                Intent intent = new Intent(HomeActivity.this, TripTutorial.class);
-                startActivity(intent);
-            } else {
-                Intent intent = new Intent(HomeActivity.this, CreateTripActivity.class);
-                intent.putExtra("tripAmount", Auth.getUser().getTripIds().size());
-                startActivity(intent);
-            }
+            Intent intent = new Intent(HomeActivity.this, CreateTripActivity.class);
+            intent.putExtra("tripAmount", Auth.getUser().getTripIds().size());
+            startActivity(intent);
         });
 
     }

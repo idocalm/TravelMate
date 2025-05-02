@@ -3,6 +3,7 @@ package com.idocalm.travelmate.fragments;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
+import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,7 +32,6 @@ import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.friends.FriendsListAdapter;
 import com.idocalm.travelmate.models.User;
-import com.idocalm.travelmate.utils.GalleryManager;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -53,7 +54,6 @@ public class ProfileAccountFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
 
-        GalleryManager galleryManager = new GalleryManager(getContext());
         View view = inflater.inflate(R.layout.fragment_profile_account, container, false);
         profileImage = view.findViewById(R.id.profile_img);
 
@@ -112,35 +112,6 @@ public class ProfileAccountFragment extends Fragment {
             Log.d("ProfileAccountFragment", "No profile image found");
         }
 
-        ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
-                        Uri imageUri = galleryManager.getImageUri(result.getData());
-                        profileImage.setImageURI(imageUri);
-
-                    }
-                });
-
-        ActivityResultLauncher<Intent> cameraLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (result.getResultCode() == Activity.RESULT_OK) {
-                    Uri imageUri = galleryManager.getImageUri(null);
-                    profileImage.setImageURI(imageUri);
-                }
-            });
-
-        ActivityResultLauncher<String> permissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                result -> {
-                    if (result) {
-                        galleryManager.launchCamera(cameraLauncher);
-                    } else {
-                        Toast.makeText(getContext(), "Permission denied", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
 
         profileImage.setOnClickListener(v -> {
             Toast.makeText(getContext(), "Long click to change profile photo", Toast.LENGTH_SHORT).show();
@@ -178,10 +149,46 @@ public class ProfileAccountFragment extends Fragment {
         currency.setText(Auth.getUser().getCurrencyString());
 
         profileImage.setOnLongClickListener(v -> {
-            galleryManager.openDialog(galleryLauncher, cameraLauncher, permissionLauncher);
+            showUrlInputDialog();
             return true;
         });
 
         return view;
+    }
+
+    private void showUrlInputDialog() {
+        AlertDialog.Builder urlDialogBuilder = new AlertDialog.Builder(getContext());
+        urlDialogBuilder.setTitle("Enter Image URL");
+
+        final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_URI);
+        urlDialogBuilder.setView(input);
+
+        urlDialogBuilder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String imageUrl = input.getText().toString().trim();
+                if (!imageUrl.isEmpty()) {
+                    Log.d("GalleryManager", "Image URL: " + imageUrl);
+                    handleImageUrl(imageUrl);
+                } else {
+                    Toast.makeText(getContext(), "URL cannot be empty", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        urlDialogBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+
+        urlDialogBuilder.show();
+    }
+
+    private void handleImageUrl(String imageUrl) {
+        // store profile image URL in the database
+        Auth.getUser().setProfile(imageUrl);
     }
 }

@@ -90,11 +90,9 @@ public class Hotels {
                     hotel.getInt("id"),
                     hotel.getString("name"),
                     hotel.getString("photoMainUrl"),
-                    hotel.getLong("latitude"),
-                    hotel.getLong("longitude"),
                     1000,
-                    checkInDate,
-                    checkOutDate
+                    checkIn,
+                    checkOut
             );
         }
             // Parse the response
@@ -105,9 +103,15 @@ public class Hotels {
         OkHttpClient client = new OkHttpClient();
 
         String currency = Auth.getUser().getCurrencyString();
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+        String checkInDate = formatter.format(hotel.getCheckInDate());
+        String checkOutDate = formatter.format(hotel.getCheckOutDate());
 
+        String url = "https://booking-com.p.rapidapi.com/v2/hotels/details?locale=en-gb&checkin_date="+checkInDate+"&hotel_id="+hotel.getId()+"&currency="+currency+"&checkout_date="+checkOutDate;
+
+        Log.d("Hotels", "getHotelData: " + url);
         Request request = new Request.Builder()
-                .url("https://booking-com.p.rapidapi.com/v2/hotels/details?locale=en-gb&checkin_date="+hotel.getCheckInDate()+"&hotel_id="+hotel.getId()+"&currency="+currency+"&checkout_date="+hotel.getCheckOutDate())
+                .url(url)
                 .get()
                 .addHeader("x-rapidapi-host", "booking-com.p.rapidapi.com")
                 .addHeader("x-rapidapi-key", "64381c16bbmshac2bfd18e22e798p1dd7dfjsn32dbec546a48")

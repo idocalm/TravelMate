@@ -63,6 +63,26 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
             segmentLayout.addView(segmentView);
         }
 
+        TextView dealLabel = view.findViewById(R.id.deal_type_label);
+        String dealType = flight.dealType != null ? flight.dealType.trim() : "";
+
+        switch (dealType) {
+            case "Best Deal":
+                dealLabel.setText("BEST DEAL");
+                dealLabel.setBackgroundColor(Color.parseColor("#2E7D32")); // Green
+                dealLabel.setVisibility(View.VISIBLE);
+                break;
+            case "Preferred":
+                dealLabel.setText("PREFERRED");
+                dealLabel.setBackgroundColor(Color.parseColor("#0277BD")); // Blue
+                dealLabel.setVisibility(View.VISIBLE);
+                break;
+            default:
+                dealLabel.setVisibility(View.GONE); // Hide for "None" or null
+                break;
+        }
+
+
         return view;
     }
 }

@@ -29,6 +29,8 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.enums.TripVisibility;
+import com.idocalm.travelmate.models.Flight;
+import com.idocalm.travelmate.models.Hotel;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 
@@ -162,8 +164,10 @@ public class CreateTripActivity extends AppCompatActivity {
                 members.add(Auth.getUser().getId());
 
                 ArrayList<ItineraryActivity> activities = new ArrayList<>();
+                ArrayList<Hotel> hotels = new ArrayList<>();
+                ArrayList<Flight> flights = new ArrayList<>();
 
-                Trip trip = new Trip(null, name, destination, Auth.getUser().getId(), description, image, members, start, end, new Timestamp(new Date()), new Timestamp(new Date()), new Timestamp(new Date()), activities);
+                Trip trip = new Trip(null, name, destination, Auth.getUser().getId(), description, image, members, start, end, new Timestamp(new Date()), new Timestamp(new Date()), new Timestamp(new Date()), activities, hotels, flights);
 
                 HashMap<String, Object> t = Trip.toHashMap(trip);
 

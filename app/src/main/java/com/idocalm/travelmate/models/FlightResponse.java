@@ -1,31 +1,47 @@
 package com.idocalm.travelmate.models;
 
 import android.util.Log;
+import android.widget.Toast;
+
+import com.idocalm.travelmate.api.CTranslator;
+import com.idocalm.travelmate.auth.Auth;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
+
+
 
 /**
  * The type Flight response.
  */
 public class FlightResponse {
 
+
+    public interface FlightParseCallback {
+        void onParsed(ArrayList<Flight> flights);
+    }
+
     /**
-     * Parse flights array list.
+     * Parses the flight response from the API.
      *
-     * @param rawJson the raw json
-     * @return the array list
+     * @param rawJson  The raw JSON string from the API response.
+     * @param callback The callback to handle the parsed flights.
      */
-    public static ArrayList<Flight> parseFlights(String rawJson) {
+    public static void parseFlights(String rawJson, FlightParseCallback callback) {
         ArrayList<Flight> flightsList = new ArrayList<>();
+        ArrayList<Flight> flightsToConvert = new ArrayList<>();
 
         Log.d("FlightResponse", "Parsing flight response: " + rawJson);
         try {
             JSONObject root = new JSONObject(rawJson);
-            Log.d("FlightResponse", "Parsed JSON: " + root.toString());
             JSONObject response = root.getJSONObject("response");
             JSONArray flights = response.getJSONArray("flights");
+
+            if (flights.length() == 0) {
+                callback.onParsed(flightsList); // Return empty list
+                return;
+            }
 
             for (int i = 0; i < flights.length(); i++) {
                 JSONObject flightJson = flights.getJSONObject(i);
@@ -42,18 +58,14 @@ public class FlightResponse {
                 flight.refundable = flightJson.optBoolean("refundable");
                 flight.isRefundable = flightJson.optString("isRefundable");
                 flight.airlineName = flightJson.getJSONArray("flight")
-                        .getJSONObject(0)
-                        .getJSONObject("airlines")
-                        .optString("full");
+                        .getJSONObject(0).getJSONObject("airlines").optString("full");
                 flight.imageUrl = flightJson.getJSONArray("flight")
-                        .getJSONObject(0)
-                        .optString("logo");
+                        .getJSONObject(0).optString("logo");
 
                 flight.segments = new ArrayList<>();
                 JSONArray segmentArray = segments.getJSONObject(0).getJSONArray("segment");
                 for (int j = 0; j < segmentArray.length(); j++) {
                     JSONObject seg = segmentArray.getJSONObject(j);
-
                     Flight.Segment segment = new Flight.Segment();
                     segment.airline = seg.getJSONObject("airlines").optString("short");
                     segment.flightNumber = seg.optString("flightNumber");
@@ -72,12 +84,48 @@ public class FlightResponse {
                     flight.segments.add(segment);
                 }
 
-                flightsList.add(flight);
+                if (!flight.currency.equals(Auth.getUser().getCurrencyString())) {
+                    flightsToConvert.add(flight);
+                } else {
+                    flightsList.add(flight);
+                }
             }
+
+            // Handle asynchronous translation if needed
+            if (flightsToConvert.isEmpty()) {
+                callback.onParsed(flightsList); // No conversion needed
+            } else {
+                final int[] completed = {0};
+                for (Flight flight : flightsToConvert) {
+                    CTranslator.translate(flight.price, flight.currency, Auth.getUser().getCurrencyString(), new CTranslator.TranslationCallback() {
+                        @Override
+                        public void onSuccess(double result) {
+                            flight.price = (int) result;
+                            flight.currency = Auth.getUser().getCurrencyString();
+                            flightsList.add(flight);
+                            checkDone();
+                        }
+
+                        @Override
+                        public void onFailure(Exception e) {
+                            Log.e("FlightResponse", "Translation error: " + e.getMessage());
+                            flightsList.add(flight);
+                            checkDone();
+                        }
+
+                        private void checkDone() {
+                            completed[0]++;
+                            if (completed[0] == flightsToConvert.size()) {
+                                callback.onParsed(flightsList);
+                            }
+                        }
+                    });
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
+            callback.onParsed(flightsList); // Return partial or empty list on error
         }
-
-        return flightsList;
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <style name = "tight">
         <item name="android:letterSpacing">-0.06</item>
     </style>
@@ -17,4 +18,5 @@
         <item name="cornerFamily">rounded</item>
         <item name="cornerSize">30dp</item>
     </style>
+
 </resources>

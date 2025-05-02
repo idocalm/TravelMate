@@ -1,41 +1,45 @@
 package com.idocalm.travelmate.dialogs;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.explore.HotelsSearchFragment;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.models.Hotel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class HotelDialog extends Dialog {
 
-    Button bookingButton, doneButton;
+    Button bookingButton, addButton;
 
+
+    Hotel hotel;
     JSONObject hotelData;
-    String name;
-    double latitude;
-    double longitude;
-    String mainPhoto;
 
 
-    public HotelDialog(Activity a, String name, double latitude, double longitude, String mainPhoto, JSONObject hotelData) {
+    public HotelDialog(Activity a, Hotel hotel, JSONObject hotelData) {
         super(a);
-        this.name = name;
-        this.latitude = latitude;
-        this.longitude = longitude;
-        this.mainPhoto = mainPhoto;
+        this.hotel = hotel;
         this.hotelData = hotelData;
     }
 
@@ -46,11 +50,11 @@ public class HotelDialog extends Dialog {
         setContentView(R.layout.hotel_dialog);
 
         bookingButton = findViewById(R.id.hotel_dialog_booking);
-        doneButton = findViewById(R.id.hotel_dialog_done);
+        addButton = findViewById(R.id.hotel_dialog_add);
         ImageView hotelImage = findViewById(R.id.dialog_hotel_image);
 
         Glide.with(getContext())
-                .load(mainPhoto)
+                .load(hotel.getMainPhoto())
                 .into(hotelImage);
 
         bookingButton.setOnClickListener((v) -> {
@@ -65,15 +69,58 @@ public class HotelDialog extends Dialog {
 
         });
 
-        doneButton.setOnClickListener((v) -> {
-            dismiss();
+        addButton.setOnClickListener((v) -> {
+            ArrayList<String> tripIds = Auth.getUser().getTripIds();
+            if (tripIds.isEmpty()) {
+                Toast.makeText(getContext(), "You need to create a trip first", Toast.LENGTH_SHORT).show();
+            } else {
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                HashMap<String, String> trips = new HashMap<>();
+                for (String tripId : tripIds) {
+                    db.collection("trips").document(tripId).get().addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful()) {
+                            trips.put(tripId, task1.getResult().getString("name"));
+
+                            if (trips.size() == tripIds.size()) {
+                                Log.d("HotelDialog", "All trips fetched: " + trips.size());
+                                // All trips have been fetched
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setTitle("Select a trip");
+                                String[] tripNames = new String[trips.size()];
+                                int i = 0;
+                                for (String id : trips.keySet()) {
+                                    tripNames[i] = trips.get(id);
+                                    i++;
+                                }
+
+                                builder.setItems(tripNames, (dialog, which) -> {
+                                    String selectedTripId = tripIds.get(which);
+                                    HashMap<String, Object> hotelMap = Hotel.toHashMap(hotel);
+
+                                    db.collection("trips").document(selectedTripId).collection("hotels").add(hotelMap)
+                                            .addOnSuccessListener(documentReference -> {
+                                                Toast.makeText(getContext(), "Hotel added to trip", Toast.LENGTH_SHORT).show();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(getContext(), "Error adding hotel to trip", Toast.LENGTH_SHORT).show();
+                                            });
+                                });
+
+                                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                                    dialog.dismiss();
+                                });
+
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+                        }
+                    });
+                }
+            }
         });
 
         TextView name = findViewById(R.id.dialog_hotel_name);
-        name.setText(this.name);
-
-
-
+        name.setText(hotel.getName());
 
     }
 

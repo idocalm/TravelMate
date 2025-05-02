@@ -129,6 +129,28 @@ public class Flight {
         }
     }
 
+
+    public Flight() {
+        // Default constructor
+    }
+
+    public Flight(String dealType, int price, String currency, String totalDuration,
+                 String departureDate, String departureTime, boolean refundable,
+                 String isRefundable, String airlineName, String imageUrl,
+                 ArrayList<Segment> segments) {
+        this.dealType = dealType;
+        this.price = price;
+        this.currency = currency;
+        this.totalDuration = totalDuration;
+        this.departureDate = departureDate;
+        this.departureTime = departureTime;
+        this.refundable = refundable;
+        this.isRefundable = isRefundable;
+        this.airlineName = airlineName;
+        this.imageUrl = imageUrl;
+        this.segments = segments;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

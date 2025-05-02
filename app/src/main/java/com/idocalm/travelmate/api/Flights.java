@@ -155,14 +155,21 @@ public class Flights {
                     throw new IOException("Unexpected code " + res);
                 }
                 String rawJson = res.body().string();
-                flights.addAll(FlightResponse.parseFlights(rawJson));
 
-                ctx.runOnUiThread(() -> callback.onFlightsFetched(flights));
+                // Async parsing with currency translation support
+                FlightResponse.parseFlights(rawJson, new FlightResponse.FlightParseCallback() {
+                    @Override
+                    public void onParsed(ArrayList<Flight> flights) {
+                        ctx.runOnUiThread(() -> callback.onFlightsFetched(flights));
+                    }
+                });
+
             } catch (IOException e) {
                 Log.e("Flights", "Error fetching flights: " + e.getMessage());
                 ctx.runOnUiThread(() -> callback.onError(e));
             }
         }).start();
+
     }
 }
 
