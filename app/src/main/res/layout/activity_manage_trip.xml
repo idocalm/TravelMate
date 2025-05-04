@@ -25,7 +25,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
+
+
+        <EditText
         android:layout_marginTop="5dp"
         android:id="@+id/trip_name"
         android:layout_width="match_parent"
@@ -40,6 +42,16 @@
         android:textColorHint="@color/white"
         android:textSize="30sp"
         android:theme="@style/tight" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/bold"
+            android:theme="@style/tight"
+            android:text="Priced at ILS 15000"
+            android:textColor="@color/green"
+            android:textSize="15sp"
+            />
 
     <!-- FLIGHTS -->
     <LinearLayout
@@ -70,6 +82,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/trip_no_flights"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/bold"
@@ -78,6 +91,14 @@
                 android:textColor="@color/hint"
                 android:textSize="15sp" />
 
+            <ListView
+                android:id="@+id/trip_flights"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="10dp"/>
 
 
         </LinearLayout>
@@ -123,6 +144,7 @@
             android:orientation="vertical">
 
             <TextView
+                android:id="@+id/trip_no_hotels"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/bold"
@@ -131,19 +153,19 @@
                 android:textColor="@color/hint"
                 android:textSize="15sp" />
 
+            <ListView
+                android:id="@+id/trip_hotels"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:visibility="gone"
+                android:layout_marginTop="10dp"/>
+
 
 
         </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/hotels_list"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:orientation="vertical"
-            android:padding="5dp"
-            android:layout_marginTop="20dp" />
 
     </LinearLayout>
 
@@ -154,6 +176,7 @@
         android:orientation="vertical">
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_marginTop="20dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 

@@ -1,10 +1,10 @@
 package com.idocalm.travelmate.models;
 
+import android.util.Log;
+
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.DocumentSnapshot;
 
 import java.time.Duration;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -14,8 +14,7 @@ public class ItineraryActivity {
 
     private String name;
     private String location;
-    private Timestamp start_date;
-    private Long duration;
+    private Timestamp date;
 
     private String note;
     private String cost;
@@ -25,35 +24,16 @@ public class ItineraryActivity {
      *
      * @param name       the name
      * @param location   the location
-     * @param start_date the start date
-     * @param duration   the duration
+     * @param date       the date
      * @param note       the note
      * @param cost       the cost
      */
-    public ItineraryActivity(String name, String location, Timestamp start_date, Long duration, String note, String cost) {
+    public ItineraryActivity(String name, String location, Timestamp date, String note, String cost) {
         this.name = name;
         this.location = location;
-        this.start_date = start_date;
-        this.duration = duration;
+        this.date = date;
         this.note = note;
         this.cost = cost;
-    }
-
-    /**
-     * From db itinerary activity.
-     *
-     * @param snapshot the snapshot
-     * @return the itinerary activity
-     */
-    public static ItineraryActivity fromDB(DocumentSnapshot snapshot) {
-        return new ItineraryActivity(
-                snapshot.getString("name"),
-                snapshot.getString("location"),
-                snapshot.getTimestamp("start_date"),
-                snapshot.getLong("duration"),
-                snapshot.getString("note"),
-                snapshot.getString("cost")
-        );
     }
 
     /**
@@ -65,8 +45,7 @@ public class ItineraryActivity {
         return Map.of(
                 "name", name,
                 "location", location,
-                "start_date", start_date,
-                "duration", duration,
+                "date", date,
                 "note", note == null ? "" : note,
                 "cost", cost == null ? "" : cost
         );
@@ -76,8 +55,7 @@ public class ItineraryActivity {
         return new ItineraryActivity(
                 (String) map.get("name"),
                 (String) map.get("location"),
-                (Timestamp) map.get("start_date"),
-                (Long) map.get("duration"),
+                (Timestamp) map.get("date"),
                 (String) map.get("note"),
                 (String) map.get("cost")
         );
@@ -85,7 +63,7 @@ public class ItineraryActivity {
 
 
     public Timestamp getDate() {
-        return start_date;
+        return date;
     }
 
     public String getName() {
@@ -94,10 +72,6 @@ public class ItineraryActivity {
 
     public String getLocation() {
         return location;
-    }
-
-    public Duration getDuration() {
-        return Duration.ofMillis(duration);
     }
 
     public String getNote() {
@@ -110,5 +84,19 @@ public class ItineraryActivity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+
+        ItineraryActivity that = (ItineraryActivity) obj;
+
+        if (!name.equals(that.name)) return false;
+        if (!location.equals(that.location)) return false;
+        if (!date.equals(that.date)) return false;
+        if (!note.equals(that.note)) return false;
+        return cost.equals(that.cost);
     }
 }

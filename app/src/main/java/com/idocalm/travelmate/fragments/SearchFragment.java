@@ -66,6 +66,9 @@ public class SearchFragment extends Fragment {
             ft.add(R.id.search_results, new SearchTripCard(trip));
             ft.commit();
         }
+
+        searchResults.requestLayout();
+        searchResults.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -100,9 +103,25 @@ public class SearchFragment extends Fragment {
                         Toast.makeText(getContext(), "found " + task.getResult().size() + " results", Toast.LENGTH_SHORT).show();
                         for (int i = 0; i < task.getResult().size(); i++) {
                             Log.d("SearchFragment", "Trip " + i + ": " + task.getResult().getDocuments().get(i).getString("name"));
-                            searchResult.add(Trip.fromDB(task.getResult().getDocuments().get(i)));
+                            Trip.fromDB(task.getResult().getDocuments().get(i), new Trip.TripCallback() {
+                                @Override
+                                public void onTripLoaded(Trip trip) {
+                                    searchResult.add(trip);
+                                    Log.d("SearchFragment", "Trip loaded: " + trip.getName());
+
+                                    if (searchResult.size() == task.getResult().size()) {
+                                        updateSearchResults();
+                                    }
+
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e("SearchFragment", "Error loading trip: " + e.getMessage());
+                                }
+                            });
+
                         }
-                        updateSearchResults();
 
                     } else {
                         Toast.makeText(getContext(), "Search failed", Toast.LENGTH_SHORT).show();

@@ -75,6 +75,9 @@ public class SearchTripCard extends Fragment {
         Log.d("TripCard", "Trip ID: " + trip.getId());
 
         name.setText(trip.getName());
+        if (trip.getName().length() > 20) {
+            name.setText(trip.getName().substring(0, 20) + "...");
+        }
         locations.setText(trip.getActivities().size() + (trip.getActivities().size() == 1 ? " Location" : " Locations"));
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
         String tripDate = formatter.format(trip.getStartDate().toDate()) + " - " + formatter.format(trip.getEndDate().toDate());

@@ -64,16 +64,24 @@ public class RecentlyViewed extends Fragment {
             // get the trip from the database
             db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-                    Trip trip = Trip.fromDB(task.getResult());
 
-                    TripCard tripCard = new TripCard(trip);
-                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
-                    transaction.add(tripCard, "trip_card");
-                    transaction.commit();
-                    transaction.runOnCommit(() -> {
-                        tripsContainer.addView(tripCard.getView());
+                    Trip.fromDB(task.getResult(), new Trip.TripCallback() {
+                                @Override
+                                public void onTripLoaded(Trip trip) {
+                                    TripCard tripCard = new TripCard(trip);
+                                    FragmentTransaction transaction = getChildFragmentManager().beginTransaction();
+                                    transaction.add(tripCard, "trip_card");
+                                    transaction.commit();
+                                    transaction.runOnCommit(() -> {
+                                        tripsContainer.addView(tripCard.getView());
+                                    });
+                                }
+
+                                @Override
+                                public void onError(Exception e) {
+
+                                }
                     });
-                    // add the trip card to the view
 
 
                 } else {

@@ -210,7 +210,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
 
         hotelsList = view.findViewById(R.id.hotels_list);
 
-        adapter = new HotelsListAdapter(getContext(), hotels);
+        adapter = new HotelsListAdapter(getContext(), hotels, false, null);
         hotelsList.setAdapter(adapter);
 
         return view;

@@ -3,6 +3,7 @@ package com.idocalm.travelmate;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.graphics.Bitmap;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -13,6 +14,7 @@ import android.widget.EditText;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +25,13 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.ActivitiesExpandableAdapter;
+import com.idocalm.travelmate.components.explore.HotelsListAdapter;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 
+import org.w3c.dom.Text;
+
+import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,6 +57,12 @@ public class ManageTripActivity extends AppCompatActivity {
         String id = getIntent().getStringExtra("trip_id");
 
         LinearLayout noActivities = findViewById(R.id.no_activities);
+        TextView noHotels = findViewById(R.id.trip_no_hotels);
+        ListView hotelList = findViewById(R.id.trip_hotels);
+
+        TextView noFlights = findViewById(R.id.trip_no_flights);
+
+
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
 
@@ -62,18 +74,10 @@ public class ManageTripActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        db.collection("trips").document(id).get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Trip t = Trip.fromDB(task.getResult());
+        Auth.getUser().getTrip(id, new Trip.TripCallback() {
+            @Override
+            public void onTripLoaded(Trip t) {
                 name.setText(t.getName());
-
-                createActivity.setOnClickListener(v -> {
-                    newActivityPopup(t, id);
-                });
-
-                createActivity2.setOnClickListener(v -> {
-                    newActivityPopup(t, id);
-                });
 
                 List<String> dateList = new ArrayList<>();
                 HashMap<String, List<ItineraryActivity>> map = new HashMap<>();
@@ -96,18 +100,98 @@ public class ManageTripActivity extends AppCompatActivity {
                     noActivities.setVisibility(View.GONE);
                 }
 
-                ActivitiesExpandableAdapter adapter = new ActivitiesExpandableAdapter(this, dateList, map);
+                // sort the dates
+                dateList.sort((d1, d2) -> {
+                    try {
+                        Date date1 = sdf.parse(d1);
+                        Date date2 = sdf.parse(d2);
+                        return date1.compareTo(date2);
+                    } catch (Exception e) {
+                        return 0;
+                    }
+                });
+
+
+
+                ActivitiesExpandableAdapter adapter = new ActivitiesExpandableAdapter(ManageTripActivity.this, ManageTripActivity.this, t, dateList, map);
                 expandableListView.setAdapter(adapter);
 
-                Glide.with(this)
+
+                createActivity.setOnClickListener(v -> {
+                    newActivityPopup(t, id, () -> {
+                        recreate();
+                    });
+                });
+
+                createActivity2.setOnClickListener(v -> {
+                    newActivityPopup(t, id, () -> {
+                        recreate();
+                    });
+                });
+
+                if (t.getHotels() == null || t.getHotels().isEmpty()) {
+                    noHotels.setVisibility(View.VISIBLE);
+                    hotelList.setVisibility(View.GONE);
+                } else {
+                    noHotels.setVisibility(View.GONE);
+                    hotelList.setVisibility(View.VISIBLE);
+
+                    HotelsListAdapter adap = new HotelsListAdapter(ManageTripActivity.this, t.getHotels(), true, id);
+                    hotelList.setAdapter(adap);
+                }
+
+                ImageView tripImage = findViewById(R.id.trip_image);
+
+
+                Glide.with(ManageTripActivity.this)
                         .load(t.getImage())
                         .placeholder(R.drawable.trip_placeholder)
-                        .into((ImageView) findViewById(R.id.trip_image));
+                        .into(tripImage);
+
+                tripImage.setOnClickListener(v -> {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder( ManageTripActivity.this);
+                    builder.setTitle("Change Image");
+
+                    builder.setMessage("Enter the URL of the image you want to use");
+                    EditText input = new EditText(ManageTripActivity.this);
+                    builder.setView(input);
+
+                    builder.setPositiveButton("Change", (dialogInterface, i) -> {
+                        String url = input.getText().toString();
+                        Glide.with(ManageTripActivity.this)
+                                .load(url)
+                                .placeholder(R.drawable.trip_placeholder)
+                                .error(R.drawable.trip_placeholder)
+                                .into((ImageView) findViewById(R.id.trip_image));
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                        db.collection("trips").document(getIntent().getStringExtra("trip_id")).update("image", url);
+
+                    });
+
+                    builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                    });
+
+                    builder.show();
+
+                });
+
+
+            }
+
+            @Override
+            public void onError(Exception e) {
+                Toast.makeText(ManageTripActivity.this, "Trip not found", Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
+
+
     }
 
-    public void newActivityPopup(Trip trip, String id) {
+    public void newActivityPopup(Trip trip, String id, Runnable onActivityAdded) {
         Dialog dialog = new Dialog(this);
 
         // change dialog width
@@ -169,16 +253,40 @@ public class ManageTripActivity extends AppCompatActivity {
             }
 
 
-            // save the activity to the database
-            Timestamp timestamp = new Timestamp(new Date());
+            EditText dateField = dialog.findViewById(R.id.activity_date);
+            if (dateField.getText().toString().isEmpty()) {
+                Toast.makeText(this, "Date is required", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-            ItineraryActivity activity = new ItineraryActivity(activityName, location, timestamp, Long.parseLong("200"), note, cost);
+            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            Date date;
+            try {
+                date = df.parse(dateField.getText().toString());
+            } catch (Exception e) {
+                Toast.makeText(this, "Invalid date format (d/m/y)", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // combine date and time to a timestamp
+            String timeStr = ((EditText) dialog.findViewById(R.id.activity_time)).getText().toString();
+            Time time;
+            try {
+                time = Time.valueOf(timeStr + ":00");
+            } catch (Exception e) {
+                Toast.makeText(this, "Invalid time format (hour:minute)", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            date.setHours(time.getHours());
+            date.setMinutes(time.getMinutes());
+            date.setSeconds(0);
+            Timestamp timestamp = new Timestamp(date);
+
+            ItineraryActivity activity = new ItineraryActivity(activityName, location, timestamp, note, cost);
             trip.addActivity(activity);
-            Log.d("Activities", trip.getActivities().toString());
+            onActivityAdded.run();
 
-            FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("trips").document(id).update("itinerary", trip.getActivities());
 
 
             dialog.dismiss();

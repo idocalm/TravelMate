@@ -1,5 +1,10 @@
 package com.idocalm.travelmate.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -8,6 +13,7 @@ import java.util.HashMap;
  */
 public class Hotel {
     private int id;
+    private String dbId;
     private String name;
     private String mainPhoto;
     private double price;
@@ -28,6 +34,7 @@ public class Hotel {
      */
     public Hotel(int id, String name, String mainPhoto, long price, Date checkInDate, Date checkOutDate) {
         this.id = id;
+        this.dbId = "";
         this.name = name;
         this.mainPhoto = mainPhoto;
         this.price = price;
@@ -35,6 +42,30 @@ public class Hotel {
         this.checkOutDate = checkOutDate;
     }
 
+    /**
+     * Instantiates a new Hotel.
+     *
+     * @param dbId         the db id
+     * @param name         the name
+     * @param mainPhoto    the main photo
+     * @param price        the price
+     * @param checkInDate  the check in date
+     * @param checkOutDate the check out date
+     */
+    public Hotel(String dbId, String name, String mainPhoto, double price, Date checkInDate, Date checkOutDate) {
+        this.dbId = dbId;
+        this.name = name;
+        this.mainPhoto = mainPhoto;
+        this.price = price;
+        this.checkInDate = checkInDate;
+        this.checkOutDate = checkOutDate;
+    }
+
+
+    public interface HotelsCallback {
+        void onHotelsLoaded(ArrayList<Hotel> hotels);
+        void onError(Exception e);
+    }
     /**
      * Gets id.
      *
@@ -60,6 +91,11 @@ public class Hotel {
      */
     public String getName() {
         return name;
+    }
+
+
+    public String getDBId() {
+        return dbId;
     }
 
     /**
@@ -99,6 +135,17 @@ public class Hotel {
         data.put("checkOutDate", hotel.getCheckOutDate());
 
         return data;
+    }
+
+    public static void deleteHotel(String tripId, String hotelId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("trips").document(tripId).collection("hotels").document(hotelId).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Hotel", "Hotel successfully deleted!");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Hotel", "Error deleting hotel", e);
+                });
     }
 
 }

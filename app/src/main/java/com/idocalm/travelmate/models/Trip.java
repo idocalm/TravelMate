@@ -7,6 +7,7 @@ import androidx.fragment.app.FragmentTransaction;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.cards.TripCard;
 import com.idocalm.travelmate.enums.TripVisibility;
@@ -40,6 +41,11 @@ public class Trip {
     private ArrayList<ItineraryActivity> activities;
     private ArrayList<Hotel> hotels;
     private ArrayList<Flight> flights;
+
+    public interface TripCallback {
+        void onTripLoaded(Trip trip);
+        void onError(Exception e);
+    }
 
     /**
      * To hash map hash map.
@@ -134,7 +140,7 @@ public class Trip {
      * @param snapshot the snapshot
      * @return the trip
      */
-    public static Trip fromDB(DocumentSnapshot snapshot) {
+    public static void fromDB(DocumentSnapshot snapshot, TripCallback callback) {
         Trip trip = new Trip(
                 snapshot.getId(),
                 snapshot.getString("name"),
@@ -149,14 +155,37 @@ public class Trip {
                 snapshot.getTimestamp("last_edited"),
                 snapshot.getTimestamp("last_opened"),
                 getActivitiesFromDB(snapshot),
-                getHotelsFromDB(snapshot),
+                new ArrayList<>(), // initially empty
                 getFlightsFromDB(snapshot)
         );
 
-        return trip;
+        getHotelsFromDB(snapshot.getId(), new Hotel.HotelsCallback() {
+            @Override
+            public void onHotelsLoaded(ArrayList<Hotel> hotels) {
+                trip.hotels = hotels;
+                callback.onTripLoaded(trip);
+            }
 
+            @Override
+            public void onError(Exception e) {
+                callback.onError(e);
+            }
+        });
     }
 
+
+    public ArrayList<Hotel> getHotels() {
+        return hotels;
+    }
+
+    /**
+     * Gets flights.
+     *
+     * @return the flights
+     */
+    public ArrayList<Flight> getFlights() {
+        return flights;
+    }
 
     /**
      * Gets members.
@@ -186,8 +215,7 @@ public class Trip {
                     activities.add(new ItineraryActivity(
                             (String) activityMap.get("name"),
                             (String) activityMap.get("location"),
-                            (Timestamp) activityMap.get("start_date"),
-                            (Long) activityMap.get("duration"),
+                            (Timestamp) activityMap.get("date"),
                             (String) activityMap.get("note"),
                             (String) activityMap.get("cost")
                     ));
@@ -203,41 +231,43 @@ public class Trip {
         return activities;
     }
 
-    /**
-     * Gets hotels from db.
-     *
-     * @param snapshot the snapshot
-     * @return the hotels from db
-     */
-    public static ArrayList<Hotel> getHotelsFromDB(DocumentSnapshot snapshot) {
-        ArrayList<Hotel> hotels = new ArrayList<>();
+    public static void getHotelsFromDB(String tripId, Hotel.HotelsCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("trips").document(tripId).collection("hotels")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Hotel> hotels = new ArrayList<>();
+                        QuerySnapshot querySnapshot = task.getResult();
 
-        Object rawHotels = snapshot.get("hotels");
+                        if (querySnapshot != null) {
+                            for (DocumentSnapshot item : querySnapshot.getDocuments()) {
+                                try {
+                                    Map<String, Object> hotelMap = item.getData();
+                                    Double price = Double.parseDouble((String) hotelMap.get("price"));
 
-        if (rawHotels instanceof List<?>) {
-            List<?> list = (List<?>) rawHotels;
-            for (Object item : list) {
-                if (item instanceof Map<?, ?>) {
-                    Map<String, Object> hotelMap = (Map<String, Object>) item;
-                    hotels.add(new Hotel(
-                            (Integer) hotelMap.get("id"),
-                            (String) hotelMap.get("name"),
-                            (String) hotelMap.get("main_photo"),
-                            (Long) hotelMap.get("price"),
-                            (Date) hotelMap.get("check_in"),
-                            (Date) hotelMap.get("check_out")
-                    ));
-                } else {
-                    // (Optional) Log if there's a weird item
-                    Log.w("Trip", "Skipping non-map item in hotels: " + item);
-                }
-            }
-        } else {
-            Log.w("Trip", "Hotels field is missing or not a list");
-        }
+                                    Hotel hotel = new Hotel(
+                                            item.getId(),
+                                            (String) hotelMap.get("name"),
+                                            (String) hotelMap.get("mainPhoto"),
+                                            price,
+                                            item.getDate("checkInDate"),
+                                            item.getDate("checkOutDate")
+                                    );
+                                    hotels.add(hotel);
+                                } catch (Exception e) {
+                                    Log.w("Trip", "Skipping invalid hotel data: " + item, e);
+                                }
+                            }
+                        }
 
-        return hotels;
+                        callback.onHotelsLoaded(hotels);
+                    } else {
+                        callback.onError(task.getException());
+                    }
+                });
     }
+
 
     /**
      * Gets flights from db.
@@ -492,6 +522,25 @@ public class Trip {
      */
     public void addActivity(ItineraryActivity activity) {
         this.activities.add(activity);
+        FirebaseFirestore.getInstance().collection("trips").document(this.id).update("itinerary", this.activities);
+    }
+
+    public void editActivity(ItineraryActivity old, ItineraryActivity newActivity) {
+        Log.d("Trip", "Editing activity: " + old.toMap() + " to " + newActivity.toMap());
+        ArrayList<ItineraryActivity> activities = new ArrayList<ItineraryActivity>();
+        for (ItineraryActivity act : this.activities) {
+            Log.d("Trip", "Activity: " + act.toMap());
+            if (act.equals(old)) {
+                Log.d("Trip", "REPLACE");
+                activities.add(newActivity);
+            } else {
+                activities.add(act);
+            }
+        }
+
+        this.activities = activities;
+
+        FirebaseFirestore.getInstance().collection("trips").document(this.id).update("itinerary", this.activities);
     }
 
     /**
@@ -504,5 +553,17 @@ public class Trip {
         FirebaseFirestore.getInstance().collection("trips").document(this.id).update("hotels", this.hotels);
     }
 
+    public void removeActivity(ItineraryActivity activity) {
+        Log.d("Trip", "Removing activity: " + activity.toMap());
+        this.activities = new ArrayList<ItineraryActivity>();
+        for (ItineraryActivity act : this.activities) {
+            if (!act.equals(activity)) {
+                this.activities.add(act);
+            }
+        }
+        Log.d("Trip", "Activities after removal: " + this.activities);
+
+        FirebaseFirestore.getInstance().collection("trips").document(this.id).update("itinerary", this.activities);
+    }
 
 }

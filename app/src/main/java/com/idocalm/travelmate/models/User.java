@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 
 import java.util.ArrayList;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The type User.
@@ -249,5 +250,36 @@ public class User {
         }).addOnFailureListener(e -> {
             Toast.makeText(context, "Failed to add friend", Toast.LENGTH_SHORT).show();
         });
+    }
+
+    public void getTrip(String id, Trip.TripCallback callback) {
+        if (!tripIds.contains(id)) {
+            callback.onTripLoaded(null);
+            return;
+        }
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("trips").document(id).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+
+                        Trip.fromDB(documentSnapshot, new Trip.TripCallback() {
+                            @Override
+                            public void onTripLoaded(Trip trip) {
+                                callback.onTripLoaded(trip);
+                            }
+
+                            @Override
+                            public void onError(Exception e) {
+                                callback.onError(e);
+                            }
+                        });
+                    } else {
+                        callback.onTripLoaded(null);
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    callback.onError(e);
+                });
     }
 }

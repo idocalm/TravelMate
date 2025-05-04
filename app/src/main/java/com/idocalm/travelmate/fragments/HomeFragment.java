@@ -108,9 +108,9 @@ public class HomeFragment extends Fragment {
         ArrayList<Trip> loadedTrips = new ArrayList<>();
 
         for (String tripId : tripIds) {
-            db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Trip trip = Trip.fromDB(task.getResult());
+            Auth.getUser().getTrip(tripId, new Trip.TripCallback() {
+                @Override
+                public void onTripLoaded(Trip trip) {
                     loadedTrips.add(trip);
 
                     // After all trips are loaded, find the closest one
@@ -149,9 +149,15 @@ public class HomeFragment extends Fragment {
                         }
                     }
                 }
+
+                @Override
+                public void onError(Exception e) {
+
+                }
             });
         }
 
         return view;
+
     }
 }

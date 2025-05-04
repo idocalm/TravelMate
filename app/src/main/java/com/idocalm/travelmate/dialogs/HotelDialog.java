@@ -94,10 +94,22 @@ public class HotelDialog extends Dialog {
                                     i++;
                                 }
 
-                                builder.setItems(tripNames, (dialog, which) -> {
-                                    String selectedTripId = tripIds.get(which);
-                                    HashMap<String, Object> hotelMap = Hotel.toHashMap(hotel);
 
+
+                                builder.setItems(tripNames, (dialog, which) -> {
+                                    String selectedTripName = tripNames[which];
+                                    String selectedTripId = null;
+
+                                    for (String id : trips.keySet()) {
+                                        if (trips.get(id).equals(selectedTripName)) {
+                                            selectedTripId = id;
+                                            break;
+                                        }
+                                    }
+
+                                    Log.d("Adding hotel", "Trip ID: " + selectedTripId);
+                                    HashMap<String, Object> hotelMap = Hotel.toHashMap(hotel);
+                                    ;
                                     db.collection("trips").document(selectedTripId).collection("hotels").add(hotelMap)
                                             .addOnSuccessListener(documentReference -> {
                                                 Toast.makeText(getContext(), "Hotel added to trip", Toast.LENGTH_SHORT).show();
