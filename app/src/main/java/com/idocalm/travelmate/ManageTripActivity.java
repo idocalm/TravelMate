@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -28,9 +29,11 @@ import com.idocalm.travelmate.components.ActivitiesExpandableAdapter;
 import com.idocalm.travelmate.components.explore.HotelsListAdapter;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
+import com.idocalm.travelmate.models.User;
 
 import org.w3c.dom.Text;
 
+import java.sql.Array;
 import java.sql.Time;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -41,6 +44,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import android.util.SparseBooleanArray;
+import android.widget.ArrayAdapter;
+import android.view.ViewGroup;
 
 public class ManageTripActivity extends AppCompatActivity {
 
@@ -60,7 +66,68 @@ public class ManageTripActivity extends AppCompatActivity {
         TextView noHotels = findViewById(R.id.trip_no_hotels);
         ListView hotelList = findViewById(R.id.trip_hotels);
 
-        TextView noFlights = findViewById(R.id.trip_no_flights);
+
+        ImageButton inviteFriend = findViewById(R.id.add_friend_totrip);
+
+        // when clicking the invite button, show a simple dialog with each friend and a checkbox, then button "apply"
+        inviteFriend.setOnClickListener(v -> {
+            Dialog dialog = new Dialog(this);
+            dialog.setContentView(R.layout.invite_friends_dialog);
+            dialog.setTitle("Invite Friends");
+
+            ListView friendsList = dialog.findViewById(R.id.friends_list);
+            Button apply = dialog.findViewById(R.id.apply_invite);
+
+            // Prepare data
+            ArrayList<String> friendsId = Auth.getUser().getFriendsIds();
+            ArrayList<String> friendNames = new ArrayList<>();
+
+            // Adapter for showing names with checkboxes
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, friendNames);
+            friendsList.setAdapter(adapter);
+            friendsList.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+
+            // Fetch friend names from Firestore
+            for (String friendId : friendsId) {
+                FirebaseFirestore.getInstance().collection("users").document(friendId).get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            User user = User.fromDocument(documentSnapshot);
+                            if (user != null) {
+                                friendNames.add(user.getName());
+                                adapter.notifyDataSetChanged();
+                            }
+                        }
+                    });
+            }
+
+            apply.setOnClickListener(v1 -> {
+                SparseBooleanArray checked = friendsList.getCheckedItemPositions();
+                ArrayList<String> selectedFriendIds = new ArrayList<>();
+                for (int i = 0; i < friendNames.size(); i++) {
+                    if (checked.get(i)) {
+                        // Map name back to ID
+                        selectedFriendIds.add(friendsId.get(i));
+                    }
+                }
+
+                // Example: Add selected friends to the trip's invitedFriends field
+                if (!selectedFriendIds.isEmpty()) {
+                    FirebaseFirestore.getInstance().collection("trips").document(id)
+                        .update("invitedFriends", selectedFriendIds)
+                        .addOnSuccessListener(aVoid -> {
+                            Toast.makeText(ManageTripActivity.this, "Friends invited successfully!", Toast.LENGTH_SHORT).show();
+                        })
+                        .addOnFailureListener(e -> {
+                            Toast.makeText(ManageTripActivity.this, "Failed to invite friends", Toast.LENGTH_SHORT).show();
+                        });
+                }
+                dialog.dismiss();
+            });
+
+            dialog.show();
+        });
+
 
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
