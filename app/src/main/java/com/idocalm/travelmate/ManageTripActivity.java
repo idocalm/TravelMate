@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
@@ -30,6 +31,7 @@ import com.idocalm.travelmate.components.explore.HotelsListAdapter;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
+import com.idocalm.travelmate.components.TripMembersAdapter;
 
 import org.w3c.dom.Text;
 
@@ -49,6 +51,7 @@ import android.widget.ArrayAdapter;
 import android.view.ViewGroup;
 
 public class ManageTripActivity extends AppCompatActivity {
+    private TripMembersAdapter membersAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +68,6 @@ public class ManageTripActivity extends AppCompatActivity {
         LinearLayout noActivities = findViewById(R.id.no_activities);
         TextView noHotels = findViewById(R.id.trip_no_hotels);
         ListView hotelList = findViewById(R.id.trip_hotels);
-
 
         ImageButton inviteFriend = findViewById(R.id.add_friend_totrip);
 
@@ -128,10 +130,11 @@ public class ManageTripActivity extends AppCompatActivity {
             dialog.show();
         });
 
-
+        RecyclerView tripMembers = findViewById(R.id.trip_members);
+        membersAdapter = new TripMembersAdapter(this);
+        tripMembers.setAdapter(membersAdapter);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-
 
         name.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -178,11 +181,8 @@ public class ManageTripActivity extends AppCompatActivity {
                     }
                 });
 
-
-
                 ActivitiesExpandableAdapter adapter = new ActivitiesExpandableAdapter(ManageTripActivity.this, ManageTripActivity.this, t, dateList, map);
                 expandableListView.setAdapter(adapter);
-
 
                 createActivity.setOnClickListener(v -> {
                     newActivityPopup(t, id, () -> {
@@ -209,14 +209,12 @@ public class ManageTripActivity extends AppCompatActivity {
 
                 ImageView tripImage = findViewById(R.id.trip_image);
 
-
                 Glide.with(ManageTripActivity.this)
                         .load(t.getImage())
                         .placeholder(R.drawable.trip_placeholder)
                         .into(tripImage);
 
                 tripImage.setOnClickListener(v -> {
-
                     AlertDialog.Builder builder = new AlertDialog.Builder( ManageTripActivity.this);
                     builder.setTitle("Change Image");
 
@@ -234,7 +232,6 @@ public class ManageTripActivity extends AppCompatActivity {
                         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
                         db.collection("trips").document(getIntent().getStringExtra("trip_id")).update("image", url);
-
                     });
 
                     builder.setNegativeButton("Cancel", (dialogInterface, i) -> {
@@ -242,10 +239,12 @@ public class ManageTripActivity extends AppCompatActivity {
                     });
 
                     builder.show();
-
                 });
 
-
+                // Update members list
+                if (t.getMembers() != null) {
+                    membersAdapter.setMembers(t.getMembers());
+                }
             }
 
             @Override
@@ -254,8 +253,6 @@ public class ManageTripActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-
     }
 
     public void newActivityPopup(Trip trip, String id, Runnable onActivityAdded) {
@@ -319,7 +316,6 @@ public class ManageTripActivity extends AppCompatActivity {
                 note = "";
             }
 
-
             EditText dateField = dialog.findViewById(R.id.activity_date);
             if (dateField.getText().toString().isEmpty()) {
                 Toast.makeText(this, "Date is required", Toast.LENGTH_SHORT).show();
@@ -354,13 +350,9 @@ public class ManageTripActivity extends AppCompatActivity {
             trip.addActivity(activity);
             onActivityAdded.run();
 
-
-
             dialog.dismiss();
         });
 
         dialog.show();
     }
-
-
 }
