@@ -9,6 +9,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ExpandableListView;
@@ -27,7 +28,9 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.ActivitiesExpandableAdapter;
+import com.idocalm.travelmate.components.explore.FlightsListAdapter;
 import com.idocalm.travelmate.components.explore.HotelsListAdapter;
+import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
@@ -49,6 +52,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
+import java.util.Calendar;
+import android.widget.Spinner;
 
 public class ManageTripActivity extends AppCompatActivity {
     private TripMembersAdapter membersAdapter;
@@ -62,14 +71,23 @@ public class ManageTripActivity extends AppCompatActivity {
         ExpandableListView expandableListView = findViewById(R.id.expandable_activities);
         Button createActivity2 = findViewById(R.id.create_activity_2);
         ImageView createActivity = findViewById(R.id.create_activity);
+        ImageButton inviteFriend = findViewById(R.id.add_friend_totrip);
 
         String id = getIntent().getStringExtra("trip_id");
+        boolean isMember = getIntent().getBooleanExtra("is_member", false);
 
         LinearLayout noActivities = findViewById(R.id.no_activities);
         TextView noHotels = findViewById(R.id.trip_no_hotels);
         ListView hotelList = findViewById(R.id.trip_hotels);
+        ListView flightList = findViewById(R.id.trip_flights);
 
-        ImageButton inviteFriend = findViewById(R.id.add_friend_totrip);
+        // Disable editing capabilities for members
+        if (isMember) {
+            name.setEnabled(false);
+            createActivity.setVisibility(View.GONE);
+            createActivity2.setVisibility(View.GONE);
+            inviteFriend.setVisibility(View.GONE);
+        }
 
         // when clicking the invite button, show a simple dialog with each friend and a checkbox, then button "apply"
         inviteFriend.setOnClickListener(v -> {
@@ -113,15 +131,39 @@ public class ManageTripActivity extends AppCompatActivity {
                     }
                 }
 
-                // Example: Add selected friends to the trip's invitedFriends field
+                // Add selected friends to the trip's members field
                 if (!selectedFriendIds.isEmpty()) {
-                    FirebaseFirestore.getInstance().collection("trips").document(id)
-                        .update("invitedFriends", selectedFriendIds)
-                        .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(ManageTripActivity.this, "Friends invited successfully!", Toast.LENGTH_SHORT).show();
+                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+                    db.collection("trips").document(id).get()
+                        .addOnSuccessListener(documentSnapshot -> {
+                            if (documentSnapshot.exists()) {
+                                Trip.fromDB(documentSnapshot, new Trip.TripCallback() {
+                                    @Override
+                                    public void onTripLoaded(Trip trip) {
+                                        for (String friendId : selectedFriendIds) {
+                                            trip.addMember(friendId);
+
+                                            // Add trip ID to friend's tripIds
+                                            db.collection("users").document(friendId).get()
+                                                    .addOnSuccessListener(userDoc -> {
+                                                        if (userDoc.exists()) {
+                                                            User friend = User.fromDocument(userDoc);
+                                                            if (friend != null) {
+                                                                friend.addTripId(id);
+                                                            }
+                                                        }
+                                                    });
+                                        }
+                                    }
+                                    @Override
+                                    public void onError(Exception e) {
+                                        Toast.makeText(ManageTripActivity.this, "Failed to add friends", Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                            }
                         })
                         .addOnFailureListener(e -> {
-                            Toast.makeText(ManageTripActivity.this, "Failed to invite friends", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ManageTripActivity.this, "Failed to add friends", Toast.LENGTH_SHORT).show();
                         });
                 }
                 dialog.dismiss();
@@ -136,18 +178,27 @@ public class ManageTripActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        name.addTextChangedListener(new TextWatcher() {
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                db.collection("trips").document(id).update("name", s.toString());
-            }
-            @Override public void afterTextChanged(Editable s) {}
-        });
-
         Auth.getUser().getTrip(id, new Trip.TripCallback() {
             @Override
             public void onTripLoaded(Trip t) {
                 name.setText(t.getName());
+
+                // Only allow name editing for trip owner
+                if (!isMember) {
+                    name.addTextChangedListener(new TextWatcher() {
+                        @Override
+                        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                        @Override
+                        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+                        @Override
+                        public void afterTextChanged(Editable s) {
+                            t.setName(s.toString());
+                            t.save();
+                        }
+                    });
+                }
 
                 List<String> dateList = new ArrayList<>();
                 HashMap<String, List<ItineraryActivity>> map = new HashMap<>();
@@ -184,11 +235,13 @@ public class ManageTripActivity extends AppCompatActivity {
                 ActivitiesExpandableAdapter adapter = new ActivitiesExpandableAdapter(ManageTripActivity.this, ManageTripActivity.this, t, dateList, map);
                 expandableListView.setAdapter(adapter);
 
-                createActivity.setOnClickListener(v -> {
-                    newActivityPopup(t, id, () -> {
-                        recreate();
+                if (!isMember) {
+                    createActivity.setOnClickListener(v -> {
+                        newActivityPopup(t, id, () -> {
+                            recreate();
+                        });
                     });
-                });
+                }
 
                 createActivity2.setOnClickListener(v -> {
                     newActivityPopup(t, id, () -> {
@@ -205,6 +258,14 @@ public class ManageTripActivity extends AppCompatActivity {
 
                     HotelsListAdapter adap = new HotelsListAdapter(ManageTripActivity.this, t.getHotels(), true, id);
                     hotelList.setAdapter(adap);
+                }
+
+                if (t.getFlights() == null || t.getFlights().isEmpty()) {
+                    findViewById(R.id.trip_no_flights).setVisibility(View.VISIBLE);
+                } else {
+                    findViewById(R.id.trip_no_flights).setVisibility(View.GONE);
+                    FlightsListAdapter flightsAdapter = new FlightsListAdapter(ManageTripActivity.this, t.getFlights(), true, id);
+                    flightList.setAdapter(flightsAdapter);
                 }
 
                 ImageView tripImage = findViewById(R.id.trip_image);
@@ -249,110 +310,122 @@ public class ManageTripActivity extends AppCompatActivity {
 
             @Override
             public void onError(Exception e) {
-                Toast.makeText(ManageTripActivity.this, "Trip not found", Toast.LENGTH_SHORT).show();
-                finish();
+                Toast.makeText(ManageTripActivity.this, "Error loading trip: " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     public void newActivityPopup(Trip trip, String id, Runnable onActivityAdded) {
-        Dialog dialog = new Dialog(this);
-
-        // change dialog width
-        AtomicReference<Boolean> noteOpen = new AtomicReference<>(false);
-        AtomicReference<Boolean> costOpen = new AtomicReference<>(false);
-
+        Dialog dialog = new Dialog(this, R.style.AlertDialogTheme);
         dialog.setContentView(R.layout.add_trip_activity_dialog);
-        dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.GONE);
-        dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.GONE);
-        Button toggleNote = dialog.findViewById(R.id.add_activity_note);
-        Button toggleCost = dialog.findViewById(R.id.add_activity_cost);
 
-        toggleNote.setText("Add Note");
-        toggleCost.setText("Add Cost");
+        // Initialize views
+        EditText activityName = dialog.findViewById(R.id.activity_name);
+        EditText activityLocation = dialog.findViewById(R.id.activity_location);
+        Button selectDate = dialog.findViewById(R.id.select_date);
+        Button selectTime = dialog.findViewById(R.id.select_time);
+        EditText costInput = dialog.findViewById(R.id.cost_input);
+        AutoCompleteTextView currencySelector = dialog.findViewById(R.id.currency_selector);
+        EditText noteInput = dialog.findViewById(R.id.note_input);
+        Button submit = dialog.findViewById(R.id.submit_activity);
 
-        toggleNote.setOnClickListener(v1 -> {
-            if (noteOpen.get()) {
-                dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.GONE);
-                toggleNote.setText("Add Note");
-                noteOpen.set(false);
-            } else {
-                dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.VISIBLE);
-                toggleNote.setText("Del. Note");
-                noteOpen.set(true);
-            }
+        // Setup currency selector
+        CurrencyType[] currencies = {CurrencyType.USD, CurrencyType.EUR, CurrencyType.ILS};
+        ArrayAdapter<CurrencyType> currencyAdapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, currencies);
+        currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        currencySelector.setAdapter(currencyAdapter);
+
+        // Initialize date/time variables
+        Calendar selectedDate = Calendar.getInstance();
+        Calendar selectedTime = Calendar.getInstance();
+        selectedTime.set(Calendar.HOUR_OF_DAY, 12);
+        selectedTime.set(Calendar.MINUTE, 0);
+
+        // Update button text with initial values
+        updateDateButtonText(selectDate, selectedDate);
+        updateTimeButtonText(selectTime, selectedTime);
+
+        // Setup date picker
+        selectDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                this,
+                (view, year, month, dayOfMonth) -> {
+                    selectedDate.set(year, month, dayOfMonth);
+                    updateDateButtonText(selectDate, selectedDate);
+                },
+                selectedDate.get(Calendar.YEAR),
+                selectedDate.get(Calendar.MONTH),
+                selectedDate.get(Calendar.DAY_OF_MONTH)
+            );
+
+            // Set min date to trip start date
+            datePickerDialog.getDatePicker().setMinDate(trip.getStartDate().toDate().getTime());
+            // Set max date to trip end date
+            datePickerDialog.getDatePicker().setMaxDate(trip.getEndDate().toDate().getTime());
+
+            datePickerDialog.show();
         });
 
-        toggleCost.setOnClickListener(v1 -> {
-            if (costOpen.get()) {
-                dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.GONE);
-                toggleCost.setText("Add Cost");
-                costOpen.set(false);
-            } else {
-                dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.VISIBLE);
-                toggleCost.setText("Del. Cost");
-                costOpen.set(true);
-            }
+        // Setup time picker
+        selectTime.setOnClickListener(v -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                this,
+                (view, hourOfDay, minute) -> {
+                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    selectedTime.set(Calendar.MINUTE, minute);
+                    updateTimeButtonText(selectTime, selectedTime);
+                },
+                selectedTime.get(Calendar.HOUR_OF_DAY),
+                selectedTime.get(Calendar.MINUTE),
+                true
+            );
+            timePickerDialog.show();
         });
 
-        Button save = dialog.findViewById(R.id.submit_activity);
-        save.setOnClickListener(v1 -> {
-            // get the values from the dialog
-            String activityName = ((EditText) dialog.findViewById(R.id.activity_name)).getText().toString();
-            String location = ((EditText) dialog.findViewById(R.id.activity_location)).getText().toString();
-            String note = ((EditText) dialog.findViewById(R.id.activity_note)).getText().toString();
-            String cost = ((EditText) dialog.findViewById(R.id.activity_cost)).getText().toString();
 
-            if (activityName.isEmpty() || location.isEmpty()) {
+        // Setup submit button
+        submit.setOnClickListener(v -> {
+            String name = activityName.getText().toString();
+            String location = activityLocation.getText().toString();
+            String note = noteInput.getText().toString();
+            String cost = costInput.getText().toString();
+            String currency = currencySelector.toString();
+
+            if (name.isEmpty() || location.isEmpty()) {
                 Toast.makeText(this, "Activity Name and Location are required", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (cost.isEmpty()) {
-                cost = "0";
-            }
-
-            if (note.isEmpty()) {
-                note = "";
-            }
-
-            EditText dateField = dialog.findViewById(R.id.activity_date);
-            if (dateField.getText().toString().isEmpty()) {
-                Toast.makeText(this, "Date is required", Toast.LENGTH_SHORT).show();
+            // Validate date/time selection
+            if (selectedDate.getTimeInMillis() < trip.getStartDate().toDate().getTime() ||
+                selectedDate.getTimeInMillis() > trip.getEndDate().toDate().getTime()) {
+                Toast.makeText(this, "Date must be within trip dates", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date date;
-            try {
-                date = df.parse(dateField.getText().toString());
-            } catch (Exception e) {
-                Toast.makeText(this, "Invalid date format (d/m/y)", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // Combine date and time
+            Calendar finalDateTime = Calendar.getInstance();
+            finalDateTime.set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH),
+                            selectedTime.get(Calendar.HOUR_OF_DAY), selectedTime.get(Calendar.MINUTE), 0);
+            Timestamp timestamp = new Timestamp(finalDateTime.getTime());
 
-            // combine date and time to a timestamp
-            String timeStr = ((EditText) dialog.findViewById(R.id.activity_time)).getText().toString();
-            Time time;
-            try {
-                time = Time.valueOf(timeStr + ":00");
-            } catch (Exception e) {
-                Toast.makeText(this, "Invalid time format (hour:minute)", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            date.setHours(time.getHours());
-            date.setMinutes(time.getMinutes());
-            date.setSeconds(0);
-            Timestamp timestamp = new Timestamp(date);
-
-            ItineraryActivity activity = new ItineraryActivity(activityName, location, timestamp, note, cost);
+            // Create activity
+            ItineraryActivity activity = new ItineraryActivity(name, location, timestamp, note, cost);
             trip.addActivity(activity);
             onActivityAdded.run();
-
             dialog.dismiss();
         });
 
         dialog.show();
+    }
+
+    private void updateDateButtonText(Button button, Calendar date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        button.setText(dateFormat.format(date.getTime()));
+    }
+
+    private void updateTimeButtonText(Button button, Calendar time) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        button.setText(timeFormat.format(time.getTime()));
     }
 }

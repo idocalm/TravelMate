@@ -1,23 +1,27 @@
 package com.idocalm.travelmate.components.explore;
 
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.Flight;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
@@ -81,6 +85,70 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
                 dealLabel.setVisibility(View.GONE); // Hide for "None" or null
                 break;
         }
+
+        view.setOnClickListener(v -> {
+            Toast.makeText(getContext(), "Long press to bind with flight", Toast.LENGTH_SHORT).show();
+        });
+
+        view.setOnLongClickListener(v -> {
+            ArrayList<String> tripIds = Auth.getUser().getTripIds();
+            if (tripIds.isEmpty()) {
+                Toast.makeText(getContext(), "You need to create a trip first", Toast.LENGTH_SHORT).show();
+            } else {
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                HashMap<String, String> trips = new HashMap<>();
+                for (String tripId : tripIds) {
+                    db.collection("trips").document(tripId).get().addOnCompleteListener(task1 -> {
+                        if (task1.isSuccessful()) {
+                            trips.put(tripId, task1.getResult().getString("name"));
+
+                            if (trips.size() == tripIds.size()) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                builder.setTitle("Select a trip");
+                                String[] tripNames = new String[trips.size()];
+
+                                int i = 0;
+                                for (String id : trips.keySet()) {
+                                    tripNames[i] = trips.get(id);
+                                    i++;
+                                }
+
+                                builder.setItems(tripNames, (dialog, which) -> {
+                                    String selectedTripName = tripNames[which];
+                                    String selectedTripId = null;
+
+                                    for (String id : trips.keySet()) {
+                                        if (trips.get(id).equals(selectedTripName)) {
+                                            selectedTripId = id;
+                                            break;
+                                        }
+                                    }
+
+                                    HashMap<String, Object> flightMap = Flight.toHashMap(flight)
+                                    ;
+                                    db.collection("trips").document(selectedTripId).collection("flights").add(flightMap)
+                                            .addOnSuccessListener(documentReference -> {
+                                                Toast.makeText(getContext(), "Flight added to trip", Toast.LENGTH_SHORT).show();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(getContext(), "Error adding flight to trip", Toast.LENGTH_SHORT).show();
+                                            });
+                                });
+
+                                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                                    dialog.dismiss();
+                                });
+
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                            }
+                        }
+                    });
+                }
+            }
+
+            return true;
+        });
 
 
         return view;

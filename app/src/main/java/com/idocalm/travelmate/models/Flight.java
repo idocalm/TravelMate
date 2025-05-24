@@ -1,6 +1,7 @@
 package com.idocalm.travelmate.models;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * The type Flight.
@@ -50,6 +51,8 @@ public class Flight {
      * The Segments.
      */
     public ArrayList<Segment> segments;
+
+
 
     /**
      * The type Segment.
@@ -127,6 +130,24 @@ public class Flight {
                     ", terminalTo='" + terminalTo + '\'' +
                     '}';
         }
+
+        public HashMap<String, Object> toHashMap() {
+            HashMap<String, Object> map = new HashMap<>();
+            map.put("airline", airline);
+            map.put("flightNumber", flightNumber);
+            map.put("origin", origin);
+            map.put("destination", destination);
+            map.put("departureDate", departureDate);
+            map.put("departureTime", departureTime);
+            map.put("arrivalDate", arrivalDate);
+            map.put("arrivalTime", arrivalTime);
+            map.put("duration", duration);
+            map.put("cabin", cabin);
+            map.put("aircraft", aircraft);
+            map.put("terminalFrom", terminalFrom);
+            map.put("terminalTo", terminalTo);
+            return map;
+        }
     }
 
 
@@ -174,6 +195,26 @@ public class Flight {
         }
         sb.append("\n]}");
         return sb.toString();
+    }
+
+    public static HashMap<String, Object> toHashMap(Flight flight) {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("dealType", flight.dealType);
+        map.put("price", flight.price);
+        map.put("currency", flight.currency);
+        map.put("totalDuration", flight.totalDuration);
+        map.put("departureDate", flight.departureDate);
+        map.put("departureTime", flight.departureTime);
+        map.put("refundable", flight.refundable);
+        map.put("isRefundable", flight.isRefundable);
+        map.put("airlineName", flight.airlineName);
+        map.put("imageUrl", flight.imageUrl);
+        ArrayList<HashMap<String, Object>> segmentMaps = new ArrayList<>();
+        for (Segment segment : flight.segments) {
+            segmentMaps.add(segment.toHashMap());
+        }
+        map.put("segments", segmentMaps);
+        return map;
     }
 }
 

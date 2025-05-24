@@ -3,6 +3,8 @@ package com.idocalm.travelmate.components;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -21,6 +23,7 @@ import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
+import com.idocalm.travelmate.enums.CurrencyType;
 
 import java.sql.Time;
 import java.text.DateFormat;
@@ -30,6 +33,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.atomic.AtomicReference;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
+import android.widget.DatePicker;
+import android.widget.TimePicker;
+import java.util.Calendar;
+import android.widget.Spinner;
 
 public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
 
@@ -137,136 +146,119 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     public void editActivityPopup(ItineraryActivity activity, Runnable onActivityEdited) {
-        Dialog dialog = new Dialog(context);
-
-        // change dialog width
-        AtomicReference<Boolean> noteOpen = new AtomicReference<>(false);
-        AtomicReference<Boolean> costOpen = new AtomicReference<>(false);
-
+        Dialog dialog = new Dialog(context, R.style.AlertDialogTheme);
         dialog.setContentView(R.layout.add_trip_activity_dialog);
-
-        Button toggleNote = dialog.findViewById(R.id.add_activity_note);
-        Button toggleCost = dialog.findViewById(R.id.add_activity_cost);
-
+        // Initialize views
         EditText nameEdit = dialog.findViewById(R.id.activity_name);
-        EditText dateEdit = dialog.findViewById(R.id.activity_date);
-        EditText timeEdit = dialog.findViewById(R.id.activity_time);
+        Button selectDate = dialog.findViewById(R.id.select_date);
+        Button selectTime = dialog.findViewById(R.id.select_time);
         EditText locationEdit = dialog.findViewById(R.id.activity_location);
+        EditText noteInput = dialog.findViewById(R.id.note_input);
+        EditText costInput = dialog.findViewById(R.id.cost_input);
+        AutoCompleteTextView currencySelector = dialog.findViewById(R.id.currency_selector);
+        Button submit = dialog.findViewById(R.id.submit_activity);
 
-        dateEdit.setText(new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(activity.getDate().toDate()));
-        timeEdit.setText(new SimpleDateFormat("HH:mm", Locale.getDefault()).format(activity.getDate().toDate()));
+        // Setup currency selector
+        CurrencyType[] currencies = {CurrencyType.USD, CurrencyType.EUR, CurrencyType.ILS};
+        ArrayAdapter<CurrencyType> currencyAdapter = new ArrayAdapter<>(context, android.R.layout.simple_spinner_item, currencies);
+        currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        currencySelector.setAdapter(currencyAdapter);
 
+        // Initialize date/time variables
+        Calendar selectedDate = Calendar.getInstance();
+        Calendar selectedTime = Calendar.getInstance();
+        selectedDate.setTime(activity.getDate().toDate());
+        selectedTime.setTime(activity.getDate().toDate());
+
+        // Update button text with initial values
+        updateDateButtonText(selectDate, selectedDate);
+        updateTimeButtonText(selectTime, selectedTime);
+
+        // Set initial values
         nameEdit.setText(activity.getName());
         locationEdit.setText(activity.getLocation());
 
+        // Setup date picker
+        selectDate.setOnClickListener(v -> {
+            DatePickerDialog datePickerDialog = new DatePickerDialog(
+                context,
+                (view, year, month, dayOfMonth) -> {
+                    selectedDate.set(year, month, dayOfMonth);
+                    updateDateButtonText(selectDate, selectedDate);
+                },
+                selectedDate.get(Calendar.YEAR),
+                selectedDate.get(Calendar.MONTH),
+                selectedDate.get(Calendar.DAY_OF_MONTH)
+            );
 
-        if (activity.getNote() != null && !activity.getNote().isEmpty()) {
-            ((EditText) dialog.findViewById(R.id.activity_note)).setText(activity.getNote());
-            dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.VISIBLE);
-            noteOpen.set(true);
-            toggleNote.setText("Del. Note");
-        } else {
-            dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.GONE);
-            toggleNote.setText("Add Note");
-        }
+            // Set min date to trip start date
+            datePickerDialog.getDatePicker().setMinDate(trip.getStartDate().toDate().getTime());
+            // Set max date to trip end date
+            datePickerDialog.getDatePicker().setMaxDate(trip.getEndDate().toDate().getTime());
 
-        if (activity.getCost() != null && !activity.getCost().isEmpty()) {
-            ((EditText) dialog.findViewById(R.id.activity_cost)).setText(activity.getCost());
-            dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.VISIBLE);
-            costOpen.set(true);
-            toggleCost.setText("Del. Cost");
-        } else {
-            dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.GONE);
-            toggleCost.setText("Add Cost");
-        }
-
-        ((EditText) dialog.findViewById(R.id.activity_name)).setText(activity.getName());
-        ((EditText) dialog.findViewById(R.id.activity_location)).setText(activity.getLocation());
-
-        toggleNote.setOnClickListener(v1 -> {
-            if (noteOpen.get()) {
-                dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.GONE);
-                toggleNote.setText("Add Note");
-                noteOpen.set(false);
-            } else {
-                dialog.findViewById(R.id.activity_note).setVisibility(LinearLayout.VISIBLE);
-                toggleNote.setText("Del. Note");
-                noteOpen.set(true);
-            }
+            datePickerDialog.show();
         });
 
-        toggleCost.setOnClickListener(v1 -> {
-            if (costOpen.get()) {
-                dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.GONE);
-                toggleCost.setText("Add Cost");
-                costOpen.set(false);
-            } else {
-                dialog.findViewById(R.id.activity_cost).setVisibility(LinearLayout.VISIBLE);
-                toggleCost.setText("Del. Cost");
-                costOpen.set(true);
-            }
+        // Setup time picker
+        selectTime.setOnClickListener(v -> {
+            TimePickerDialog timePickerDialog = new TimePickerDialog(
+                context,
+                (view, hourOfDay, minute) -> {
+                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    selectedTime.set(Calendar.MINUTE, minute);
+                    updateTimeButtonText(selectTime, selectedTime);
+                },
+                selectedTime.get(Calendar.HOUR_OF_DAY),
+                selectedTime.get(Calendar.MINUTE),
+                true
+            );
+            timePickerDialog.show();
         });
 
-        Button save = dialog.findViewById(R.id.submit_activity);
-        save.setOnClickListener(v1 -> {
-            // get the values from the dialog
-            String activityName = nameEdit.getText().toString();
+        // Setup submit button
+        submit.setOnClickListener(v -> {
+            String name = nameEdit.getText().toString();
             String location = locationEdit.getText().toString();
-            String note = ((EditText) dialog.findViewById(R.id.activity_note)).getText().toString();
-            String cost = ((EditText) dialog.findViewById(R.id.activity_cost)).getText().toString();
+            String note = noteInput.getText().toString();
+            String cost = costInput.getText().toString();
+            String currency = currencySelector.toString();
 
-            if (activityName.isEmpty() || location.isEmpty()) {
+            if (name.isEmpty() || location.isEmpty()) {
                 Toast.makeText(context, "Activity Name and Location are required", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            if (cost.isEmpty()) {
-                cost = "0";
-            }
-
-            if (note.isEmpty()) {
-                note = "";
-            }
-
-
-            EditText dateField = dialog.findViewById(R.id.activity_date);
-            if (dateField.getText().toString().isEmpty()) {
-                Toast.makeText(context, "Date is required", Toast.LENGTH_SHORT).show();
+            // Validate date/time selection
+            if (selectedDate.getTimeInMillis() < trip.getStartDate().toDate().getTime() ||
+                selectedDate.getTimeInMillis() > trip.getEndDate().toDate().getTime()) {
+                Toast.makeText(context, "Date must be within trip dates", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            DateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
-            Date date;
-            try {
-                date = df.parse(dateField.getText().toString());
-            } catch (Exception e) {
-                Toast.makeText(context, "Invalid date format (d/m/y)", Toast.LENGTH_SHORT).show();
-                return;
-            }
+            // Combine date and time
+            Calendar finalDateTime = Calendar.getInstance();
+            finalDateTime.set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH),
+                            selectedTime.get(Calendar.HOUR_OF_DAY), selectedTime.get(Calendar.MINUTE), 0);
+            Timestamp timestamp = new Timestamp(finalDateTime.getTime());
 
-            // combine date and time to a timestamp
-            String timeStr = ((EditText) dialog.findViewById(R.id.activity_time)).getText().toString();
-            Time time;
-            try {
-                time = Time.valueOf(timeStr + ":00");
-            } catch (Exception e) {
-                Toast.makeText(context, "Invalid time format (hour:minute)", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            date.setHours(time.getHours());
-            date.setMinutes(time.getMinutes());
-            date.setSeconds(0);
-            Timestamp timestamp = new Timestamp(date);
-
-            ItineraryActivity newActivity = new ItineraryActivity(activityName, location, timestamp, note, cost);
+            // Create activity
+            ItineraryActivity newActivity = new ItineraryActivity(name, location, timestamp, note, cost);
             this.trip.editActivity(activity, newActivity);
             onActivityEdited.run();
-
             dialog.dismiss();
         });
 
         dialog.show();
+    }
+
+    private void updateDateButtonText(Button button, Calendar date) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        button.setText(dateFormat.format(date.getTime()));
+    }
+
+    private void updateTimeButtonText(Button button, Calendar time) {
+        SimpleDateFormat timeFormat = new SimpleDateFormat("HH:mm", Locale.getDefault());
+        button.setText(timeFormat.format(time.getTime()));
     }
 
     @Override public boolean isChildSelectable(int i, int i1) { return false; }

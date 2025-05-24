@@ -68,6 +68,7 @@ public class TripCard extends Fragment {
         TextView name = view.findViewById(R.id.trip_name);
         TextView date = view.findViewById(R.id.trip_date);
         TextView locations = view.findViewById(R.id.trip_locations_amount);
+        ImageView memberIndicator = view.findViewById(R.id.member_indicator);
 
         name.setText(trip.getName());
         locations.setText(trip.getActivities().size() + (trip.getActivities().size() == 1 ? " Location" : " Locations"));
@@ -80,15 +81,29 @@ public class TripCard extends Fragment {
                 .placeholder(R.drawable.trip_placeholder)
                 .into((ImageView) view.findViewById(R.id.trip_image));
 
+        // Show member indicator if user is a member but not the owner
+        if (!trip.getOwner().equals(Auth.getUser().getId()) && trip.getMembers().contains(Auth.getUser().getId())) {
+            memberIndicator.setVisibility(View.VISIBLE);
+        }
+
+        // Handle click based on user's role
         if (trip.getOwner().equals(Auth.getUser().getId())) {
+            // Owner can manage the trip
             view.setOnClickListener(v -> {
-                // pass to manage trip activity, with the trip id as an extra
                 Intent intent = new Intent(getActivity(), ManageTripActivity.class);
                 intent.putExtra("trip_id", trip.getId());
                 startActivity(intent);
-
+            });
+        } else if (trip.getMembers().contains(Auth.getUser().getId())) {
+            // Member can view the trip
+            view.setOnClickListener(v -> {
+                Intent intent = new Intent(getActivity(), ManageTripActivity.class);
+                intent.putExtra("trip_id", trip.getId());
+                intent.putExtra("is_member", true);
+                startActivity(intent);
             });
         } else {
+            // Non-member can view trip details
             view.setOnClickListener(v -> {
                 Toast.makeText(getContext(), "Long press to view more.", Toast.LENGTH_SHORT).show();
             });
@@ -102,8 +117,6 @@ public class TripCard extends Fragment {
 
         Log.d("TripCard", "Owner: " + trip.getOwner());
         Log.d("TripCard", "Auth: " + Auth.getUser().getId());
-
-
 
         return view;
     }

@@ -566,4 +566,47 @@ public class Trip {
         FirebaseFirestore.getInstance().collection("trips").document(this.id).update("itinerary", this.activities);
     }
 
+    /**
+     * Save the trip to Firestore.
+     */
+    public void save() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        HashMap<String, Object> tripData = toHashMap(this);
+        db.collection("trips").document(this.id).update(tripData)
+            .addOnFailureListener(e -> {
+                Log.e("Trip", "Error saving trip: " + e.getMessage());
+            });
+    }
+
+    /**
+     * Add a member to the trip.
+     *
+     * @param memberId the member id
+     */
+    public void addMember(String memberId) {
+        if (!members.contains(memberId)) {
+            members.add(memberId);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("trips").document(this.id).update("members", members)
+                .addOnFailureListener(e -> {
+                    Log.e("Trip", "Error adding member: " + e.getMessage());
+                });
+        }
+    }
+
+    /**
+     * Remove a member from the trip.
+     *
+     * @param memberId the member id
+     */
+    public void removeMember(String memberId) {
+        if (members.contains(memberId)) {
+            members.remove(memberId);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("trips").document(this.id).update("members", members)
+                .addOnFailureListener(e -> {
+                    Log.e("Trip", "Error removing member: " + e.getMessage());
+                });
+        }
+    }
 }

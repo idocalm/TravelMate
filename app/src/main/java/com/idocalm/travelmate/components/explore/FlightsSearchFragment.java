@@ -1,6 +1,7 @@
 package com.idocalm.travelmate.components.explore;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -29,30 +30,47 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.zip.Inflater;
 
 public class FlightsSearchFragment extends Fragment implements DatePickerDialog.OnDateSetListener, DatePickerDialog.OnCancelListener {
 
     static Button peopleAmount;
     static int amount = 1;
     Date flightDate;
+    private boolean isTripView;
+    private String tripId;
 
     Button date, search;
     AutoCompleteTextView origin, destination;
     FlightsListAdapter adapter;
     LinearLayout loading;
 
-    public FlightsSearchFragment() {
-        // Required empty public constructor
-    }
-
-    public static FlightsSearchFragment newInstance(String param1, String param2) {
-        return new FlightsSearchFragment();
+    public FlightsSearchFragment(Context context, boolean isTripView, String tripId) {
+        this.isTripView = isTripView;
+        this.tripId = tripId;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+
+        if (isTripView)
+            return setupTripView(inflater, container);
+
+        return setupNormalView(inflater, container);
+
+    }
+
+    public View setupTripView(LayoutInflater inflater, ViewGroup container) {
+        View view = inflater.inflate(R.layout.fragment_trip_flight_card, container, false);
+
+
+
+
+    }
+
+    public View setupNormalView(LayoutInflater inflater, ViewGroup container) {
         View view = inflater.inflate(R.layout.fragment_flights_search, container, false);
 
         peopleAmount = view.findViewById(R.id.people_amount);

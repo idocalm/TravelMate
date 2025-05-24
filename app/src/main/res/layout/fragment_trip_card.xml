@@ -9,13 +9,29 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ImageView
-        android:id="@+id/trip_image"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="160dp"
+        android:layout_height="200dp">
 
-        android:adjustViewBounds="true"
-        android:scaleType="centerCrop"/>
+        <ImageView
+            android:id="@+id/trip_image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:contentDescription="Trip image" />
+
+        <ImageView
+            android:id="@+id/member_indicator"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:src="@drawable/ic_group"
+            android:visibility="gone"
+            android:contentDescription="Member trip indicator" />
+
+    </FrameLayout>
+
     <TextView
         android:layout_marginTop="10dp"
         android:id="@+id/trip_name"
@@ -60,7 +76,6 @@
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
 
 </LinearLayout>
 

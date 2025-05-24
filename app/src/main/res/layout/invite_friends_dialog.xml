@@ -9,7 +9,7 @@
         android:id="@+id/invite_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Invite Friends"
+        android:text="Add Friends"
         android:fontFamily="@font/bold"
         android:textSize="24sp"
         android:textColor="@color/black"
