@@ -18,6 +18,7 @@ import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.idocalm.travelmate.R;
@@ -37,40 +38,20 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
     static Button peopleAmount;
     static int amount = 1;
     Date flightDate;
-    private boolean isTripView;
-    private String tripId;
 
     Button date, search;
     AutoCompleteTextView origin, destination;
     FlightsListAdapter adapter;
     LinearLayout loading;
 
-    public FlightsSearchFragment(Context context, boolean isTripView, String tripId) {
-        this.isTripView = isTripView;
-        this.tripId = tripId;
+    public FlightsSearchFragment() {
+
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-
-        if (isTripView)
-            return setupTripView(inflater, container);
-
-        return setupNormalView(inflater, container);
-
-    }
-
-    public View setupTripView(LayoutInflater inflater, ViewGroup container) {
-        View view = inflater.inflate(R.layout.fragment_trip_flight_card, container, false);
-
-
-
-
-    }
-
-    public View setupNormalView(LayoutInflater inflater, ViewGroup container) {
         View view = inflater.inflate(R.layout.fragment_flights_search, container, false);
 
         peopleAmount = view.findViewById(R.id.people_amount);
@@ -110,6 +91,7 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
         });
 
         return view;
+
     }
 
     private void searchFlights() {
@@ -149,7 +131,7 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
 
     private void showResults(ArrayList<Flight> flights) {
         ListView listView = getView().findViewById(R.id.flights_list);
-        adapter = new FlightsListAdapter(getContext(), flights);
+        adapter = new FlightsListAdapter(getContext(), flights, false, null);
         listView.setAdapter(adapter);
         listView.setVisibility(View.VISIBLE);
     }
@@ -179,6 +161,5 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
 
     @Override
     public void onCancel(DialogInterface dialog) {
-        // No-op
     }
 }

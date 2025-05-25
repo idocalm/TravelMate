@@ -7,43 +7,77 @@
     android:layout_marginBottom="10dp"
     android:background="@color/bg">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
+
+    <ImageView
+        android:id="@+id/airline_logo"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:scaleType="fitCenter"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
 
-        <TextView
-            android:id="@+id/airline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/bold"
-            android:text="Airline"
-            android:textColor="@color/white"
-            android:textSize="15sp" />
-
-        <TextView
-            android:id="@+id/hotel_dates"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/bold"
-            android:text="17/10/2023 - 20/10/2023"
-            android:textColor="@color/white"
-            android:textSize="12sp" />
-
-        <TextView
-            android:id="@+id/hotel_price"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/bold"
-            android:text="ILS 1500"
-            android:textColor="@color/green"
-            android:textSize="15sp" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            app:layout_constraintStart_toEndOf="@+id/airline_logo"
+            app:layout_constraintTop_toTopOf="parent">
 
 
+            <TextView
+                android:id="@+id/airline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/bold"
+                android:text="Airline"
+                android:textColor="@color/white"
+                android:textSize="15sp" />
 
-    </LinearLayout>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/flight_dates"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/bold"
+                    android:text="17/10/2023"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/flight_duration"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:fontFamily="@font/bold"
+                    android:text="5 hours"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/flight_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/bold"
+                android:text="ILS 1500"
+                android:textColor="@color/green"
+                android:textSize="15sp" />
+
+
+        </LinearLayout>
 
     <LinearLayout
         android:id="@+id/delete_hotel"

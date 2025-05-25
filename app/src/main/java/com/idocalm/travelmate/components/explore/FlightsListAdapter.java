@@ -20,24 +20,60 @@ import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.Flight;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
-    public FlightsListAdapter(Context context, ArrayList<Flight> flights) {
+    private boolean isTripView;
+    private String tripId;
+
+    public FlightsListAdapter(Context context, ArrayList<Flight> flights, boolean isTripView, String tripId) {
         super(context, 0, flights);
+
+        this.isTripView = isTripView;
+        this.tripId = tripId;
     }
 
     @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         Flight flight = getItem(position);
-        View view = convertView;
-        if (view == null) {
-            view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_flight_card, parent, false);
+
+        if (isTripView) {
+            return setupTripView(flight, parent);
         }
 
+        return setupNormalView(flight, parent);
+
+
+    }
+
+    public View setupTripView(Flight flight, ViewGroup parent) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_trip_flight_card, parent, false);
+
+        TextView airline = view.findViewById(R.id.airline);
+        airline.setText(flight.airlineName);
+
+        TextView flightDates = view.findViewById(R.id.flight_dates);
+        flightDates.setText(flight.departureDate);
+
+        TextView flightDuration = view.findViewById(R.id.flight_duration);
+        flightDuration.setText(flight.totalDuration + " • " + (flight.segments.isEmpty() ? "" : flight.segments.get(0).cabin));
+
+        TextView priceText = view.findViewById(R.id.flight_price);
+        priceText.setText(flight.currency + " " + flight.price);
+
+        ImageView logo = view.findViewById(R.id.airline_logo);
+
+
+        return view;
+    }
+
+    public View setupNormalView(Flight flight, ViewGroup parent) {
+        View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_flight_card, parent, false);
         // Bind views
         ImageView logo = view.findViewById(R.id.airline_logo);
         TextView airlineName = view.findViewById(R.id.airline_name);
@@ -125,7 +161,7 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
                                     }
 
                                     HashMap<String, Object> flightMap = Flight.toHashMap(flight)
-                                    ;
+                                            ;
                                     db.collection("trips").document(selectedTripId).collection("flights").add(flightMap)
                                             .addOnSuccessListener(documentReference -> {
                                                 Toast.makeText(getContext(), "Flight added to trip", Toast.LENGTH_SHORT).show();
@@ -149,7 +185,6 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
             return true;
         });
-
 
         return view;
     }
