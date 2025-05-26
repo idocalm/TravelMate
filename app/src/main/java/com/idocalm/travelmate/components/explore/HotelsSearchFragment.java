@@ -1,7 +1,6 @@
 package com.idocalm.travelmate.components.explore;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
@@ -24,6 +23,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.adapters.HotelsListAdapter;
 import com.idocalm.travelmate.models.Hotel;
 
 import com.idocalm.travelmate.api.Hotels;

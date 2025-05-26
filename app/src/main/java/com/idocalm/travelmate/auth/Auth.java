@@ -24,11 +24,7 @@ import com.idocalm.travelmate.HomeActivity;
 import com.idocalm.travelmate.MainActivity;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.RegisterActivity;
-import com.idocalm.travelmate.SplashActivity;
-import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.User;
-
-import java.util.ArrayList;
 
 public class Auth {
 

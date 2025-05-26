@@ -1,4 +1,4 @@
-package com.idocalm.travelmate.components;
+package com.idocalm.travelmate.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;

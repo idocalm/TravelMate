@@ -2,12 +2,9 @@ package com.idocalm.travelmate;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -27,20 +24,15 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
-import com.idocalm.travelmate.components.ActivitiesExpandableAdapter;
-import com.idocalm.travelmate.components.explore.FlightsListAdapter;
-import com.idocalm.travelmate.components.explore.HotelsListAdapter;
+import com.idocalm.travelmate.adapters.ActivitiesExpandableAdapter;
+import com.idocalm.travelmate.adapters.FlightsListAdapter;
+import com.idocalm.travelmate.adapters.HotelsListAdapter;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
-import com.idocalm.travelmate.components.TripMembersAdapter;
+import com.idocalm.travelmate.adapters.TripMembersAdapter;
 
-import org.w3c.dom.Text;
-
-import java.sql.Array;
-import java.sql.Time;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -48,16 +40,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
+
 import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
-import android.view.ViewGroup;
-import android.widget.DatePicker;
-import android.widget.TimePicker;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import java.util.Calendar;
-import android.widget.Spinner;
 
 public class ManageTripActivity extends AppCompatActivity {
     private TripMembersAdapter membersAdapter;

@@ -1,13 +1,11 @@
 package com.idocalm.travelmate.components.explore;
 
 import android.app.DatePickerDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,11 +15,10 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.adapters.FlightsListAdapter;
 import com.idocalm.travelmate.api.FlightCallback;
 import com.idocalm.travelmate.api.Flights;
 import com.idocalm.travelmate.dialogs.PersonsDialog;
@@ -31,7 +28,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.zip.Inflater;
 
 public class FlightsSearchFragment extends Fragment implements DatePickerDialog.OnDateSetListener, DatePickerDialog.OnCancelListener {
 

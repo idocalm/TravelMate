@@ -1,4 +1,4 @@
-package com.idocalm.travelmate.components.explore;
+package com.idocalm.travelmate.adapters;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -19,8 +19,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.Flight;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,7 +65,6 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
         priceText.setText(flight.currency + " " + flight.price);
 
         ImageView logo = view.findViewById(R.id.airline_logo);
-
 
         return view;
     }
