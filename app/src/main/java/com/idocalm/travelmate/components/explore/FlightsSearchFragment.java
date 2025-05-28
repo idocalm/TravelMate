@@ -40,9 +40,7 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
     FlightsListAdapter adapter;
     LinearLayout loading;
 
-    public FlightsSearchFragment() {
-
-    }
+    public FlightsSearchFragment() {}
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

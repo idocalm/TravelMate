@@ -77,7 +77,6 @@ public class ManageTripActivity extends AppCompatActivity {
             inviteFriend.setVisibility(View.GONE);
         }
 
-        // when clicking the invite button, show a simple dialog with each friend and a checkbox, then button "apply"
         inviteFriend.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
             dialog.setContentView(R.layout.invite_friends_dialog);

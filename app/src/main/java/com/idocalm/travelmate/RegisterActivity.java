@@ -25,9 +25,9 @@ import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    String[] currencies = new String[] {"USD", "EUR", "ILS"};
+    CurrencyType[] currencies = {CurrencyType.USD, CurrencyType.EUR, CurrencyType.ILS};
     AutoCompleteTextView currencyCompleteTextView;
-    ArrayAdapter<String> currencyAdapter;
+    ArrayAdapter<CurrencyType> currencyAdapter;
 
     CurrencyType currency = CurrencyType.NONE;
     EditText nameEditText;
@@ -59,14 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
         currencyCompleteTextView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String item = currencyAdapter.getItem(position);
-                if (item.equals("USD")) {
-                    currency = CurrencyType.USD;
-                } else if (item.equals("EUR")) {
-                    currency = CurrencyType.EUR;
-                } else if (item.equals("ILS")) {
-                    currency = CurrencyType.ILS;
-                }
+                currency = currencyAdapter.getItem(position);
             }
         });
 
@@ -98,9 +91,6 @@ public class RegisterActivity extends AppCompatActivity {
                     Auth.instantiateUser(this);
                 }
             });
-
-
         });
-
     }
 }

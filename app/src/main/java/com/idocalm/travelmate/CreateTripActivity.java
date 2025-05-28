@@ -209,9 +209,7 @@ public class CreateTripActivity extends AppCompatActivity {
     private boolean isPast(String date) {
 
         String[] parts = date.split("/");
-        for (String part : parts) {
-            Log.d("CreateTripActivity", part);
-        }
+
         Calendar d = Calendar.getInstance();
         d.set(Integer.parseInt(parts[2]), Integer.parseInt(parts[1]), Integer.parseInt(parts[0]));
 

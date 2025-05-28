@@ -138,6 +138,7 @@ public class Auth {
                 onSuccess.run();
             })
             .addOnFailureListener(e -> {
+                // No user found - register it
                 register(email, password, onSuccess, onFailure);
             });
     }

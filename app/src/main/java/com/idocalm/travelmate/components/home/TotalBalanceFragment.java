@@ -63,8 +63,6 @@ public class TotalBalanceFragment extends Fragment {
                     double hotels = task.getResult().getDouble("total_hotels");
                     double other = task.getResult().getDouble("total_other");
 
-                    Log.d("TotalBalanceFragment", "Flights: " + flights + " Hotels: " + hotels + " Other: " + other);
-
                     double balance = flights + hotels + other;
 
                     TextView totalBalanceText = view.findViewById(R.id.total_balance);

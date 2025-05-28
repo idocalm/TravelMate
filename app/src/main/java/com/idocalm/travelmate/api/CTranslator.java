@@ -16,7 +16,6 @@ import okhttp3.Response;
 public class CTranslator {
 
     private static final String API_URL = "https://v6.exchangerate-api.com/v6/42346474fcabda4d6c2db244/latest/"; // Example base URL
-    private static final String TAG = "CTranslator";
 
     public interface TranslationCallback {
         void onSuccess(double result);
@@ -34,7 +33,7 @@ public class CTranslator {
     public static void translate(int amount, String fromCode, String toCode, TranslationCallback callback) {
         OkHttpClient client = new OkHttpClient();
 
-        String url = API_URL + fromCode; // e.g., https://api.exchangerate-api.com/v4/latest/USD
+        String url = API_URL + fromCode; 
 
         Request request = new Request.Builder()
                 .url(url)

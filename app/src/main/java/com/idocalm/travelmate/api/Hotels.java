@@ -25,8 +25,6 @@ public class Hotels {
         // Required empty public constructor
     }
 
-
-
     public static Hotel[] fetchHotels(String location, int peopleAmount, Date checkIn, Date checkOut) throws IOException, JSONException {
 
         OkHttpClient client = new OkHttpClient();
@@ -48,7 +46,6 @@ public class Hotels {
 
         for (int i = 0; i < locations.length(); i++) {
             JSONObject locationObject = locations.getJSONObject(i);
-            Log.d("Hotels", "fetchHotels: " + locationObject.getString("dest_type"));
             if (locationObject.getString("dest_type").equals("city") ) {
                 city = locationObject;
                 break;
@@ -90,7 +87,7 @@ public class Hotels {
                     hotel.getInt("id"),
                     hotel.getString("name"),
                     hotel.getString("photoMainUrl"),
-                    1000,
+                    1000, // TODO
                     checkIn,
                     checkOut
             );

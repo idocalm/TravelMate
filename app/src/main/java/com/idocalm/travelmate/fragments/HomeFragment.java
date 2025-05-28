@@ -152,7 +152,7 @@ public class HomeFragment extends Fragment {
 
                 @Override
                 public void onError(Exception e) {
-
+                    Log.e("HomeFragment", "Error loading trip: " + e.getMessage());
                 }
             });
         }
