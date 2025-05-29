@@ -36,7 +36,6 @@ public class TripCard extends Fragment {
     private Trip trip;
     public TripCard(Trip trip) {
         this.trip = trip;
-        // Required empty public constructor
     }
 
     @Override
@@ -44,25 +43,10 @@ public class TripCard extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    public void setImage(Bitmap image) {
-        if (getActivity() == null) return; // avoid crash if activity is not available
-
-
-         getActivity().runOnUiThread( new Runnable() {
-            @Override
-            public void run() {
-                ImageView imageView = getView().findViewById(R.id.trip_image);
-                Log.d("TripCard", "Setting image");
-                imageView.setImageBitmap(image);
-
-            }
-        });
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_trip_card, container, false);
 
         TextView name = view.findViewById(R.id.trip_name);

@@ -102,32 +102,6 @@
 
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_marginTop="10dp"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textColorHint="@color/white"
-            app:placeholderTextColor="@color/white"
-            android:theme="@style/font_bold"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:hint="Select visibility">
-
-            <AutoCompleteTextView
-
-                android:layout_marginRight="5dp"
-                android:id="@+id/trip_visibility"
-                android:layout_width="match_parent"
-
-                android:layout_height="wrap_content"
-                android:textColor="@color/white"
-                app:boxStrokeColor="@color/white"
-                app:boxStrokeWidth="2dp"
-                android:inputType="none"
-                />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-
 
         <LinearLayout
             android:id="@+id/trip_participants_panel"

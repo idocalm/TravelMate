@@ -163,8 +163,6 @@ public class ManageTripActivity extends AppCompatActivity {
         membersAdapter = new TripMembersAdapter(this);
         tripMembers.setAdapter(membersAdapter);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
         Auth.getUser().getTrip(id, new Trip.TripCallback() {
             @Override
             public void onTripLoaded(Trip t) {
@@ -208,7 +206,6 @@ public class ManageTripActivity extends AppCompatActivity {
                     noActivities.setVisibility(View.GONE);
                 }
 
-                // sort the dates
                 dateList.sort((d1, d2) -> {
                     try {
                         Date date1 = sdf.parse(d1);
@@ -397,7 +394,7 @@ public class ManageTripActivity extends AppCompatActivity {
             Timestamp timestamp = new Timestamp(finalDateTime.getTime());
 
             // Create activity
-            ItineraryActivity activity = new ItineraryActivity(name, location, timestamp, note, cost);
+            ItineraryActivity activity = new ItineraryActivity(name, location, timestamp, note, cost, currency);
             trip.addActivity(activity);
             onActivityAdded.run();
             dialog.dismiss();

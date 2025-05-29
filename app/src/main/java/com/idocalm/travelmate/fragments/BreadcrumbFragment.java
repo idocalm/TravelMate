@@ -1,12 +1,10 @@
 package com.idocalm.travelmate.fragments;
 
-import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.idocalm.travelmate.MainActivity;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.BreadcrumbEvent;
@@ -46,13 +42,11 @@ public class BreadcrumbFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_breadcrumb, container, false);
         Typeface bold = getResources().getFont(R.font.bold);
 
         Button logoutButton = view.findViewById(R.id.logout_btn);
         logoutButton.setOnClickListener(v -> {
-            Log.d("BreadcrumbFragment", "Logout button clicked");
             Auth.logOut(getActivity());
         });
 
@@ -62,12 +56,10 @@ public class BreadcrumbFragment extends Fragment {
         if (fragment != null) {
             getChildFragmentManager().beginTransaction().replace(fragmentLayout.getId(), fragment).commit();
         }
-        /* insert the layout: first an element, then a separator (an image view with a right_arrow drawable), and keep going until the last element to which you don't add a separator */
 
         if (elements.isEmpty()) {
             return view;
         }
-
 
         ImageView first = new ImageView(getContext());
         first.setImageResource(R.drawable.right_arrow);
@@ -108,7 +100,6 @@ public class BreadcrumbFragment extends Fragment {
             separator.setImageResource(R.drawable.right_arrow);
 
             contentLayout.addView(separator);
-
         }
 
 

@@ -118,7 +118,6 @@ public class HotelsListAdapter extends ArrayAdapter<Hotel> {
         hotelNameTextView.setText(sb.toString());
 
         view.setOnLongClickListener((v) -> {
-
             try {
                 openHotelDialog(hotel);
             } catch (JSONException e) {

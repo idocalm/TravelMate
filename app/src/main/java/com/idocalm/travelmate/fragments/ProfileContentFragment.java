@@ -28,7 +28,6 @@ public class ProfileContentFragment extends Fragment {
 
 
     public ProfileContentFragment() {
-        // Required empty public constructor
     }
 
     public interface ContentListener {
@@ -67,7 +66,6 @@ public class ProfileContentFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile_content, container, false);
         Button addFriendButton = view.findViewById(R.id.add_friend_btn);
         EditText addFriendInput = view.findViewById(R.id.add_friend_input);
@@ -97,10 +95,7 @@ public class ProfileContentFragment extends Fragment {
         LinearLayout inviteFriends = view.findViewById(R.id.profile_friend_button);
 
         inviteFriends.setOnClickListener(v -> {
-            Log.d("ProfileContentFragment", "Invite friends clicked");
-            // hash the user id to create a unique link, with length of 6
             shareInviteLink(Auth.getUser().getId().toString(), getContext());
-            Log.d("ProfileContentFragment", "Invite link generated");
 
         });
 

@@ -8,23 +8,19 @@ import androidx.fragment.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.google.firebase.Timestamp;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.home.RecentlyViewed;
 import com.idocalm.travelmate.components.home.TotalBalanceFragment;
 import com.idocalm.travelmate.models.Trip;
-import com.idocalm.travelmate.models.User;
 
-import java.lang.reflect.Array;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.regex.Matcher;
@@ -34,16 +30,12 @@ import java.util.regex.Pattern;
 public class HomeFragment extends Fragment {
 
 
-    public HomeFragment() {
-        // Required empty public constructor
-    }
+    public HomeFragment() {}
 
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        //fetchRecentTrips();
     }
 
     public static String getTimeRemainingString(Timestamp now, Timestamp tripTime) {
@@ -69,14 +61,12 @@ public class HomeFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
 
         getChildFragmentManager().beginTransaction().replace(R.id.recently_viewed_container, new RecentlyViewed()).commit();
         getChildFragmentManager().beginTransaction().replace(R.id.total_balance_container, new TotalBalanceFragment()).commit();
 
         String name = Auth.getUser().getName();
-
 
         /* check if the current time is between 7:00 and 12:00 */
         String greeting = "";
@@ -102,7 +92,6 @@ public class HomeFragment extends Fragment {
             return view;
         }
 
-        // fetch all ids from "trips", then get the one with the most recent start date
         ArrayList<String> tripIds = Auth.getUser().getTripIds();
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         ArrayList<Trip> loadedTrips = new ArrayList<>();
@@ -115,7 +104,6 @@ public class HomeFragment extends Fragment {
 
                     // After all trips are loaded, find the closest one
                     if (loadedTrips.size() == tripIds.size()) {
-                        Log.d("HomeFragment", "All trips loaded: " + loadedTrips.size());
                         Trip closestTrip = null;
                         for (Trip t : loadedTrips) {
                             if ((closestTrip == null || t.getStartDate().compareTo(closestTrip.getStartDate()) < 0) && t.getStartDate().compareTo(Timestamp.now()) > 0) {
@@ -124,9 +112,7 @@ public class HomeFragment extends Fragment {
                         }
 
                         if (closestTrip != null) {
-                            Log.d("HomeFragment", "Closest trip: " + closestTrip.getId());
-                            Log.d("HomeFragment", "Closest trip start date: " + closestTrip.getStartDate());
-                            Log.d("HomeFragment", "Current time: " + Timestamp.now());
+
                             String time = getTimeRemainingString(Timestamp.now(), closestTrip.getStartDate());
                             SpannableString spannable = new SpannableString(time);
 
@@ -137,7 +123,7 @@ public class HomeFragment extends Fragment {
                                 int start = matcher.start();
                                 int end = matcher.end();
                                 spannable.setSpan(
-                                        new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.green)), // Replace R.color.green with your green
+                                        new ForegroundColorSpan(ContextCompat.getColor(getContext(), R.color.green)),
                                         start,
                                         end,
                                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -151,9 +137,7 @@ public class HomeFragment extends Fragment {
                 }
 
                 @Override
-                public void onError(Exception e) {
-                    Log.e("HomeFragment", "Error loading trip: " + e.getMessage());
-                }
+                public void onError(Exception e) {}
             });
         }
 

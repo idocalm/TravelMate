@@ -32,10 +32,7 @@ public class SearchFragment extends Fragment {
     List<Trip> searchResult = new ArrayList<>();
     LinearLayout searchResults;
 
-
-    public SearchFragment() {
-        // Required empty public constructor
-    }
+    public SearchFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,8 +59,6 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
                             Bundle savedInstanceState) {
     View view = inflater.inflate(R.layout.fragment_search, container, false);
 
-    publicButton = view.findViewById(R.id.global_search);
-    privateButton = view.findViewById(R.id.private_search);
     searchInput = view.findViewById(R.id.search_input);
     searchResults = view.findViewById(R.id.search_results);
 
@@ -116,11 +111,7 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
         return false;
     });
 
-
-    
     return view;
 
-
-
-}
+    }
 }

@@ -9,7 +9,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.enums.CurrencyType;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The type User.

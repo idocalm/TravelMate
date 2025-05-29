@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.Airport;
 import com.idocalm.travelmate.models.Flight;
 import com.idocalm.travelmate.models.FlightResponse;
@@ -25,7 +24,6 @@ import okhttp3.Response;
 public class Flights {
 
     public Flights() {
-        // Required empty public constructor
     }
 
     public static ArrayList<Airport> fetchAirports(Activity ctx, String country) {

@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-/**
- * The type Hotel.
- */
+
 public class Hotel {
     private int id;
     private String dbId;
@@ -21,17 +19,7 @@ public class Hotel {
     private Date checkInDate;
 
 
-    /**
-     * Instantiates a new Hotel.
-     *
-     * @param id           the id
-     * @param name         the name
-     * @param mainPhoto    the main photo
 
-     * @param price        the price
-     * @param checkInDate  the check in date
-     * @param checkOutDate the check out date
-     */
     public Hotel(int id, String name, String mainPhoto, long price, Date checkInDate, Date checkOutDate) {
         this.id = id;
         this.dbId = "";
@@ -42,16 +30,6 @@ public class Hotel {
         this.checkOutDate = checkOutDate;
     }
 
-    /**
-     * Instantiates a new Hotel.
-     *
-     * @param dbId         the db id
-     * @param name         the name
-     * @param mainPhoto    the main photo
-     * @param price        the price
-     * @param checkInDate  the check in date
-     * @param checkOutDate the check out date
-     */
     public Hotel(String dbId, String name, String mainPhoto, double price, Date checkInDate, Date checkOutDate) {
         this.dbId = dbId;
         this.name = name;
@@ -66,29 +44,14 @@ public class Hotel {
         void onHotelsLoaded(ArrayList<Hotel> hotels);
         void onError(Exception e);
     }
-    /**
-     * Gets id.
-     *
-     * @return the id
-     */
     public int getId() {
         return id;
     }
 
-    /**
-     * Gets main photo.
-     *
-     * @return the main photo
-     */
     public String getMainPhoto() {
         return mainPhoto;
     }
 
-    /**
-     * Gets name.
-     *
-     * @return the name
-     */
     public String getName() {
         return name;
     }
@@ -97,30 +60,14 @@ public class Hotel {
     public String getDBId() {
         return dbId;
     }
-
-    /**
-     * Gets price.
-     *
-     * @return the price
-     */
     public double getPrice() {
         return price;
     }
 
-    /**
-     * Gets check in date.
-     *
-     * @return the check in date
-     */
     public Date getCheckInDate() {
         return checkInDate;
     }
 
-    /**
-     * Gets check out date.
-     *
-     * @return the check out date
-     */
     public Date getCheckOutDate() {
         return checkOutDate;
     }

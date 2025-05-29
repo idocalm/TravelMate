@@ -15,21 +15,13 @@ import okhttp3.Response;
 
 public class CTranslator {
 
-    private static final String API_URL = "https://v6.exchangerate-api.com/v6/42346474fcabda4d6c2db244/latest/"; // Example base URL
+    private static final String API_URL = "https://v6.exchangerate-api.com/v6/42346474fcabda4d6c2db244/latest/";
 
     public interface TranslationCallback {
         void onSuccess(double result);
         void onFailure(Exception e);
     }
 
-    /**
-     * Translates a given amount from one currency to another using OkHttp.
-     *
-     * @param amount     The amount of money to convert
-     * @param fromCode   The source currency code (e.g., "USD")
-     * @param toCode     The target currency code (e.g., "EUR")
-     * @param callback   Callback to handle success/failure
-     */
     public static void translate(int amount, String fromCode, String toCode, TranslationCallback callback) {
         OkHttpClient client = new OkHttpClient();
 
@@ -43,7 +35,6 @@ public class CTranslator {
 
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e(TAG, "HTTP request failed", e);
                 callback.onFailure(e);
             }
 

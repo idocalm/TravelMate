@@ -9,7 +9,6 @@ import com.idocalm.travelmate.R;
 
 public class TripSearchDialog extends Dialog {
 
-
     public TripSearchDialog(Activity a) {
         super(a);
     }

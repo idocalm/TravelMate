@@ -30,7 +30,6 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
     public FlightsListAdapter(Context context, ArrayList<Flight> flights, boolean isTripView, String tripId) {
         super(context, 0, flights);
-
         this.isTripView = isTripView;
         this.tripId = tripId;
     }
@@ -63,8 +62,6 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
         TextView priceText = view.findViewById(R.id.flight_price);
         priceText.setText(flight.currency + " " + flight.price);
-
-        ImageView logo = view.findViewById(R.id.airline_logo);
 
         return view;
     }

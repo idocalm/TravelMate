@@ -3,13 +3,10 @@ package com.idocalm.travelmate.components.friends;
 
 import android.app.AlertDialog;
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,7 +28,6 @@ public class FriendsListAdapter extends PagerAdapter {
     public FriendsListAdapter(Context context, ArrayList<User> friendsListData) {
         this.context = context;
         this.friendsListData = friendsListData;
-
     }
 
     @Override

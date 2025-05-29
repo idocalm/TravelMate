@@ -14,11 +14,7 @@ import com.idocalm.travelmate.components.explore.HotelsSearchFragment;
 import com.idocalm.travelmate.R;
 
 public class ExploreFragment extends Fragment {
-
-
-    public ExploreFragment() {
-        // Required empty public constructor
-    }
+    public ExploreFragment() {}
 
     Button hotels, flights;
     Button selectedButton;
@@ -46,7 +42,6 @@ public class ExploreFragment extends Fragment {
         @Override
         public void onClick(View v) {
             setButton((Button) v);
-
         }
     };
 
@@ -62,9 +57,7 @@ public class ExploreFragment extends Fragment {
         hotels.setOnClickListener(buttonListener);
         flights.setOnClickListener(buttonListener);
 
-
         return view;
-
 
     }
 }

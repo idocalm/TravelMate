@@ -1,15 +1,9 @@
 package com.idocalm.travelmate.fragments;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager.widget.ViewPager;
 
@@ -20,13 +14,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
@@ -40,9 +31,7 @@ public class ProfileAccountFragment extends Fragment {
 
 
     ImageView profileImage;
-    public ProfileAccountFragment() {
-        // Required empty public constructor
-    }
+    public ProfileAccountFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -52,22 +41,19 @@ public class ProfileAccountFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_profile_account, container, false);
         profileImage = view.findViewById(R.id.profile_img);
 
         ViewPager friendsList = view.findViewById(R.id.friends_list);
         ArrayList<String> friends = Auth.getUser().getFriendsIds();
-        Log.d("ProfileAccountFragment", "Friends IDs: " + friends.toString());
         ArrayList<User> friendsListData = new ArrayList<>();
 
         int totalFriends = friends.size();
-        AtomicInteger completedCount = new AtomicInteger(0); // thread-safe counter
+        AtomicInteger completedCount = new AtomicInteger(0);
 
         for (String id : friends) {
             final String friendId = id;
-            Log.d("ProfileAccountFragment", "Fetching friend: " + friendId);
 
             FirebaseFirestore.getInstance().collection("users").document(friendId).get()
                     .addOnSuccessListener(documentSnapshot -> {
@@ -87,15 +73,10 @@ public class ProfileAccountFragment extends Fragment {
                         }
                     })
                     .addOnFailureListener(e -> {
-                        Log.d("ProfileAccountFragment", "Failed to fetch friend: " + friendId + " - " + e.getMessage());
 
                         if (completedCount.incrementAndGet() == totalFriends) {
-                            // All fetches done!
                             FriendsListAdapter adapter = new FriendsListAdapter(getContext(), friendsListData);
                             friendsList.setAdapter(adapter);
-
-                            // make it so when you click a friend, theres a dialog to remove them
-
 
                         }
                     });
@@ -117,12 +98,10 @@ public class ProfileAccountFragment extends Fragment {
             Toast.makeText(getContext(), "Long click to change profile photo", Toast.LENGTH_SHORT).show();
         });
 
-
         TextView name = view.findViewById(R.id.profile_name);
         TextView currency = view.findViewById(R.id.profile_currency);
 
         ImageView editName = view.findViewById(R.id.edit_name);
-        ImageView editCurrency = view.findViewById(R.id.edit_currency);
 
         editName.setOnClickListener(v -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
@@ -188,7 +167,6 @@ public class ProfileAccountFragment extends Fragment {
     }
 
     private void handleImageUrl(String imageUrl) {
-        // store profile image URL in the database
         Auth.getUser().setProfile(imageUrl);
     }
 }

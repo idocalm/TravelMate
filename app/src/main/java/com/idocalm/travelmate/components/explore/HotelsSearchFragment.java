@@ -55,9 +55,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     HotelsListAdapter adapter;
     ProgressBar loading;
 
-    public HotelsSearchFragment() {
-        // Required empty public constructor
-    }
+    public HotelsSearchFragment() {}
 
     public static void setPeopleAmount(int update) {
         amount =  update;

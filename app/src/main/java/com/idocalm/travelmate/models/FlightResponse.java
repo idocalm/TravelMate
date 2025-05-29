@@ -1,7 +1,6 @@
 package com.idocalm.travelmate.models;
 
 import android.util.Log;
-import android.widget.Toast;
 
 import com.idocalm.travelmate.api.CTranslator;
 import com.idocalm.travelmate.auth.Auth;
@@ -10,11 +9,6 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import java.util.ArrayList;
 
-
-
-/**
- * The type Flight response.
- */
 public class FlightResponse {
 
 
@@ -22,17 +16,10 @@ public class FlightResponse {
         void onParsed(ArrayList<Flight> flights);
     }
 
-    /**
-     * Parses the flight response from the API.
-     *
-     * @param rawJson  The raw JSON string from the API response.
-     * @param callback The callback to handle the parsed flights.
-     */
     public static void parseFlights(String rawJson, FlightParseCallback callback) {
         ArrayList<Flight> flightsList = new ArrayList<>();
         ArrayList<Flight> flightsToConvert = new ArrayList<>();
 
-        Log.d("FlightResponse", "Parsing flight response: " + rawJson);
         try {
             JSONObject root = new JSONObject(rawJson);
             JSONObject response = root.getJSONObject("response");

@@ -90,14 +90,14 @@ public class Auth {
         }
     }
 
-    public static void logOut(Activity act) {
-        FirebaseAuth.getInstance().signOut();
-        Intent intent = new Intent(act, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        act.startActivity(intent);
-        act.finish();
-        instance = null;
-    }
+public static void logOut(Activity act) {
+    FirebaseAuth.getInstance().signOut();
+    Intent intent = new Intent(act, MainActivity.class);
+    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+    act.startActivity(intent);
+    act.finish();
+    instance = null;
+}
 
 
     public static User getUser() {

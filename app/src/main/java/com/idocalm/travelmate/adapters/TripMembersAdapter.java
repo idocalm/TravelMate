@@ -41,7 +41,6 @@ public class TripMembersAdapter extends RecyclerView.Adapter<TripMembersAdapter.
     public void onBindViewHolder(@NonNull MemberViewHolder holder, int position) {
         String memberId = memberIds.get(position);
         
-        // Load user data from Firestore
         com.google.firebase.firestore.FirebaseFirestore.getInstance()
             .collection("users")
             .document(memberId)

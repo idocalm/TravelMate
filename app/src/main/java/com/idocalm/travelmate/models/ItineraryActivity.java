@@ -7,9 +7,6 @@ import com.google.firebase.Timestamp;
 import java.time.Duration;
 import java.util.Map;
 
-/**
- * The type Itinerary activity.
- */
 public class ItineraryActivity {
 
     private String name;
@@ -18,22 +15,15 @@ public class ItineraryActivity {
 
     private String note;
     private String cost;
+    private String currency;
 
-    /**
-     * Instantiates a new Itinerary activity.
-     *
-     * @param name       the name
-     * @param location   the location
-     * @param date       the date
-     * @param note       the note
-     * @param cost       the cost
-     */
-    public ItineraryActivity(String name, String location, Timestamp date, String note, String cost) {
+    public ItineraryActivity(String name, String location, Timestamp date, String note, String cost, String currency) {
         this.name = name;
         this.location = location;
         this.date = date;
         this.note = note;
         this.cost = cost;
+        this.currency = currency;
     }
 
     /**
@@ -47,7 +37,8 @@ public class ItineraryActivity {
                 "location", location,
                 "date", date,
                 "note", note == null ? "" : note,
-                "cost", cost == null ? "" : cost
+                "cost", cost == null ? "" : cost,
+                "currency", currency == null ? "" : currency
         );
     }
 
@@ -57,7 +48,8 @@ public class ItineraryActivity {
                 (String) map.get("location"),
                 (Timestamp) map.get("date"),
                 (String) map.get("note"),
-                (String) map.get("cost")
+                (String) map.get("cost"),
+                (String) map.get("currency")
         );
     }
 
@@ -82,6 +74,10 @@ public class ItineraryActivity {
         return cost;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -97,6 +93,7 @@ public class ItineraryActivity {
         if (!location.equals(that.location)) return false;
         if (!date.equals(that.date)) return false;
         if (!note.equals(that.note)) return false;
+        if (!currency.equals(that.currency)) return false;
         return cost.equals(that.cost);
     }
 }

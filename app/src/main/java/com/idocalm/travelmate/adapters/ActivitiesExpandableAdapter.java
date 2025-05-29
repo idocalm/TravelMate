@@ -236,7 +236,7 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
             Timestamp timestamp = new Timestamp(finalDateTime.getTime());
 
             // Create activity
-            ItineraryActivity newActivity = new ItineraryActivity(name, location, timestamp, note, cost);
+            ItineraryActivity newActivity = new ItineraryActivity(name, location, timestamp, note, cost, currency);
             this.trip.editActivity(activity, newActivity);
             onActivityEdited.run();
             dialog.dismiss();

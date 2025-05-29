@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,31 +15,15 @@ import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.User;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TotalBalanceFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class TotalBalanceFragment extends Fragment {
 
-
-    public TotalBalanceFragment() {
-        // Required empty public constructor
-    }
-
-    public static TotalBalanceFragment newInstance(String param1, String param2) {
-        TotalBalanceFragment fragment = new TotalBalanceFragment();
-        return fragment;
-    }
+    public TotalBalanceFragment() {}
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
-
     }
 
     @Override
@@ -51,7 +34,6 @@ public class TotalBalanceFragment extends Fragment {
 
         User user = Auth.getUser();
         ArrayList<String> ids = user.getTripIds();
-
 
         // Get the total balance of all trips
         FirebaseFirestore db = FirebaseFirestore.getInstance();

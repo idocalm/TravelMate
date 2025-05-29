@@ -1,9 +1,6 @@
 package com.idocalm.travelmate;
 
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
@@ -14,17 +11,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.github.jinatonic.confetti.CommonConfetti;
-import com.github.jinatonic.confetti.ConfettiManager;
-import com.github.jinatonic.confetti.ConfettiSource;
-import com.github.jinatonic.confetti.ConfettoGenerator;
-import com.github.jinatonic.confetti.confetto.BitmapConfetto;
-import com.github.jinatonic.confetti.confetto.Confetto;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
@@ -34,24 +20,14 @@ import com.idocalm.travelmate.models.Hotel;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
 public class CreateTripActivity extends AppCompatActivity {
 
-
-    AutoCompleteTextView visibilityCompleteTextView;
-    ArrayAdapter<String> visibilityAdapter;
     EditText destinationEditText, startDateEditText, endDateEditText, tripNameEditText, tripDescEditText;
-
-    TripVisibility visibility = TripVisibility.NONE;
-
-    String[] visibilityOptions = new String[] {"Public", "Private"};
 
     LinearLayout participantsLayout;
 
@@ -61,23 +37,8 @@ public class CreateTripActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_create_trip);
 
-        visibilityCompleteTextView = findViewById(R.id.trip_visibility);
         participantsLayout = findViewById(R.id.trip_participants_panel);
         participantsLayout.setVisibility(View.GONE);
-
-        visibilityAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, visibilityOptions);
-        visibilityCompleteTextView.setAdapter(visibilityAdapter);
-        visibilityCompleteTextView.setOnItemClickListener((parent, view, position, id) -> {
-            String item = visibilityAdapter.getItem(position);
-            if (item.equals("Public")) {
-                participantsLayout.setVisibility(View.GONE);
-                visibility = TripVisibility.PUBLIC;
-            } else if (item.equals("Private")) {
-                participantsLayout.setVisibility(View.VISIBLE);
-                visibility = TripVisibility.PRIVATE;
-            }
-            visibilityCompleteTextView.setError(null);
-        });
 
         destinationEditText = findViewById(R.id.trip_dest);
         startDateEditText = findViewById(R.id.trip_start_date);
@@ -101,10 +62,6 @@ public class CreateTripActivity extends AppCompatActivity {
         Button create = findViewById(R.id.create_trip_button);
         create.setOnClickListener(v -> {
             boolean valid = true;
-            if (visibility == TripVisibility.NONE) {
-                visibilityCompleteTextView.setError("Please select a visibility option");
-                valid = false;
-            }
 
             if (tripNameEditText.getText().toString().isEmpty()) {
                 tripNameEditText.setError("Please enter a trip name");
@@ -207,7 +164,6 @@ public class CreateTripActivity extends AppCompatActivity {
     }
 
     private boolean isPast(String date) {
-
         String[] parts = date.split("/");
 
         Calendar d = Calendar.getInstance();

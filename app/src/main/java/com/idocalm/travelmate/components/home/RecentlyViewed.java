@@ -23,28 +23,14 @@ import java.util.ArrayList;
 
 public class RecentlyViewed extends Fragment {
 
-    private Trip[] recentlyViewedTrips;
-    public RecentlyViewed() {
-        // Required empty public constructor
-    }
+    public RecentlyViewed() {}
     @Override
     public void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
-        Log.d("RecentlyViewed", "User: " + Auth.getUser().getName());
-
-    }
-
-    public void setRecentlyViewedTrips(Trip[] trips) {
-        // get the recently viewed trips from the database
-        recentlyViewedTrips = trips;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-
-        Log.d("RecentlyViewed", "User: " + Auth.getUser().getName());
         View view = inflater.inflate(R.layout.fragment_recently_viewed, container, false);
 
         ArrayList<String> arr = Auth.getUser().getTripIds();
@@ -60,11 +46,9 @@ public class RecentlyViewed extends Fragment {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         for (String tripId : arr) {
-            Log.d("RecentlyViewed", "Trip ID: " + tripId);
             // get the trip from the database
             db.collection("trips").document(tripId).get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
-
                     Trip.fromDB(task.getResult(), new Trip.TripCallback() {
                                 @Override
                                 public void onTripLoaded(Trip trip) {
@@ -82,8 +66,6 @@ public class RecentlyViewed extends Fragment {
 
                                 }
                     });
-
-
                 } else {
                     Log.e("Trip", "Error getting document", task.getException());
                 }

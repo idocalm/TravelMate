@@ -22,7 +22,6 @@ import okhttp3.Response;
 public class Hotels {
 
     public Hotels() {
-        // Required empty public constructor
     }
 
     public static Hotel[] fetchHotels(String location, int peopleAmount, Date checkIn, Date checkOut) throws IOException, JSONException {
@@ -106,7 +105,6 @@ public class Hotels {
 
         String url = "https://booking-com.p.rapidapi.com/v2/hotels/details?locale=en-gb&checkin_date="+checkInDate+"&hotel_id="+hotel.getId()+"&currency="+currency+"&checkout_date="+checkOutDate;
 
-        Log.d("Hotels", "getHotelData: " + url);
         Request request = new Request.Builder()
                 .url(url)
                 .get()
