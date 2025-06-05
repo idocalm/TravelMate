@@ -63,7 +63,7 @@ public class HotelsListAdapter extends ArrayAdapter<Hotel> {
         hotelNameTextView.setText(hotel.getName());
 
         TextView hotelPriceTextView = view.findViewById(R.id.hotel_price);
-        String price = Auth.getUser().getCurrencyString() + " " + hotel.getPrice();
+        String price = hotel.getCurrency() + " " + hotel.getPrice();
         hotelPriceTextView.setText(price);
 
         TextView hotelDatesTextView = view.findViewById(R.id.hotel_dates);

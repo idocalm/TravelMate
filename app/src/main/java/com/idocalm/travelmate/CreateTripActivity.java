@@ -20,6 +20,9 @@ import com.idocalm.travelmate.models.Hotel;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -104,41 +107,66 @@ public class CreateTripActivity extends AppCompatActivity {
                 String description = tripDescEditText.getText().toString();
                 String image = "";
 
-                /* create a timestamp with the startDate at 00:00:00 */
-                String[] startParts = startDateEditText.getText().toString().split("/");
-                String[] endParts = endDateEditText.getText().toString().split("/");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                Date startDateParsed = null;
+                try {
+                    startDateParsed = sdf.parse(startDateEditText.getText().toString());
 
-                Calendar startDate = Calendar.getInstance();
-                startDate.set(Integer.parseInt(startParts[2]), Integer.parseInt(startParts[1]), Integer.parseInt(startParts[0]), 0, 0, 0);
+                    Date endDateParsed = null;
+                    try {
+                        endDateParsed = sdf.parse(endDateEditText.getText().toString());
 
-                Calendar endDate = Calendar.getInstance();
-                endDate.set(Integer.parseInt(endParts[2]), Integer.parseInt(endParts[1]), Integer.parseInt(endParts[0]), 0, 0, 0);
+                        if (startDateParsed == null || endDateParsed == null) {
+                            Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                Timestamp start = new Timestamp(startDate.getTime());
-                Timestamp end = new Timestamp(endDate.getTime());
+                        Timestamp start = new Timestamp(startDateParsed);
+                        Timestamp end = new Timestamp(endDateParsed);
 
-                ArrayList<String> members = new ArrayList<>();
-                members.add(Auth.getUser().getId());
+                        if (start.toDate().after(end.toDate())) {
+                            Toast.makeText(this, "End date must be after start date", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                ArrayList<ItineraryActivity> activities = new ArrayList<>();
-                ArrayList<Hotel> hotels = new ArrayList<>();
-                ArrayList<Flight> flights = new ArrayList<>();
+                        if (end.toDate().before(new Date())) {
+                            Toast.makeText(this, "End date can't be in the past", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                Trip trip = new Trip(null, name, destination, Auth.getUser().getId(), description, image, members, start, end, new Timestamp(new Date()), new Timestamp(new Date()), new Timestamp(new Date()), activities, hotels, flights);
+                        if (start.toDate().before(new Date())) {
+                            Toast.makeText(this, "Start date can't be in the past", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                HashMap<String, Object> t = Trip.toHashMap(trip);
+                        ArrayList<String> members = new ArrayList<>();
+                        members.add(Auth.getUser().getId());
 
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                db.collection("trips").add(t).addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        String id = task.getResult().getId();
-                        db.collection("trips").document(id).update("id", task.getResult().getId());
-                        Auth.getUser().addTripId(id);
-                        Toast.makeText(this, "Trip created successfully", Toast.LENGTH_SHORT).show();
-                        finish();
+                        ArrayList<ItineraryActivity> activities = new ArrayList<>();
+                        ArrayList<Hotel> hotels = new ArrayList<>();
+                        ArrayList<Flight> flights = new ArrayList<>();
 
+                        Trip trip = new Trip(null, name, destination, Auth.getUser().getId(), description, image, members, start, end, new Timestamp(new Date()), new Timestamp(new Date()), new Timestamp(new Date()), activities, hotels, flights);
+
+                        HashMap<String, Object> t = Trip.toHashMap(trip);
+
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("trips").add(t).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                String id = task.getResult().getId();
+                                db.collection("trips").document(id).update("id", task.getResult().getId());
+                                Auth.getUser().addTripId(id);
+                                Toast.makeText(this, "Trip created successfully", Toast.LENGTH_SHORT).show();
+                                finish();
+                            }
+                        });
+                    } catch (ParseException e) {
+                        Toast.makeText(this, "Invalid end date format", Toast.LENGTH_SHORT).show();
                     }
-                });
+                } catch (ParseException e) {
+                    Toast.makeText(this, "Invalid start date format", Toast.LENGTH_SHORT).show();
+                }
+
 
             }
         });

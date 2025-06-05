@@ -86,7 +86,7 @@ public class Hotel {
         data.put("price", String.valueOf(hotel.getPrice()));
         data.put("checkInDate", hotel.getCheckInDate());
         data.put("checkOutDate", hotel.getCheckOutDate());
-
+        data.put("currency", hotel.getCurrency());
         return data;
     }
 

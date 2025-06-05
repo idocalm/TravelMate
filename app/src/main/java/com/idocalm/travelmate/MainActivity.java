@@ -93,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
             Auth.login(this, email, password, () -> {
                 Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show();
+
             }, () -> {
                 // Show error message
                 Toast.makeText(this, "Login failed - ", Toast.LENGTH_SHORT).show();

@@ -84,7 +84,7 @@ public class RegisterActivity extends AppCompatActivity {
             user.put("id", FirebaseAuth.getInstance().getCurrentUser().getUid());
             user.put("friendsIds", new ArrayList<String>());
 
-            FirebaseFirestore.getInstance().collection("users").document(Auth.getUser().getId()).set(user).addOnCompleteListener(task -> {
+            FirebaseFirestore.getInstance().collection("users").document(FirebaseAuth.getInstance().getCurrentUser().getUid()).set(user).addOnCompleteListener(task -> {
                 if (!task.isSuccessful()) {
                     Toast.makeText(this, "Failed to register user", Toast.LENGTH_SHORT).show();
                 } else {

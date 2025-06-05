@@ -139,13 +139,16 @@ public static void logOut(Activity act) {
             })
             .addOnFailureListener(e -> {
                 // No user found - register it
-                register(email, password, onSuccess, onFailure);
+                register(activity, email, password, onSuccess, onFailure);
             });
     }
 
-    public static void register(String email, String password, Runnable onSuccess, Runnable onFailure) {
+    public static void register(Activity act, String email, String password, Runnable onSuccess, Runnable onFailure) {
         FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, password)
             .addOnSuccessListener(authResult -> {
+                Intent intent = new Intent(act, RegisterActivity.class);
+                act.startActivity(intent);
+                act.finish();
                 onSuccess.run();
             })
             .addOnFailureListener(e -> {

@@ -51,7 +51,7 @@ public class TotalBalanceFragment extends Fragment {
         totals.put("flights", 0.0);
 
         for (Hotel hotel : hotels) {
-            CTranslator.translate((int) hotel.getPrice(), "USD", Auth.getUser().getCurrencyString(), new CTranslator.TranslationCallback() {
+            CTranslator.translate((int) hotel.getPrice(), hotel.getCurrency(), Auth.getUser().getCurrencyString(), new CTranslator.TranslationCallback() {
                 @Override
                 public void onSuccess(double result) {
                     Log.d("TotalBalanceFragment", "Hotel price translated: " + result);
@@ -113,7 +113,7 @@ public class TotalBalanceFragment extends Fragment {
                                 }
 
                                 for (Hotel hotel : hotels) {
-                                    CTranslator.translate((int) hotel.getPrice(), "USD", Auth.getUser().getCurrencyString(), new CTranslator.TranslationCallback() {
+                                    CTranslator.translate((int) hotel.getPrice(), hotel.getCurrency(), Auth.getUser().getCurrencyString(), new CTranslator.TranslationCallback() {
                                         @Override
                                         public void onSuccess(double result) {
                                             Log.d("TotalBalanceFragment", "Hotel price translated: " + result);
@@ -158,7 +158,7 @@ public class TotalBalanceFragment extends Fragment {
 
         if (activities.size() == 0) {
             Log.d("TotalBalanceFragment", "No activities found for trip: " + trip.getName());
-            return;
+            loadTripFlights(trip, totals, callback);
         }
 
         for (ItineraryActivity activity : activities) {
