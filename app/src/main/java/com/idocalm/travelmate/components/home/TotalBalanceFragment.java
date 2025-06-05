@@ -261,7 +261,8 @@ public class TotalBalanceFragment extends Fragment {
 
         if (flights.size() == 0) {
             Log.d("TotalBalanceFragment", "No flights found for trip: " + trip.getName());
-            requireActivity().runOnUiThread(() -> updateUI(totals, view));
+            if (getActivity() != null)
+                requireActivity().runOnUiThread(() -> updateUI(totals, view));
             return;
         }
 
@@ -275,7 +276,8 @@ public class TotalBalanceFragment extends Fragment {
 
                     if (handledFlights.size() == flights.size()) {
                         Log.d("TotalBalanceFragment", "All flight costs translated, updating UI");
-                        requireActivity().runOnUiThread(() -> updateUI(totals, view));
+                        if (getActivity() != null)
+                            requireActivity().runOnUiThread(() -> updateUI(totals, view));
                     }
                 }
 

@@ -81,6 +81,7 @@
         android:layout_weight="1"
         android:textAllCaps="false"
         android:text="Date"
+        android:textColor="@color/black"
         android:textSize="15dp"
         android:fontFamily="@font/bold"
         android:layout_marginEnd="4dp"/>
@@ -94,6 +95,7 @@
         android:background="@drawable/button_clean"
         android:fontFamily="@font/bold"
         android:text="Time"
+        android:textColor="@color/black"
         android:textAllCaps="false" />
 </LinearLayout>
 

@@ -35,7 +35,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
+        super.onCreate(savedInstanceState);
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             Log.d("RegisterActivity", "User not logged in, redirecting to login screen.");
             startActivity(new Intent(RegisterActivity.this, MainActivity.class));
@@ -45,7 +45,6 @@ public class RegisterActivity extends AppCompatActivity {
             Log.d("RegisterActivity", "User logged in, proceeding with registration.");
         }
 
-        super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 

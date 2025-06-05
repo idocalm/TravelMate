@@ -80,11 +80,11 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
                 Request.Method.GET,
                 url,
                 null,
-                response -> {
-                    loading.setVisibility(View.GONE);
+                response -> new Thread(() -> {
                     try {
                         JSONArray dataArray = response.getJSONArray("data");
                         List<String> countryList = new ArrayList<>();
+                        Map<String, List<String>> tempMap = new HashMap<>();
 
                         for (int i = 0; i < dataArray.length(); i++) {
                             JSONObject countryObj = dataArray.getJSONObject(i);
@@ -94,28 +94,43 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
                             List<String> cities = new ArrayList<>();
                             for (int j = 0; j < citiesArray.length(); j++) {
                                 String rawCity = citiesArray.getString(j);
-                                String normalizedCity = normalizeToAscii(rawCity);
-
-                                cities.add(normalizedCity);
+                                cities.add(normalizeToAscii(rawCity));
                             }
 
-                            countryList.add(countryName);
-                            countryCityMap.put(countryName, cities);
+                            synchronized (this) {
+                                tempMap.put(countryName, cities);
+                                countryList.add(countryName);
+                            }
+
+                            // Optional: throttle or batch process
+                            if (i % 20 == 0) {
+                                Thread.sleep(10); // brief yield for GC/UI
+                            }
                         }
 
-                        // Set up countries adapter
-                        ArrayAdapter<String> countryAdapter = new ArrayAdapter<>(
-                                requireContext(),
-                                android.R.layout.simple_list_item_1,
-                                countryList
-                        );
-                        countries.setAdapter(countryAdapter);
-                        countries.setVisibility(View.VISIBLE);
-                    } catch (JSONException e) {
+                        // Post to UI thread
+                        if (getActivity() != null)
+                            requireActivity().runOnUiThread(() -> {
+                                countryCityMap.clear();
+                                countryCityMap.putAll(tempMap);
+
+                                ArrayAdapter<String> countryAdapter = new ArrayAdapter<>(
+                                        requireContext(),
+                                        android.R.layout.simple_list_item_1,
+                                        countryList
+                                );
+                                countries.setAdapter(countryAdapter);
+                                countries.setVisibility(View.VISIBLE);
+                                loading.setVisibility(View.GONE);
+                            });
+
+                    } catch (JSONException | InterruptedException e) {
                         e.printStackTrace();
-                        Toast.makeText(getContext(), "Failed to parse country data", Toast.LENGTH_SHORT).show();
+                        requireActivity().runOnUiThread(() ->
+                                Toast.makeText(getContext(), "Error processing data", Toast.LENGTH_SHORT).show()
+                        );
                     }
-                },
+                }).start(),
                 error -> {
                     loading.setVisibility(View.GONE);
                     Toast.makeText(getContext(), "Failed to fetch country data", Toast.LENGTH_SHORT).show();

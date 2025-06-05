@@ -122,6 +122,9 @@ public class HomeFragment extends Fragment {
                             Pattern pattern = Pattern.compile("\\d+\\s+(days|day|hours|hour)");
                             Matcher matcher = pattern.matcher(time);
 
+                            /*
+
+
                             if (matcher.find()) {
                                 int start = matcher.start();
                                 int end = matcher.end();
@@ -132,6 +135,7 @@ public class HomeFragment extends Fragment {
                                         Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                                 );
                             }
+                             */
 
                             leftToTrip.setText(spannable);
                             leftToTrip.setVisibility(View.VISIBLE);
