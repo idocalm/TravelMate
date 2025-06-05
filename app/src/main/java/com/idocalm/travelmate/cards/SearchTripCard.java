@@ -20,6 +20,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.Firebase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.ManageTripActivity;
@@ -33,6 +34,7 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class SearchTripCard extends Fragment {
@@ -55,13 +57,15 @@ public class SearchTripCard extends Fragment {
 
         TextView name = view.findViewById(R.id.trip_name);
         TextView date = view.findViewById(R.id.trip_date);
-        TextView locations = view.findViewById(R.id.trip_locations_amount);
+        TextView activities = view.findViewById(R.id.trip_activities_amount);
 
         name.setText(trip.getName());
         if (trip.getName().length() > 20) {
             name.setText(trip.getName().substring(0, 20) + "...");
         }
-        locations.setText(trip.getActivities().size() + (trip.getActivities().size() == 1 ? " Location" : " Locations"));
+
+        Log.d("TripCard", "Trip activities size: " + trip.getActivities().size());
+        activities.setText(trip.getActivities().size() + (trip.getActivities().size() == 1 ? " Activity" : " Activities"));
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
         String tripDate = formatter.format(trip.getStartDate().toDate()) + " - " + formatter.format(trip.getEndDate().toDate());
         date.setText(tripDate);
@@ -87,17 +91,11 @@ public class SearchTripCard extends Fragment {
         }
 
         view.findViewById(R.id.trip_result_peek).setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-            builder.setTitle("Trip Details");
-            builder.setMessage("Trip Name: " + trip.getName() + "\n" +
-                    "Trip Owner: " + trip.getOwner() + "\n" +
-                    "Trip Start Date: " + trip.getStartDate().toDate() + "\n" +
-                    "Trip End Date: " + trip.getEndDate().toDate() + "\n" +
-                    "Trip Locations: " + trip.getActivities().size());
-            builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
-            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            Intent intent = new Intent(getActivity(), ManageTripActivity.class);
+            intent.putExtra("trip_id", trip.getId());
+            intent.putExtra("is_peak", true);
+
+            startActivity(intent);
         });
 
         view.findViewById(R.id.trip_result_duplicate).setOnClickListener(v -> {
@@ -108,18 +106,41 @@ public class SearchTripCard extends Fragment {
                 // Duplicate the trip
                 Trip newTrip = new Trip(trip);
                 newTrip.setOwner(Auth.getUser().getId());
+                ArrayList<String> members = new ArrayList<>();
+                members.add(Auth.getUser().getId());
+                newTrip.setMembers(members);
                 newTrip.setId(null);
 
                 HashMap<String, Object> tripMap = Trip.toHashMap(newTrip);
 
                 // Save the new trip to the database
-                FirebaseFirestore.getInstance().collection("trips")
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                db.collection("trips")
                         .add(tripMap).addOnSuccessListener(documentReference -> {
                             Log.d("Trip", "Trip duplicated with ID: " + documentReference.getId());
                             newTrip.setId(documentReference.getId());
-                            documentReference.update("tripId", documentReference.getId());
+                            documentReference.update("id", documentReference.getId());
+
+                            db.collection("trips").document(trip.getId()).collection("hotels").get().addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    db.collection("trips").document(documentReference.getId())
+                                            .collection("hotels").document(doc.getId())
+                                            .set(doc.getData());
+                                }
+                            });
+
+                            db.collection("trips").document(trip.getId()).collection("flights").get().addOnSuccessListener(querySnapshot -> {
+                                for (DocumentSnapshot doc : querySnapshot.getDocuments()) {
+                                    db.collection("trips").document(documentReference.getId())
+                                            .collection("flights").document(doc.getId())
+                                            .set(doc.getData());
+                                }
+                            });
+
+
                             Auth.getUser().addTripId(documentReference.getId());
-                            Toast.makeText(getContext(), "Trip duplicated successfully", Toast.LENGTH_SHORT).show();
+
                         }).addOnFailureListener(e -> {
                             Log.w("Trip", "Error duplicating trip", e);
                             Toast.makeText(getContext(), "Error duplicating trip", Toast.LENGTH_SHORT).show();

@@ -22,6 +22,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.components.friends.FriendsListAdapter;
+import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.User;
 
 import java.util.ArrayList;
@@ -50,6 +51,8 @@ public class ProfileAccountFragment extends Fragment {
         ArrayList<User> friendsListData = new ArrayList<>();
 
         int totalFriends = friends.size();
+
+
         AtomicInteger completedCount = new AtomicInteger(0);
 
         for (String id : friends) {
@@ -102,9 +105,10 @@ public class ProfileAccountFragment extends Fragment {
         TextView currency = view.findViewById(R.id.profile_currency);
 
         ImageView editName = view.findViewById(R.id.edit_name);
+        ImageView editCurrency = view.findViewById(R.id.edit_currency);
 
         editName.setOnClickListener(v -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext(), R.style.AlertDialogTheme);
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             builder.setTitle("Edit Name");
             builder.setMessage("Enter your new name");
 
@@ -124,6 +128,25 @@ public class ProfileAccountFragment extends Fragment {
             builder.show();
         });
 
+        editCurrency.setOnClickListener(v -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setTitle("Edit Currency");
+
+            // show all the CurrencyType options and let the user select one
+            String[] currencyOptions = {"USD", "EUR", "ILS"};
+            builder.setItems(currencyOptions, (dialog, which) -> {
+                String selectedCurrency = currencyOptions[which];
+                currency.setText(selectedCurrency);
+                Auth.getUser().setCurrencyType(CurrencyType.valueOf(selectedCurrency));
+            });
+
+            // Set up the buttons
+            builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
+
+
+            builder.show();
+        });
+
         name.setText(Auth.getUser().getName());
         currency.setText(Auth.getUser().getCurrencyString());
 
@@ -136,6 +159,7 @@ public class ProfileAccountFragment extends Fragment {
     }
 
     private void showUrlInputDialog() {
+
         AlertDialog.Builder urlDialogBuilder = new AlertDialog.Builder(getContext());
         urlDialogBuilder.setTitle("Enter Image URL");
 

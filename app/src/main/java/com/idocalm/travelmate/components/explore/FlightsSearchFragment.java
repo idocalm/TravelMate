@@ -125,7 +125,7 @@ public class FlightsSearchFragment extends Fragment implements DatePickerDialog.
 
     private void showResults(ArrayList<Flight> flights) {
         ListView listView = getView().findViewById(R.id.flights_list);
-        adapter = new FlightsListAdapter(getContext(), flights, false, null);
+        adapter = new FlightsListAdapter(getContext(), flights, false, null, false);
         listView.setAdapter(adapter);
         listView.setVisibility(View.VISIBLE);
     }

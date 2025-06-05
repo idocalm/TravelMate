@@ -1,8 +1,10 @@
 package com.idocalm.travelmate.adapters;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +21,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.Flight;
+import com.idocalm.travelmate.models.Hotel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,11 +30,15 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
     private boolean isTripView;
     private String tripId;
+    private boolean disableEdits;
 
-    public FlightsListAdapter(Context context, ArrayList<Flight> flights, boolean isTripView, String tripId) {
+    public FlightsListAdapter(Context context, ArrayList<Flight> flights, boolean isTripView, String tripId, boolean disableEdits) {
         super(context, 0, flights);
         this.isTripView = isTripView;
         this.tripId = tripId;
+        this.disableEdits = disableEdits;
+
+        Log.d("FlightsListAdapter", "Initialized with isTripView: " + isTripView + ", tripId: " + tripId);
     }
 
     @NonNull
@@ -39,9 +46,12 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
     public View getView(int position, View convertView, ViewGroup parent) {
         Flight flight = getItem(position);
 
-        if (isTripView) {
+        if (this.isTripView) {
+            Log.d("FlightsListAdapter", "Setting up trip view for flight: " + flight.airlineName);
             return setupTripView(flight, parent);
         }
+
+        Log.d("FlightsListAdapter", "Setting up normal view for flight: " + flight.airlineName);
 
         return setupNormalView(flight, parent);
 
@@ -49,6 +59,10 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
     }
 
     public View setupTripView(Flight flight, ViewGroup parent) {
+
+        Log.d("FlightsListAdapter", "Flight details: " + flight.toString());
+
+        Log.d("FlightsListAdapter", "Setting up trip view for flight: " + flight.airlineName);
         View view = LayoutInflater.from(getContext()).inflate(R.layout.fragment_trip_flight_card, parent, false);
 
         TextView airline = view.findViewById(R.id.airline);
@@ -62,6 +76,44 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
 
         TextView priceText = view.findViewById(R.id.flight_price);
         priceText.setText(flight.currency + " " + flight.price);
+
+        ImageView logo = view.findViewById(R.id.airline_logo);
+        Glide.with(getContext())
+                .load(flight.imageUrl)
+                .placeholder(R.drawable.profile_icon) // Placeholder image
+                .into(logo);
+
+        if (!disableEdits) {
+            view.setOnClickListener(v -> {
+                Toast.makeText(getContext(), "Long press to remove", Toast.LENGTH_SHORT).show();
+            });
+        }
+
+        if (!disableEdits) {
+            view.setOnLongClickListener(v -> {
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Delete Flight");
+                builder.setMessage("Are you sure you want to delete this flight?");
+                builder.setPositiveButton("Delete", (dialog, which) -> {
+                    dialog.dismiss();
+
+                    Flight.deleteFlight(tripId, flight.dbId);
+                    Toast.makeText(getContext(), "Flight deleted", Toast.LENGTH_SHORT).show();
+                    ((Activity) getContext()).recreate();
+                });
+                builder.setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                });
+                AlertDialog dialog = builder.create();
+                dialog.show();
+
+                return true;
+            });
+        }
+
+
+
+
 
         return view;
     }

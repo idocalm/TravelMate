@@ -5,8 +5,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import java.text.Normalizer;
+import java.util.regex.Pattern;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -39,6 +40,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HotelsSearchFragment extends Fragment implements DatePickerDialog.OnDateSetListener, DatePickerDialog.OnCancelListener {
 
@@ -54,6 +58,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
     ListView hotelsList;
     HotelsListAdapter adapter;
     ProgressBar loading;
+    private Map<String, List<String>> countryCityMap = new HashMap<>();
 
     public HotelsSearchFragment() {}
 
@@ -66,6 +71,59 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
         }
     }
 
+    private void fetchCountriesAndCities() {
+        loading.setVisibility(View.VISIBLE);
+        RequestQueue queue = Volley.newRequestQueue(requireContext());
+        String url = "https://countriesnow.space/api/v0.1/countries";
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.GET,
+                url,
+                null,
+                response -> {
+                    loading.setVisibility(View.GONE);
+                    try {
+                        JSONArray dataArray = response.getJSONArray("data");
+                        List<String> countryList = new ArrayList<>();
+
+                        for (int i = 0; i < dataArray.length(); i++) {
+                            JSONObject countryObj = dataArray.getJSONObject(i);
+                            String countryName = countryObj.getString("country");
+                            JSONArray citiesArray = countryObj.getJSONArray("cities");
+
+                            List<String> cities = new ArrayList<>();
+                            for (int j = 0; j < citiesArray.length(); j++) {
+                                String rawCity = citiesArray.getString(j);
+                                String normalizedCity = normalizeToAscii(rawCity);
+
+                                cities.add(normalizedCity);
+                            }
+
+                            countryList.add(countryName);
+                            countryCityMap.put(countryName, cities);
+                        }
+
+                        // Set up countries adapter
+                        ArrayAdapter<String> countryAdapter = new ArrayAdapter<>(
+                                requireContext(),
+                                android.R.layout.simple_list_item_1,
+                                countryList
+                        );
+                        countries.setAdapter(countryAdapter);
+                        countries.setVisibility(View.VISIBLE);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                        Toast.makeText(getContext(), "Failed to parse country data", Toast.LENGTH_SHORT).show();
+                    }
+                },
+                error -> {
+                    loading.setVisibility(View.GONE);
+                    Toast.makeText(getContext(), "Failed to fetch country data", Toast.LENGTH_SHORT).show();
+                }
+        );
+
+        queue.add(request);
+    }
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -91,68 +149,40 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
         super.onCreate(savedInstanceState);
     }
 
+
+    public static String normalizeToAscii(String input) {
+        String normalized = Normalizer.normalize(input, Normalizer.Form.NFD);
+        return normalized.replaceAll("\\p{M}", "").replaceAll("[^\\p{ASCII}]", "");
+    }
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_hotels_search, container, false);
 
         loading = view.findViewById(R.id.loading_spinner);
-        loading.setVisibility(View.GONE);
         countries = view.findViewById(R.id.dest_country);
         city = view.findViewById(R.id.dest_city);
         city.setVisibility(View.GONE);
-        countries.setVisibility(View.VISIBLE);
+        countries.setVisibility(View.GONE);
 
-        ArrayAdapter<String> locationAdapter = new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, getResources().getStringArray(R.array.countries));
-        countries.setAdapter(locationAdapter);
+        fetchCountriesAndCities();
 
-        // in any country change, use external API to get cities, then set them to the city AutoCompleteTextView
         countries.setOnItemClickListener((parent, view1, position, id) -> {
-            String selectedCountry = locationAdapter.getItem(position);
-            if (selectedCountry != null) {
-                Log.d("Selected Country", selectedCountry);
-                city.setVisibility(View.VISIBLE);
-
-                RequestQueue queue = Volley.newRequestQueue(getContext());
-                String url = "https://countriesnow.space/api/v0.1/countries/cities";
-
-                JSONObject requestBody = new JSONObject();
-                try {
-                    requestBody.put("country", selectedCountry);
-                } catch (JSONException e) {
-                    throw new RuntimeException(e);
+            String selectedCountry = (String) parent.getItemAtPosition(position);
+            if (selectedCountry != null && countryCityMap.containsKey(selectedCountry)) {
+                List<String> cities = countryCityMap.get(selectedCountry);
+                if (cities != null && !cities.isEmpty()) {
+                    city.setVisibility(View.VISIBLE);
+                    ArrayAdapter<String> cityAdapter = new ArrayAdapter<>(
+                            getContext(),
+                            android.R.layout.simple_list_item_1,
+                            cities
+                    );
+                    city.setAdapter(cityAdapter);
+                } else {
+                    Toast.makeText(getContext(), "No cities found for selected country", Toast.LENGTH_SHORT).show();
                 }
-                Log.d("Request Body", requestBody.toString());
-
-                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
-                        Request.Method.POST,
-                        url,
-                        requestBody,
-                        response -> {
-                            try {
-                                JSONArray citiesArray = response.getJSONArray("data");
-                                Log.d("Cities", citiesArray.toString());
-                                ArrayList<String> availableCities = new ArrayList<>();
-                                for (int i = 0; i < citiesArray.length(); i++) {
-                                    availableCities.add(citiesArray.getString(i));
-                                }
-
-                                ArrayAdapter<String> cityAdapter = new ArrayAdapter<>(
-                                        getContext(),
-                                        android.R.layout.simple_list_item_1,
-                                        availableCities
-                                );
-                                city.setAdapter(cityAdapter);
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                                Toast.makeText(getContext(), "Error parsing city data", Toast.LENGTH_SHORT).show();
-                            }
-                        },
-                        error -> {
-                            Toast.makeText(getContext(), "Failed to load cities", Toast.LENGTH_SHORT).show();
-                        }
-                );
-
-                queue.add(jsonObjectRequest);
             }
         });
 
@@ -208,7 +238,7 @@ public class HotelsSearchFragment extends Fragment implements DatePickerDialog.O
 
         hotelsList = view.findViewById(R.id.hotels_list);
 
-        adapter = new HotelsListAdapter(getContext(), hotels, false, null);
+        adapter = new HotelsListAdapter(getContext(), hotels, false, null, false);
         hotelsList.setAdapter(adapter);
 
         return view;

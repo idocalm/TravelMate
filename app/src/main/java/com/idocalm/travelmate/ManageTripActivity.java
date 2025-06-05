@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -27,12 +28,14 @@ import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.adapters.ActivitiesExpandableAdapter;
 import com.idocalm.travelmate.adapters.FlightsListAdapter;
 import com.idocalm.travelmate.adapters.HotelsListAdapter;
+import com.idocalm.travelmate.components.home.TotalBalanceFragment;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
 import com.idocalm.travelmate.models.User;
 import com.idocalm.travelmate.adapters.TripMembersAdapter;
 
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -45,6 +48,9 @@ import android.util.SparseBooleanArray;
 import android.widget.ArrayAdapter;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+
+import org.w3c.dom.Text;
+
 import java.util.Calendar;
 
 public class ManageTripActivity extends AppCompatActivity {
@@ -63,6 +69,7 @@ public class ManageTripActivity extends AppCompatActivity {
 
         String id = getIntent().getStringExtra("trip_id");
         boolean isMember = getIntent().getBooleanExtra("is_member", false);
+        boolean isPeak = getIntent().getBooleanExtra("is_peak", false);
 
         LinearLayout noActivities = findViewById(R.id.no_activities);
         TextView noHotels = findViewById(R.id.trip_no_hotels);
@@ -70,12 +77,49 @@ public class ManageTripActivity extends AppCompatActivity {
         ListView flightList = findViewById(R.id.trip_flights);
 
         // Disable editing capabilities for members
-        if (isMember) {
+        if (isMember || isPeak) {
             name.setEnabled(false);
             createActivity.setVisibility(View.GONE);
             createActivity2.setVisibility(View.GONE);
             inviteFriend.setVisibility(View.GONE);
         }
+
+        TextView totalExpenses = findViewById(R.id.trip_total_price);
+        totalExpenses.setText("");
+
+        Log.d("ManageTripActivity", "Loading trip with ID: " + id);
+        Auth.getUser().getTrip(id, new Trip.TripCallback() {
+            @Override
+            public void onTripLoaded(Trip t) {
+                TotalBalanceFragment.loadTripExpenses(t, new TotalBalanceFragment.Callback() {
+                    @Override
+                    public void onSuccess(double total) {
+                        Log.d("ManageTripActivity", "Total expenses for trip " + t.getName() + ": " + total);
+                        String currency = Auth.getUser().getCurrencySymbol();
+                        runOnUiThread(() -> {
+                            NumberFormat formatter = NumberFormat.getNumberInstance(Locale.getDefault());
+                            formatter.setMinimumFractionDigits(2);
+                            formatter.setMaximumFractionDigits(2);
+
+                            totalExpenses.setText("Priced at " + currency + formatter.format(total));
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(Exception e) {
+                        Log.d("ManageTripActivity", "Failed to load trip expenses: " + e.getMessage());
+                    }
+
+                });
+            }
+
+            @Override
+            public void onError(Exception e) {
+                totalExpenses.setText("Couldn't load total expenses");
+            }
+        });
+
+
 
         inviteFriend.setOnClickListener(v -> {
             Dialog dialog = new Dialog(this);
@@ -83,11 +127,28 @@ public class ManageTripActivity extends AppCompatActivity {
             dialog.setTitle("Invite Friends");
 
             ListView friendsList = dialog.findViewById(R.id.friends_list);
+
+
             Button apply = dialog.findViewById(R.id.apply_invite);
 
             // Prepare data
             ArrayList<String> friendsId = Auth.getUser().getFriendsIds();
             ArrayList<String> friendNames = new ArrayList<>();
+
+            if (friendsId.size() == 0) {
+                Toast.makeText(this, "You have no friends to invite", Toast.LENGTH_SHORT).show();
+
+                dialog.findViewById(R.id.no_friends_to_add).setVisibility(View.VISIBLE);
+                friendsList.setVisibility(View.GONE);
+
+                dialog.show();
+
+                return;
+            }
+
+            dialog.findViewById(R.id.no_friends_to_add).setVisibility(View.GONE);
+            friendsList.setVisibility(View.VISIBLE);
+
 
             // Adapter for showing names with checkboxes
             ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_multiple_choice, friendNames);
@@ -189,7 +250,7 @@ public class ManageTripActivity extends AppCompatActivity {
                 HashMap<String, List<ItineraryActivity>> map = new HashMap<>();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
 
-                for (Map<String, Object> actMap : t.getActivities()) {
+                for (Map<String, Object> actMap : t.getActivitiesHashed()) {
                     ItineraryActivity act = ItineraryActivity.fromMap(actMap);
                     String dateStr = sdf.format(act.getDate().toDate());
 
@@ -216,7 +277,7 @@ public class ManageTripActivity extends AppCompatActivity {
                     }
                 });
 
-                ActivitiesExpandableAdapter adapter = new ActivitiesExpandableAdapter(ManageTripActivity.this, ManageTripActivity.this, t, dateList, map);
+                ActivitiesExpandableAdapter adapter = new ActivitiesExpandableAdapter(ManageTripActivity.this, ManageTripActivity.this, t, dateList, map,  isMember || isPeak);
                 expandableListView.setAdapter(adapter);
 
                 if (!isMember) {
@@ -240,7 +301,7 @@ public class ManageTripActivity extends AppCompatActivity {
                     noHotels.setVisibility(View.GONE);
                     hotelList.setVisibility(View.VISIBLE);
 
-                    HotelsListAdapter adap = new HotelsListAdapter(ManageTripActivity.this, t.getHotels(), true, id);
+                    HotelsListAdapter adap = new HotelsListAdapter(ManageTripActivity.this, t.getHotels(), true, id, isMember || isPeak);
                     hotelList.setAdapter(adap);
                 }
 
@@ -248,8 +309,11 @@ public class ManageTripActivity extends AppCompatActivity {
                     findViewById(R.id.trip_no_flights).setVisibility(View.VISIBLE);
                 } else {
                     findViewById(R.id.trip_no_flights).setVisibility(View.GONE);
-                    FlightsListAdapter flightsAdapter = new FlightsListAdapter(ManageTripActivity.this, t.getFlights(), true, id);
+                    Log.d("ManageTripActivity", "Loading flights for trip: " + t.getName());
+                    FlightsListAdapter flightsAdapter = new FlightsListAdapter(ManageTripActivity.this, t.getFlights(), true, id, isMember || isPeak);
                     flightList.setAdapter(flightsAdapter);
+
+                    findViewById(R.id.trip_flights).setVisibility(View.VISIBLE);
                 }
 
                 ImageView tripImage = findViewById(R.id.trip_image);
@@ -319,11 +383,13 @@ public class ManageTripActivity extends AppCompatActivity {
         currencyAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         currencySelector.setAdapter(currencyAdapter);
 
-        // Initialize date/time variables
+        // Initialize date/time variables with the first day of the trip
         Calendar selectedDate = Calendar.getInstance();
+        selectedDate.setTime(trip.getStartDate().toDate());
         Calendar selectedTime = Calendar.getInstance();
-        selectedTime.set(Calendar.HOUR_OF_DAY, 12);
-        selectedTime.set(Calendar.MINUTE, 0);
+        selectedTime.setTime(new Date()); // Default to current time
+        selectedTime.set(Calendar.SECOND, 0);
+        selectedTime.set(Calendar.MILLISECOND, 0);
 
         // Update button text with initial values
         updateDateButtonText(selectDate, selectedDate);
@@ -373,7 +439,10 @@ public class ManageTripActivity extends AppCompatActivity {
             String location = activityLocation.getText().toString();
             String note = noteInput.getText().toString();
             String cost = costInput.getText().toString();
-            String currency = currencySelector.toString();
+
+            if (cost.isEmpty()) {
+                cost = "0"; // Default cost if not provided
+            }
 
             if (name.isEmpty() || location.isEmpty()) {
                 Toast.makeText(this, "Activity Name and Location are required", Toast.LENGTH_SHORT).show();
@@ -387,6 +456,13 @@ public class ManageTripActivity extends AppCompatActivity {
                 return;
             }
 
+            String currency;
+            if (!currencySelector.getText().toString().isEmpty()) {
+                currency = currencySelector.getText().toString();
+            } else {
+                currency = Auth.getUser().getCurrencySymbol(); // Default to user's currency if not selected
+            }
+
             // Combine date and time
             Calendar finalDateTime = Calendar.getInstance();
             finalDateTime.set(selectedDate.get(Calendar.YEAR), selectedDate.get(Calendar.MONTH), selectedDate.get(Calendar.DAY_OF_MONTH),
@@ -394,7 +470,15 @@ public class ManageTripActivity extends AppCompatActivity {
             Timestamp timestamp = new Timestamp(finalDateTime.getTime());
 
             // Create activity
-            ItineraryActivity activity = new ItineraryActivity(name, location, timestamp, note, cost, currency);
+            Double costValue = 0.0;
+            try {
+                costValue = Double.parseDouble(cost);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Invalid cost value", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            ItineraryActivity activity = new ItineraryActivity(name, location, timestamp, note, costValue, currency, Timestamp.now());
             trip.addActivity(activity);
             onActivityAdded.run();
             dialog.dismiss();
@@ -404,7 +488,7 @@ public class ManageTripActivity extends AppCompatActivity {
     }
 
     private void updateDateButtonText(Button button, Calendar date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
         button.setText(dateFormat.format(date.getTime()));
     }
 

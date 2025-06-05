@@ -14,16 +14,18 @@ public class ItineraryActivity {
     private Timestamp date;
 
     private String note;
-    private String cost;
+    private Double cost;
     private String currency;
+    private Timestamp createdAt;
 
-    public ItineraryActivity(String name, String location, Timestamp date, String note, String cost, String currency) {
+    public ItineraryActivity(String name, String location, Timestamp date, String note, Double cost, String currency, Timestamp createdAt) {
         this.name = name;
         this.location = location;
         this.date = date;
         this.note = note;
         this.cost = cost;
         this.currency = currency;
+        this.createdAt = createdAt;
     }
 
     /**
@@ -48,8 +50,9 @@ public class ItineraryActivity {
                 (String) map.get("location"),
                 (Timestamp) map.get("date"),
                 (String) map.get("note"),
-                (String) map.get("cost"),
-                (String) map.get("currency")
+                (Double) map.get("cost"),
+                (String) map.get("currency"),
+                (Timestamp) map.getOrDefault("createdAt", Timestamp.now())
         );
     }
 
@@ -70,7 +73,7 @@ public class ItineraryActivity {
         return note;
     }
 
-    public String getCost() {
+    public double getCost() {
         return cost;
     }
 
@@ -95,5 +98,13 @@ public class ItineraryActivity {
         if (!note.equals(that.note)) return false;
         if (!currency.equals(that.currency)) return false;
         return cost.equals(that.cost);
+    }
+
+    public Object getCreatedAt() {
+        if (createdAt == null) {
+            Log.w("ItineraryActivity", "CreatedAt is null, returning current time");
+            return Timestamp.now();
+        }
+        return createdAt;
     }
 }

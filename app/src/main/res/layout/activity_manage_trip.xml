@@ -81,9 +81,8 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-
-
         <TextView
+            android:id="@+id/trip_total_price"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="@font/bold"

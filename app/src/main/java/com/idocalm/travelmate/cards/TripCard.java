@@ -38,6 +38,7 @@ public class TripCard extends Fragment {
         this.trip = trip;
     }
 
+    public TripCard() {}
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,11 +52,11 @@ public class TripCard extends Fragment {
 
         TextView name = view.findViewById(R.id.trip_name);
         TextView date = view.findViewById(R.id.trip_date);
-        TextView locations = view.findViewById(R.id.trip_locations_amount);
+        TextView activities = view.findViewById(R.id.trip_activities_amount);
         ImageView memberIndicator = view.findViewById(R.id.member_indicator);
 
         name.setText(trip.getName());
-        locations.setText(trip.getActivities().size() + (trip.getActivities().size() == 1 ? " Location" : " Locations"));
+        activities.setText(trip.getActivities().size() + (trip.getActivities().size() == 1 ? " Activity" : " Activities"));
         SimpleDateFormat formatter = new SimpleDateFormat("MMM dd");
         String tripDate = formatter.format(trip.getStartDate().toDate()) + " - " + formatter.format(trip.getEndDate().toDate());
         date.setText(tripDate);

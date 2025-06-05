@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 
 import com.google.firebase.Timestamp;
 import com.idocalm.travelmate.R;
+import com.idocalm.travelmate.api.CTranslator;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.ItineraryActivity;
 import com.idocalm.travelmate.models.Trip;
@@ -32,6 +34,8 @@ import java.util.Locale;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 
+import org.w3c.dom.Text;
+
 import java.util.Calendar;
 
 public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
@@ -41,13 +45,15 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
     private final Trip trip;
     private final HashMap<String, List<ItineraryActivity>> activitiesMap;
     private final Activity activity;
+    private final boolean disableEdit;
 
-    public ActivitiesExpandableAdapter(Context context, Activity activity, Trip trip, List<String> dateList, HashMap<String, List<ItineraryActivity>> activitiesMap) {
+    public ActivitiesExpandableAdapter(Context context, Activity activity, Trip trip, List<String> dateList, HashMap<String, List<ItineraryActivity>> activitiesMap, boolean disableEdit) {
         this.context = context;
         this.dateList = dateList;
         this.activitiesMap = activitiesMap;
         this.trip = trip;
         this.activity = activity;
+        this.disableEdit = disableEdit;
     }
 
     @Override public int getGroupCount() { return dateList.size(); }
@@ -91,13 +97,23 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
         ((TextView) convertView.findViewById(R.id.activity_card_name)).setText(activity.getName());
         ((TextView) convertView.findViewById(R.id.activity_card_location)).setText(activity.getLocation());
 
-        if (activity.getCost() != null && !activity.getCost().isEmpty()) {
-            String currency = Auth.getUser().getCurrencyString();
-            ((TextView) convertView.findViewById(R.id.activity_card_price)).setText(currency + " " + activity.getCost());
+        TextView priceText = convertView.findViewById(R.id.activity_card_price);
+
+        if (activity.getCost() > 0) {
+            priceText.setText(activity.getCurrency() + " " + activity.getCost());
+
         }
 
         Button delete = convertView.findViewById(R.id.delete_activity);
         Button edit =  convertView.findViewById(R.id.edit_activity);
+
+        if (disableEdit) {
+            delete.setVisibility(View.GONE);
+            edit.setVisibility(View.GONE);
+        } else {
+            delete.setVisibility(View.VISIBLE);
+            edit.setVisibility(View.VISIBLE);
+        }
 
         edit.setOnClickListener(v -> {
             editActivityPopup(activity, () -> {
@@ -151,6 +167,11 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
         EditText costInput = dialog.findViewById(R.id.cost_input);
         AutoCompleteTextView currencySelector = dialog.findViewById(R.id.currency_selector);
         Button submit = dialog.findViewById(R.id.submit_activity);
+
+        costInput.setText(String.valueOf(activity.getCost()));
+        currencySelector.setText(activity.getCurrency(), false);
+
+        noteInput.setText(activity.getNote());
 
         // Setup currency selector
         CurrencyType[] currencies = {CurrencyType.USD, CurrencyType.EUR, CurrencyType.ILS};
@@ -215,7 +236,7 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
             String location = locationEdit.getText().toString();
             String note = noteInput.getText().toString();
             String cost = costInput.getText().toString();
-            String currency = currencySelector.toString();
+            String currency = currencySelector.getText().toString();
 
             if (name.isEmpty() || location.isEmpty()) {
                 Toast.makeText(context, "Activity Name and Location are required", Toast.LENGTH_SHORT).show();
@@ -236,7 +257,14 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
             Timestamp timestamp = new Timestamp(finalDateTime.getTime());
 
             // Create activity
-            ItineraryActivity newActivity = new ItineraryActivity(name, location, timestamp, note, cost, currency);
+            Double costValue = 0.0;
+            try {
+                costValue = Double.parseDouble(cost);
+            } catch (NumberFormatException e) {
+                // If cost is not a valid number, it will default to 0.0
+            }
+
+            ItineraryActivity newActivity = new ItineraryActivity(name, location, timestamp, note, costValue, currency, Timestamp.now());
             this.trip.editActivity(activity, newActivity);
             onActivityEdited.run();
             dialog.dismiss();
@@ -246,7 +274,7 @@ public class ActivitiesExpandableAdapter extends BaseExpandableListAdapter {
     }
 
     private void updateDateButtonText(Button button, Calendar date) {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy", Locale.getDefault());
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd", Locale.getDefault());
         button.setText(dateFormat.format(date.getTime()));
     }
 

@@ -18,6 +18,8 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/Theme.TravelMate"
+        android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         tools:targetApi="31">
 
         <activity
@@ -48,12 +50,6 @@
         <activity
             android:name=".CreateTripActivity"
             android:exported="false" />
-        <activity
-            android:name=".tutorials.TripTutorial"
-            android:exported="false" />
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="YOUR_API_KEY" />
         <meta-data
             android:name="android.max_aspect"
             android:value="2.1" />

@@ -230,6 +230,7 @@
         android:fontFamily="@font/bold"
         android:hint="Password"
         android:textColorHint="@color/white"
+        android:inputType="textPassword"
         android:padding="15dp"
         android:textColor="@color/white"/>
 

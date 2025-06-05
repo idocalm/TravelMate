@@ -17,10 +17,10 @@ public class Hotel {
     private double price;
     private Date checkOutDate;
     private Date checkInDate;
+    private String currency;
 
 
-
-    public Hotel(int id, String name, String mainPhoto, long price, Date checkInDate, Date checkOutDate) {
+    public Hotel(int id, String name, String mainPhoto, long price, Date checkInDate, Date checkOutDate, String currency) {
         this.id = id;
         this.dbId = "";
         this.name = name;
@@ -28,15 +28,17 @@ public class Hotel {
         this.price = price;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
+        this.currency = currency;
     }
 
-    public Hotel(String dbId, String name, String mainPhoto, double price, Date checkInDate, Date checkOutDate) {
+    public Hotel(String dbId, String name, String mainPhoto, double price, Date checkInDate, Date checkOutDate, String currency) {
         this.dbId = dbId;
         this.name = name;
         this.mainPhoto = mainPhoto;
         this.price = price;
         this.checkInDate = checkInDate;
         this.checkOutDate = checkOutDate;
+        this.currency = currency;
     }
 
 
@@ -56,6 +58,9 @@ public class Hotel {
         return name;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
 
     public String getDBId() {
         return dbId;
@@ -71,6 +76,7 @@ public class Hotel {
     public Date getCheckOutDate() {
         return checkOutDate;
     }
+
 
     public static HashMap<String, Object> toHashMap(Hotel hotel) {
         HashMap<String, Object> data = new HashMap<>();

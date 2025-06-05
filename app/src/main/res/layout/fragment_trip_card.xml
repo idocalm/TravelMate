@@ -63,12 +63,12 @@
             />
 
         <TextView
-            android:id="@+id/trip_locations_amount"
+            android:id="@+id/trip_activities_amount"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="5 Locations"
+            android:text="5 Activities"
             android:textSize="10sp"
             android:textColor="@color/hint"
             android:fontFamily="@font/bold"

@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -106,6 +107,8 @@ public class HomeFragment extends Fragment {
                     if (loadedTrips.size() == tripIds.size()) {
                         Trip closestTrip = null;
                         for (Trip t : loadedTrips) {
+                            if (trip == null)
+                                Log.d("HomeFragment", "Trip is null for ID: " + tripId);
                             if ((closestTrip == null || t.getStartDate().compareTo(closestTrip.getStartDate()) < 0) && t.getStartDate().compareTo(Timestamp.now()) > 0) {
                                 closestTrip = t;
                             }

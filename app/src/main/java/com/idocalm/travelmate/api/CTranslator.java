@@ -23,6 +23,8 @@ public class CTranslator {
     }
 
     public static void translate(int amount, String fromCode, String toCode, TranslationCallback callback) {
+
+        Log.d("CTranslator", "Translating " + amount + " from " + fromCode + " to " + toCode);
         OkHttpClient client = new OkHttpClient();
 
         String url = API_URL + fromCode; 
@@ -53,6 +55,7 @@ public class CTranslator {
                     if (rates.has(toCode)) {
                         double rate = rates.getDouble(toCode);
                         double convertedAmount = amount * rate;
+                        Log.d("CTranslator", "Converted amount: " + convertedAmount);
                         callback.onSuccess(convertedAmount);
                     } else {
                         callback.onFailure(new IllegalArgumentException("Invalid currency code: " + toCode));

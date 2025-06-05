@@ -8,28 +8,64 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <EditText
-        android:id="@+id/activity_name"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Activity Name"
-        android:inputType="text"
-        android:textColor="@color/white"
-        android:textColorHint="@color/white"
-        android:fontFamily="@font/bold"
-        android:layout_marginBottom="8dp"/>
 
-    <EditText
-        android:id="@+id/activity_location"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:boxStrokeColor="@color/green"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:hintEnabled="true"
+        android:hint="Name"
+        android:textColorHint="@color/white"
+        style="@style/EditText">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/activity_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/bold"
+            android:inputType="text"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            app:boxStrokeColor="@color/green"
+            style="@style/EditText"/>
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:boxStrokeColor="@color/green"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:hintEnabled="true"
         android:hint="Location"
-        android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:fontFamily="@font/bold"
-        android:inputType="text"
+        android:layout_marginBottom="10dp"
+        style="@style/EditText">
 
-        android:layout_marginBottom="8dp"/>
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/activity_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hintTextColor="@color/white"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            android:inputType="text"
+            android:hint="Location"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:fontFamily="@font/bold" />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+
+
 
 <LinearLayout
     android:layout_width="match_parent"
@@ -45,6 +81,7 @@
         android:layout_weight="1"
         android:textAllCaps="false"
         android:text="Date"
+        android:textSize="15dp"
         android:fontFamily="@font/bold"
         android:layout_marginEnd="4dp"/>
 
@@ -67,17 +104,33 @@
     android:orientation="horizontal"
     >
 
-    <EditText
-        android:id="@+id/cost_input"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
         android:layout_weight="1"
+        android:layout_height="wrap_content"
+        app:boxStrokeColor="@color/green"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:hintEnabled="true"
         android:hint="Cost"
-        android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:fontFamily="@font/bold"
-        android:inputType="numberDecimal"
-        android:layout_marginEnd="4dp"/>
+        android:layout_marginBottom="10dp"
+        style="@style/EditText">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/cost_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hintTextColor="@color/white"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            android:inputType="numberDecimal"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:fontFamily="@font/bold" />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="0dp"
@@ -85,8 +138,9 @@
         android:layout_height="wrap_content"
         android:textColorHint="@color/white"
         app:placeholderTextColor="@color/white"
+        app:endIconTint="@color/green"
         android:theme="@style/font_bold"
-        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+        style="@style/DropDown"
         android:hint="Currency">
 
         <AutoCompleteTextView
@@ -94,8 +148,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
-            app:boxStrokeColor="@color/white"
-            app:boxStrokeWidth="2dp"
             android:inputType="none"
             />
 
@@ -110,16 +162,33 @@
     android:orientation="vertical"
     >
 
-    <EditText
-        android:id="@+id/note_input"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:boxStrokeColor="@color/green"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="2dp"
+        app:hintEnabled="true"
         android:hint="Note"
-        android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:fontFamily="@font/bold"
-        android:inputType="textMultiLine"
-        />
+        android:layout_marginBottom="10dp"
+        style="@style/EditText">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/note_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:hintTextColor="@color/white"
+            app:boxStrokeWidth="1dp"
+            app:boxStrokeWidthFocused="2dp"
+            android:inputType="text"
+            android:textColor="@color/white"
+            android:textColorHint="@color/white"
+            android:fontFamily="@font/bold" />
+
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 </LinearLayout>
 
 

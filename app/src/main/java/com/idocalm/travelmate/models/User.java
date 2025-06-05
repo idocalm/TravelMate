@@ -136,6 +136,18 @@ public class User {
         }
     }
 
+    public String getCurrencySymbol() {
+        if (currency == CurrencyType.NONE) {
+            return "";
+        } else if (currency == CurrencyType.USD) {
+            return "$";
+        } else if (currency == CurrencyType.EUR) {
+            return "€";
+        } else {
+            return "₪";
+        }
+    }
+
     /**
      * From document user.
      *
@@ -182,6 +194,9 @@ public class User {
      */
     public void setCurrencyType(CurrencyType currencyType) {
         this.currency = currencyType;
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("users").document(id).update("currency", currencyType.toString());
     }
 
     /**
@@ -252,10 +267,6 @@ public class User {
     }
 
     public void getTrip(String id, Trip.TripCallback callback) {
-        if (!tripIds.contains(id)) {
-            callback.onTripLoaded(null);
-            return;
-        }
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("trips").document(id).get()

@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Total Balance"
+        android:text="Total Expenses"
         android:textSize="18sp"
         android:textColor="@color/white"
         android:fontFamily="@font/bold"
@@ -67,6 +67,7 @@
                 />
 
             <TextView
+                android:id="@+id/balance_hotels"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="₪ 0.00"
@@ -74,7 +75,6 @@
                 android:textColor="@color/white"
                 android:fontFamily="@font/bold"
                 android:theme="@style/tight"
-                android:layout_marginTop="5dp"
                 />
 
         </LinearLayout>
@@ -83,11 +83,12 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="Flights"
                 android:layout_weight="1"
                 android:textSize="15sp"
@@ -97,14 +98,14 @@
                 />
 
             <TextView
+                android:id="@+id/balance_flights"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="₪ 0.00"
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/bold"
                 android:theme="@style/tight"
-                android:layout_marginTop="5dp"
                 />
 
         </LinearLayout>
@@ -112,12 +113,13 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
             android:orientation="horizontal">
 
             <TextView
                 android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="Other"
+                android:layout_height="match_parent"
+                android:text="Activities"
                 android:layout_weight="1"
                 android:textSize="15sp"
                 android:textColor="@color/white"
@@ -126,15 +128,14 @@
                 />
 
             <TextView
-                android:id="@+id/balance_other"
+                android:id="@+id/balance_activities"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:text="₪ 0.00"
                 android:textSize="15sp"
                 android:textColor="@color/white"
                 android:fontFamily="@font/bold"
                 android:theme="@style/tight"
-                android:layout_marginTop="5dp"
                 />
 
         </LinearLayout>

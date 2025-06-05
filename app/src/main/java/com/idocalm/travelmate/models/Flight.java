@@ -1,5 +1,10 @@
 package com.idocalm.travelmate.models;
 
+import android.util.Log;
+
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.idocalm.travelmate.auth.Auth;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,6 +20,12 @@ public class Flight {
     public String airlineName;
     public String imageUrl;
     public ArrayList<Segment> segments;
+    public String dbId;
+
+    public interface FlightsCallback {
+        void onFlightsLoaded(ArrayList<Flight> flights);
+        void onError(Exception e);
+    }
 
 
     public static class Segment {
@@ -69,8 +80,25 @@ public class Flight {
             map.put("terminalTo", terminalTo);
             return map;
         }
-    }
 
+        public static Segment fromHashMap(HashMap<String, Object> map) {
+            Segment segment = new Segment();
+            segment.airline = (String) map.get("airline");
+            segment.flightNumber = (String) map.get("flightNumber");
+            segment.origin = (String) map.get("origin");
+            segment.destination = (String) map.get("destination");
+            segment.departureDate = (String) map.get("departureDate");
+            segment.departureTime = (String) map.get("departureTime");
+            segment.arrivalDate = (String) map.get("arrivalDate");
+            segment.arrivalTime = (String) map.get("arrivalTime");
+            segment.duration = (String) map.get("duration");
+            segment.cabin = (String) map.get("cabin");
+            segment.aircraft = (String) map.get("aircraft");
+            segment.terminalFrom = (String) map.get("terminalFrom");
+            segment.terminalTo = (String) map.get("terminalTo");
+            return segment;
+        }
+    }
 
     public Flight() {
     }
@@ -78,7 +106,7 @@ public class Flight {
     public Flight(String dealType, int price, String currency, String totalDuration,
                  String departureDate, String departureTime, boolean refundable,
                  String isRefundable, String airlineName, String imageUrl,
-                 ArrayList<Segment> segments) {
+                 ArrayList<Segment> segments, String dbId) {
         this.dealType = dealType;
         this.price = price;
         this.currency = currency;
@@ -90,6 +118,33 @@ public class Flight {
         this.airlineName = airlineName;
         this.imageUrl = imageUrl;
         this.segments = segments;
+        this.dbId = dbId;
+    }
+
+
+    public static Flight fromHashMap(HashMap<String, Object> map) {
+        Flight flight = new Flight();
+        flight.dealType = (String) map.get("dealType");
+        flight.price = ((Number) map.get("price")).intValue();
+        flight.currency = (String) map.get("currency");
+        flight.totalDuration = (String) map.get("totalDuration");
+        flight.departureDate = (String) map.get("departureDate");
+        flight.departureTime = (String) map.get("departureTime");
+        flight.refundable = (boolean) map.get("refundable");
+        flight.isRefundable = (String) map.get("isRefundable");
+        flight.airlineName = (String) map.get("airlineName");
+        flight.imageUrl = (String) map.get("imageUrl");
+
+        ArrayList<Segment> segments = new ArrayList<>();
+        ArrayList<HashMap<String, Object>> segmentMaps = (ArrayList<HashMap<String, Object>>) map.get("segments");
+        if (segmentMaps != null) {
+            for (HashMap<String, Object> segmentMap : segmentMaps) {
+                segments.add(Segment.fromHashMap(segmentMap));
+            }
+        }
+        flight.segments = segments;
+
+        return flight;
     }
 
     @Override
@@ -135,6 +190,17 @@ public class Flight {
         }
         map.put("segments", segmentMaps);
         return map;
+    }
+
+    public static void deleteFlight(String tripId, String flightId) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("trips").document(tripId).collection("flights").document(flightId).delete()
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Flight", "Flight successfully deleted!");
+                })
+                .addOnFailureListener(e -> {
+                    Log.w("Flight", "Error deleting flight", e);
+                });
     }
 }
 

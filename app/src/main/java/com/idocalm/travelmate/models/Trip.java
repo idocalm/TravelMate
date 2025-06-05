@@ -15,6 +15,7 @@ import com.idocalm.travelmate.enums.TripVisibility;
 import org.w3c.dom.Document;
 
 import java.io.Serializable;
+import java.lang.reflect.Array;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,7 +52,7 @@ public class Trip {
         trip.put("owner", Auth.getUser().getId());
         trip.put("description", t.getDescription());
         trip.put("image", t.getImage());
-        trip.put("visibility", TripVisibility.PUBLIC.toString()); // TODO: make this dynamic
+        trip.put("visibility", TripVisibility.PUBLIC.toString());
         trip.put("members", t.getMembers());
         trip.put("start_date", t.getStartDate());
         trip.put("end_date", t.getEndDate());
@@ -59,10 +60,6 @@ public class Trip {
         trip.put("last_edited", t.getLastEdited());
         trip.put("last_opened", t.getLastOpened());
         trip.put("itinerary", t.getActivities());
-        trip.put("total_flights", 0.0);
-        trip.put("total_hotels", 0.0);
-        trip.put("total_other", 0.0);
-
         return trip;
     }
 
@@ -119,14 +116,26 @@ public class Trip {
                 snapshot.getTimestamp("last_opened"),
                 getActivitiesFromDB(snapshot),
                 new ArrayList<>(), // initially empty
-                getFlightsFromDB(snapshot)
+                new ArrayList<>() // initially empty
         );
 
         getHotelsFromDB(snapshot.getId(), new Hotel.HotelsCallback() {
             @Override
             public void onHotelsLoaded(ArrayList<Hotel> hotels) {
                 trip.hotels = hotels;
-                callback.onTripLoaded(trip);
+
+                getFlightsFromDB(trip.id, new Flight.FlightsCallback() {
+                    @Override
+                    public void onFlightsLoaded(ArrayList<Flight> flights) {
+                        trip.flights = flights;
+                        callback.onTripLoaded(trip);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        callback.onError(e);
+                    }
+                });
             }
 
             @Override
@@ -134,6 +143,8 @@ public class Trip {
                 callback.onError(e);
             }
         });
+
+
     }
 
 
@@ -159,13 +170,22 @@ public class Trip {
             for (Object item : list) {
                 if (item instanceof Map<?, ?>) {
                     Map<String, Object> activityMap = (Map<String, Object>) item;
+
+                    Object costObj = activityMap.get("cost");
+                    Double cost = null;
+
+                    if (costObj instanceof Number) {
+                        cost = ((Number) costObj).doubleValue();
+                    }
+
                     activities.add(new ItineraryActivity(
                             (String) activityMap.get("name"),
                             (String) activityMap.get("location"),
                             (Timestamp) activityMap.get("date"),
                             (String) activityMap.get("note"),
-                            (String) activityMap.get("cost"),
-                            (String) activityMap.get("currency")
+                            cost,
+                            (String) activityMap.get("currency"),
+                            (Timestamp) activityMap.get("createdAt")
                     ));
                 } else {
                     // (Optional) Log if there's a weird item
@@ -178,6 +198,52 @@ public class Trip {
 
         return activities;
     }
+
+    public static void getFlightsFromDB(String tripId, Flight.FlightsCallback callback) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("trips").document(tripId).collection("flights")
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        ArrayList<Flight> flights = new ArrayList<>();
+                        QuerySnapshot querySnapshot = task.getResult();
+
+                        if (querySnapshot != null) {
+                            for (DocumentSnapshot item : querySnapshot.getDocuments()) {
+                                try {
+                                    Map<String, Object> flightMap = item.getData();
+
+                                    ArrayList<Flight.Segment> segments = new ArrayList<>();
+                                    if (flightMap.get("segments") instanceof List<?>) {
+                                        List<?> segmentList = (List<?>) flightMap.get("segments");
+                                        for (Object segmentItem : segmentList) {
+                                            if (segmentItem instanceof Map<?, ?>) {
+                                                Flight.Segment segment = Flight.Segment.fromHashMap((HashMap<String, Object>) segmentItem);
+                                                segments.add(segment);
+                                            } else {
+                                                Log.w("Trip", "Skipping non-map item in segments: " + segmentItem);
+                                            }
+                                        }
+                                    }
+
+                                    Flight flight = Flight.fromHashMap((HashMap<String, Object>) flightMap);
+                                    flight.dbId = item.getId();
+
+                                    flights.add(flight);
+                                } catch (Exception e) {
+                                    Log.w("Trip", "Skipping invalid hotel data: " + item, e);
+                                }
+                            }
+                        }
+
+                        callback.onFlightsLoaded(flights);
+                    } else {
+                        callback.onError(task.getException());
+                    }
+                });
+
+    }
+
 
     public static void getHotelsFromDB(String tripId, Hotel.HotelsCallback callback) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -200,7 +266,8 @@ public class Trip {
                                             (String) hotelMap.get("mainPhoto"),
                                             price,
                                             item.getDate("checkInDate"),
-                                            item.getDate("checkOutDate")
+                                            item.getDate("checkOutDate"),
+                                            (String) hotelMap.get("currency")
                                     );
                                     hotels.add(hotel);
                                 } catch (Exception e) {
@@ -217,49 +284,22 @@ public class Trip {
     }
 
 
-    public static ArrayList<Flight> getFlightsFromDB(DocumentSnapshot snapshot) {
-        ArrayList<Flight> flights = new ArrayList<>();
 
-        Object rawFlights = snapshot.get("flights");
-
-        if (rawFlights instanceof List<?>) {
-            List<?> list = (List<?>) rawFlights;
-            for (Object item : list) {
-                if (item instanceof Map<?, ?>) {
-                    Map<String, Object> flightMap = (Map<String, Object>) item;
-                    flights.add(new Flight(
-                            (String) flightMap.get("deal_type"),
-                            (Integer) flightMap.get("price"),
-                            (String) flightMap.get("currency"),
-                            (String) flightMap.get("total_duration"),
-                            (String) flightMap.get("departure_date"),
-                            (String) flightMap.get("departure_time"),
-                            (Boolean) flightMap.get("refundable"),
-                            (String) flightMap.get("is_refundable"),
-                            (String) flightMap.get("airline_name"),
-                            (String) flightMap.get("image_url"),
-                            (ArrayList<Flight.Segment>) flightMap.get("segments")
-                    ));
-                } else {
-                    // (Optional) Log if there's a weird item
-                    Log.w("Trip", "Skipping non-map item in flights: " + item);
-                }
-            }
-        } else {
-            Log.w("Trip", "Flights field is missing or not a list");
-        }
-
-        return flights;
-
-    }
-
-    public ArrayList<Map<String, Object>> getActivities() {
+    public ArrayList<Map<String, Object>> getActivitiesHashed() {
         ArrayList<Map<String, Object>> res = new ArrayList<>();
         for (ItineraryActivity activity : this.activities) {
             res.add(activity.toMap());
         }
 
         return res;
+    }
+
+    public void setMembers(ArrayList<String> members) {
+        this.members = members;
+    }
+
+    public ArrayList<ItineraryActivity> getActivities() {
+        return activities;
     }
 
     public String getId() {
@@ -348,14 +388,17 @@ public class Trip {
         FirebaseFirestore.getInstance().collection("trips").document(this.id).update("itinerary", this.activities);
     }
 
+
     public void removeActivity(ItineraryActivity activity) {
         Log.d("Trip", "Removing activity: " + activity.toMap());
-        this.activities = new ArrayList<ItineraryActivity>();
+        ArrayList<ItineraryActivity> activities = new ArrayList<ItineraryActivity>();
         for (ItineraryActivity act : this.activities) {
             if (!act.equals(activity)) {
-                this.activities.add(act);
+                activities.add(act);
             }
         }
+
+        this.activities = activities;
         Log.d("Trip", "Activities after removal: " + this.activities);
 
         FirebaseFirestore.getInstance().collection("trips").document(this.id).update("itinerary", this.activities);

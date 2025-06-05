@@ -61,10 +61,16 @@ public class Hotels {
         String checkInDate = formatter.format(checkIn);
         String currency = Auth.getUser().getCurrencyString();
 
+
+
         Log.d("Hotels", "fetchHotels: " + cityId + " " + checkOutDate + " " + checkInDate + " " + currency);
 
+        String url = "https://booking-com.p.rapidapi.com/v2/hotels/search?dest_id=" + cityId + "&order_by=popularity&children_number=1&children_ages=0&checkout_date=" + checkOutDate + "&filter_by_currency="+currency+"&locale=en-gb&dest_type=city&checkin_date="+checkInDate+"&page_number=0&adults_number="+peopleAmount+"&room_number=1&units=metric";
+
+        Log.d("Hotels", "fetchHotels: URL: " + url);
+
         request = new Request.Builder()
-                .url("https://booking-com.p.rapidapi.com/v2/hotels/search?dest_id=" + cityId + "&order_by=popularity&children_number=1&children_ages=0&checkout_date=" + checkOutDate + "&filter_by_currency="+currency+"&locale=en-gb&dest_type=city&checkin_date="+checkInDate+"&page_number=0&adults_number="+peopleAmount+"&room_number=1&units=metric")
+                .url(url)
                 .get()
                 .addHeader("X-RapidAPI-Host", "booking-com.p.rapidapi.com")
                 .addHeader("X-RapidAPI-Key", "64381c16bbmshac2bfd18e22e798p1dd7dfjsn32dbec546a48")
@@ -82,16 +88,39 @@ public class Hotels {
         Hotel[] hotelList = new Hotel[hotelsArray.length()];
         for (int i = 0; i < hotelsArray.length(); i++) {
             JSONObject hotel = hotelsArray.getJSONObject(i);
+
+            Log.d("Hotels", "PRICE ATTEMPT");
+            JSONObject priceBreakdown = hotel.optJSONObject("priceDetails");
+
+            String rawPrice = priceBreakdown.optString("strikethrough");
+            if (rawPrice == null || rawPrice.trim().isEmpty()) {
+                rawPrice = priceBreakdown.optString("gross");
+            }
+
+            String priceWithCurrency = rawPrice.replaceAll("[^\\d.]", "").trim();
+            Log.d("Hotels", "PRICE WITH CURRENCY: '" + priceWithCurrency + "'");
+
+            double price = 0.0;
+            if (!priceWithCurrency.isEmpty()) {
+                price = Double.parseDouble(priceWithCurrency);
+            } else {
+                Log.w("Hotels", "Price string is empty after cleaning. Defaulting to 0.0");
+            }
+
+            Log.d("Hotels", "PRICE: " + price);
+            Log.d("Hotels", "PRICE BREAKDOWN: " + priceBreakdown.toString());
+
             hotelList[i] = new Hotel(
                     hotel.getInt("id"),
                     hotel.getString("name"),
                     hotel.getString("photoMainUrl"),
-                    1000, // TODO
+                    (long) price,
                     checkIn,
-                    checkOut
+                    checkOut,
+                    Auth.getUser().getCurrencyString()
             );
         }
-            // Parse the response
+
         return hotelList;
     }
 

@@ -1,5 +1,5 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
     <style name="Base.Theme.TravelMate" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorOnSurface">#181717</item>
@@ -10,17 +10,10 @@
         <item name="colorControlNormal">@color/green_dark</item>     <!-- Unfocused underline -->
         <item name="colorControlHighlight">@color/green</item> <!-- Ripple/highlight -->
 
+        <item name="android:windowSplashScreenAnimatedIcon">@null</item>
+        <item name="android:windowSplashScreenBackground">@android:color/transparent</item>
+        <item name="android:windowSplashScreenIconBackgroundColor">@android:color/transparent</item>
+        <item name="android:windowSplashScreenBrandingImage">@null</item>
+
     </style>
-
-    <style name="Widget.BottomNavigationView"
-        parent="Widget.Design.BottomNavigationView">
-        <item name="fontFamily">@font/bold</item>
-    </style>
-
-    <style name="font_bold">
-        <item name="fontFamily">@font/bold</item>
-    </style>
-
-    <style name="Theme.TravelMate" parent="Base.Theme.TravelMate" />
-
 </resources>

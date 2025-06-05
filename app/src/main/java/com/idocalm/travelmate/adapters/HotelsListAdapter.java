@@ -29,13 +29,15 @@ import java.util.ArrayList;
 public class HotelsListAdapter extends ArrayAdapter<Hotel> {
 
     private boolean isTripView;
+    private boolean disableEdits;
     private String tripId;
 
-    public HotelsListAdapter(Context context, ArrayList<Hotel> hotels, boolean isTripView, String tripId) {
+    public HotelsListAdapter(Context context, ArrayList<Hotel> hotels, boolean isTripView, String tripId, boolean disableEdits) {
         super(context, 0, hotels);
 
         this.isTripView = isTripView;
         this.tripId = tripId;
+        this.disableEdits = disableEdits;
     }
 
     @NonNull
@@ -61,7 +63,7 @@ public class HotelsListAdapter extends ArrayAdapter<Hotel> {
         hotelNameTextView.setText(hotel.getName());
 
         TextView hotelPriceTextView = view.findViewById(R.id.hotel_price);
-        String price = Auth.getUser().getCurrencyString() + " " + hotel.getPrice() + " / night";
+        String price = Auth.getUser().getCurrencyString() + " " + hotel.getPrice();
         hotelPriceTextView.setText(price);
 
         TextView hotelDatesTextView = view.findViewById(R.id.hotel_dates);
@@ -70,6 +72,13 @@ public class HotelsListAdapter extends ArrayAdapter<Hotel> {
         hotelDatesTextView.setText(checkInDate + " - " + checkOutDate);
 
         LinearLayout delete = view.findViewById(R.id.delete_hotel);
+
+        if (disableEdits) {
+            delete.setVisibility(View.GONE);
+        } else {
+            delete.setVisibility(View.VISIBLE);
+        }
+
 
         delete.setOnClickListener((v) -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
