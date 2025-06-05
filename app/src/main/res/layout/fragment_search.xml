@@ -44,32 +44,6 @@
             />
 
 
-        <ImageButton
-            android:id="@+id/global_search"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:paddingHorizontal="10dp"
-            android:layout_marginRight="10dp"
-            android:src="@drawable/network_icon"
-            android:background="@drawable/radius_transparent"
-            android:fontFamily="@font/bold"
-            android:textSize="13sp"
-            android:tooltipText="Search public trips"
-            android:textColor="@color/hint" />
-
-
-        <ImageButton
-            android:id="@+id/private_search"
-            android:layout_width="wrap_content"
-            android:layout_height="40dp"
-            android:paddingHorizontal="10dp"
-            android:textAllCaps="false"
-            android:src="@drawable/user_icon"
-            android:background="@drawable/radius_transparent"
-            android:fontFamily="@font/bold"
-            android:textSize="13sp"
-            android:tooltipText="Search private trips"
-            android:textColor="@color/hint" />
     </LinearLayout>
 
     <LinearLayout
