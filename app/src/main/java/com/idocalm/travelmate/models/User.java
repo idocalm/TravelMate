@@ -231,13 +231,7 @@ public class User {
     public void setProfile(String imageUrl) {
         this.imageUrl = imageUrl;
         FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("users").document(id).update("profile", imageUrl)
-                .addOnSuccessListener(aVoid -> {
-                    Toast.makeText(null, "Profile image updated", Toast.LENGTH_SHORT).show();
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(null, "Failed to update profile image", Toast.LENGTH_SHORT).show();
-                });
+        db.collection("users").document(id).update("profile", imageUrl);
     }
 
     /**

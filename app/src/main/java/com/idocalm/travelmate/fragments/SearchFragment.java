@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.cards.SearchTripCard;
@@ -41,10 +42,13 @@ public class SearchFragment extends Fragment {
 
 
 private void updateSearchResults() {
+
+        Log.d("SearchFragment", "Updating search results with " + searchResult.size() + " trips");
     searchResults.removeAllViews();
     searchResults.invalidate();
 
     for (Trip trip : searchResult) {
+        Log.d("SearchFragment", "Adding trip: " + trip.getName() + " to search results");
         FragmentTransaction ft = getChildFragmentManager().beginTransaction();
         ft.add(R.id.search_results, new SearchTripCard(trip));
         ft.commit();
@@ -69,44 +73,57 @@ public View onCreateView(LayoutInflater inflater, ViewGroup container,
     searchInput.setOnEditorActionListener((v, actionId, event) -> {
         if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE) {
             String query = searchInput.getText().toString();
-            // search the trips based on the query and the search type
-            db.collection("trips").whereEqualTo("name",  query)
-                    .get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    searchResult.clear();
+            // Search trips collection to find trips where the destination or name matches the query
+            if (query.isEmpty()) {
+                Toast.makeText(getContext(), "Please enter a search query", Toast.LENGTH_SHORT).show();
+                return false;
+            }
 
-                    if (task.getResult().size() == 0) {
-                        searchTitle.setText("No results found");
-                    } else {
-                        searchTitle.setText("Found " + task.getResult().size() + " results");
-                    }
 
-                    Toast.makeText(getContext(), "found " + task.getResult().size() + " results", Toast.LENGTH_SHORT).show();
-                    for (int i = 0; i < task.getResult().size(); i++) {
-                        Trip.fromDB(task.getResult().getDocuments().get(i), new Trip.TripCallback() {
-                            @Override
-                            public void onTripLoaded(Trip trip) {
-                                searchResult.add(trip);
-                                Log.d("SearchFragment", "Trip loaded: " + trip.getName());
+            db.collection("trips").get().addOnSuccessListener(querySnapshot -> {
+                searchResult.clear();
+                List<DocumentSnapshot> documents = querySnapshot.getDocuments();
 
-                                if (searchResult.size() == task.getResult().size()) {
-                                    updateSearchResults();
-                                }
-
-                            }
-
-                            @Override
-                            public void onError(Exception e) {
-                                Log.e("SearchFragment", "Error loading trip: " + e.getMessage());
-                            }
-                        });
-
-                    }
-
+                if (documents.isEmpty()) {
+                    searchTitle.setText("No results found");
+                    searchResults.setVisibility(View.GONE);
+                    return;
                 } else {
-                    Toast.makeText(getContext(), "Search failed", Toast.LENGTH_SHORT).show();
+                    searchResults.setVisibility(View.VISIBLE);
                 }
+
+                ArrayList<Trip> trips = new ArrayList<>();
+
+                for (DocumentSnapshot document : documents) {
+                    Trip.fromDB(document, new Trip.TripCallback() {
+                        @Override
+                        public void onTripLoaded(Trip trip) {
+                            if (trip.getName().toLowerCase().contains(query.toLowerCase()) ||
+                                    trip.getDestination().toLowerCase().contains(query.toLowerCase())) {
+                                searchResult.add(trip);
+                            }
+
+                            trips.add(trip);
+
+                            if (trips.size() == documents.size()) {
+                                updateSearchResults();
+                                searchTitle.setText("Found " + searchResult.size() + " results");
+                            }
+                        }
+
+                        @Override
+                        public void onError(Exception e) {
+                            Log.e("SearchFragment", "Error loading trip: " + e.getMessage());
+                        }
+                    });
+                }
+            }).addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Search failed", Toast.LENGTH_SHORT).show();
             });
+
+
+
+
         }
         return false;
     });
