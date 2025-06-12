@@ -22,6 +22,7 @@ import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.models.Flight;
 import com.idocalm.travelmate.models.Hotel;
+import com.idocalm.travelmate.models.Trip;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,15 +207,33 @@ public class FlightsListAdapter extends ArrayAdapter<Flight> {
                                         }
                                     }
 
-                                    HashMap<String, Object> flightMap = Flight.toHashMap(flight)
-                                            ;
-                                    db.collection("trips").document(selectedTripId).collection("flights").add(flightMap)
-                                            .addOnSuccessListener(documentReference -> {
-                                                Toast.makeText(getContext(), "Flight added to trip", Toast.LENGTH_SHORT).show();
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                Toast.makeText(getContext(), "Error adding flight to trip", Toast.LENGTH_SHORT).show();
-                                            });
+                                    String finalSelectedTripId = selectedTripId;
+                                    Auth.getUser().getTrip(selectedTripId, new Trip.TripCallback() {
+                                        @Override
+                                        public void onTripLoaded(Trip trip) {
+                                            if (trip.getOwner() != null && !trip.getOwner().equals(Auth.getUser().getId())) {
+                                                Toast.makeText(getContext(), "You can only add flights to your own trips", Toast.LENGTH_SHORT).show();
+                                                return;
+                                            }
+
+                                            HashMap<String, Object> flightMap = Flight.toHashMap(flight)
+                                                    ;
+                                            db.collection("trips").document(finalSelectedTripId).collection("flights").add(flightMap)
+                                                    .addOnSuccessListener(documentReference -> {
+                                                        Toast.makeText(getContext(), "Flight added to trip", Toast.LENGTH_SHORT).show();
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Toast.makeText(getContext(), "Error adding flight to trip", Toast.LENGTH_SHORT).show();
+                                                    });
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+
+                                        }
+                                    });
+
+
                                 });
 
                                 builder.setNegativeButton("Cancel", (dialog, which) -> {

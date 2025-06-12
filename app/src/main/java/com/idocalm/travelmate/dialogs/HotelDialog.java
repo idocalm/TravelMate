@@ -18,6 +18,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.auth.Auth;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.models.Hotel;
+import com.idocalm.travelmate.models.Trip;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,6 +67,7 @@ public class HotelDialog extends Dialog {
 
         addButton.setOnClickListener((v) -> {
             ArrayList<String> tripIds = Auth.getUser().getTripIds();
+
             if (tripIds.isEmpty()) {
                 Toast.makeText(getContext(), "You need to create a trip first", Toast.LENGTH_SHORT).show();
             } else {
@@ -102,17 +104,34 @@ public class HotelDialog extends Dialog {
                                         }
                                     }
 
-                                    Log.d("Adding hotel", "Trip ID: " + selectedTripId);
-                                    HashMap<String, Object> hotelMap = Hotel.toHashMap(hotel);
-                                    ;
-                                    db.collection("trips").document(selectedTripId).collection("hotels").add(hotelMap)
-                                            .addOnSuccessListener(documentReference -> {
-                                                Toast.makeText(getContext(), "Hotel added to trip", Toast.LENGTH_SHORT).show();
-                                                dismiss();
-                                            })
-                                            .addOnFailureListener(e -> {
-                                                Toast.makeText(getContext(), "Error adding hotel to trip", Toast.LENGTH_SHORT).show();
-                                            });
+                                    String finalSelectedTripId = selectedTripId;
+                                    Auth.getUser().getTrip(selectedTripId, new Trip.TripCallback() {
+                                        @Override
+                                        public void onTripLoaded(Trip t) {
+                                            if (t.getOwner() != null && !t.getOwner().equals(Auth.getUser().getId())) {
+                                                Toast.makeText(getContext(), "You can only add hotels to your own trips", Toast.LENGTH_SHORT).show();
+                                            } else {
+                                                Log.d("Adding hotel", "Trip ID: " + finalSelectedTripId);
+                                                HashMap<String, Object> hotelMap = Hotel.toHashMap(hotel);
+                                                ;
+                                                db.collection("trips").document(finalSelectedTripId).collection("hotels").add(hotelMap)
+                                                        .addOnSuccessListener(documentReference -> {
+                                                            Toast.makeText(getContext(), "Hotel added to trip", Toast.LENGTH_SHORT).show();
+                                                            dismiss();
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            Toast.makeText(getContext(), "Error adding hotel to trip", Toast.LENGTH_SHORT).show();
+                                                        });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onError(Exception e) {
+
+                                        }
+                                    });
+
+
                                 });
 
                                 builder.setNegativeButton("Cancel", (dialog, which) -> {
