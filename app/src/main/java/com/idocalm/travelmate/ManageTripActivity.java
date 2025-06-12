@@ -133,6 +133,26 @@ public class ManageTripActivity extends AppCompatActivity {
 
             // Prepare data
             ArrayList<String> friendsId = Auth.getUser().getFriendsIds();
+
+            // make sure the friendsId list doesn't have people who are already members of the trip
+            Auth.getUser().getTrip(id, new Trip.TripCallback() {
+                @Override
+                public void onTripLoaded(Trip t) {
+                    if (t.getMembers() != null) {
+                        for (String memberId : t.getMembers()) {
+                            if (friendsId.contains(memberId)) {
+                                friendsId.remove(memberId);
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    Log.e("ManageTripActivity", "Error loading trip members: " + e.getMessage());
+                }
+            });
+
             ArrayList<String> friendNames = new ArrayList<>();
 
             if (friendsId.size() == 0) {
@@ -221,7 +241,7 @@ public class ManageTripActivity extends AppCompatActivity {
         });
 
         RecyclerView tripMembers = findViewById(R.id.trip_members);
-        membersAdapter = new TripMembersAdapter(this);
+        membersAdapter = new TripMembersAdapter(this, id, !isMember && !isPeak);
         tripMembers.setAdapter(membersAdapter);
 
         Auth.getUser().getTrip(id, new Trip.TripCallback() {

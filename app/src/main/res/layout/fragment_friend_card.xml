@@ -25,14 +25,6 @@
             android:text="Name"
             android:textColor="@color/white" />
 
-        <TextView
-            android:id="@+id/profile_email"
-            android:layout_width="match_parent"
-            android:layout_marginTop="10dp"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/bold"
-            android:text="Email"
-            android:textColor="@color/white" />
 
     </LinearLayout>
 

@@ -1,4 +1,4 @@
-package com.idocalm.travelmate.components.friends;
+package com.idocalm.travelmate.adapters;
 
 
 import android.app.AlertDialog;
@@ -74,12 +74,10 @@ public class FriendsListAdapter extends PagerAdapter {
         User friend = friendsListData.get(position);
 
         TextView friendName = view.findViewById(R.id.profile_name);
-        TextView friendEmail = view.findViewById(R.id.profile_email);
         ImageView friendImage = view.findViewById(R.id.friend_profile_img);
 
 
         friendName.setText(friend.getName());
-        friendEmail.setText(friend.getEmail());
         Glide.with(context).load(friend.getProfileImage()).into(friendImage);
 
         container.addView(view);

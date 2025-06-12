@@ -21,7 +21,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.idocalm.travelmate.R;
 import com.idocalm.travelmate.auth.Auth;
-import com.idocalm.travelmate.components.friends.FriendsListAdapter;
+import com.idocalm.travelmate.adapters.FriendsListAdapter;
 import com.idocalm.travelmate.enums.CurrencyType;
 import com.idocalm.travelmate.models.User;
 
@@ -51,7 +51,6 @@ public class ProfileAccountFragment extends Fragment {
         ArrayList<User> friendsListData = new ArrayList<>();
 
         int totalFriends = friends.size();
-
 
         AtomicInteger completedCount = new AtomicInteger(0);
 
@@ -191,6 +190,10 @@ public class ProfileAccountFragment extends Fragment {
     }
 
     private void handleImageUrl(String imageUrl) {
+        Glide.with(getContext())
+                .load(imageUrl)
+                .placeholder(R.drawable.profile_placeholder)
+                .into(profileImage);
         Auth.getUser().setProfile(imageUrl);
     }
 }

@@ -58,7 +58,7 @@ public class ProfileContentFragment extends Fragment {
     private void shareInviteLink(String link, Context context) {
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, "Join me on tarvelmate! Enter my code: " + link);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, "Join me on travelmate! Enter my code: " + link);
         sendIntent.setType("text/plain");
         context.startActivity(Intent.createChooser(sendIntent, "Invite a friend"));
     }

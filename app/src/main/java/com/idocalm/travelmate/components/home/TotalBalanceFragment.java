@@ -302,10 +302,19 @@ public class TotalBalanceFragment extends Fragment {
 
         Log.d("TotalBalanceFragment", "Updating UI with totals: " + totals);
 
+        Log.d("TOTAL", "total hotels: " + totalHotels.getText().toString());
+        Log.d("TOTAL", "total activities: " + totalActivities.getText().toString());
+        Log.d("TOTAL", "total flights: " + totalFlights.getText().toString());
+
         // remove the first character ($ won't always be there, it might be a different currency symbol)
-        Double currentFlights = Double.parseDouble(totalFlights.getText().toString().substring(1));
-        Double currentActivities = Double.parseDouble(totalActivities.getText().toString().substring(1));
-        Double currentHotels = Double.parseDouble(totalHotels.getText().toString().substring(1));
+        String flightsString = totalFlights.getText().toString().substring(1).replace(",", "");
+        Double currentFlights = Double.parseDouble(flightsString);
+
+        String activitiesString = totalActivities.getText().toString().substring(1).replace(",", "");
+        Double currentActivities = Double.parseDouble(activitiesString);
+
+        String hotelsString = totalHotels.getText().toString().substring(1).replace(",", "");
+        Double currentHotels = Double.parseDouble(hotelsString);
 
         String currency = Auth.getUser().getCurrencySymbol();
 

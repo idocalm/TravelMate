@@ -424,4 +424,15 @@ public class Trip {
         }
     }
 
+    public void removeMember(String memberId) {
+        if (members.contains(memberId)) {
+            members.remove(memberId);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("trips").document(this.id).update("members", members)
+                .addOnFailureListener(e -> {
+                    Log.e("Trip", "Error removing member: " + e.getMessage());
+                });
+        }
+    }
+
 }
